@@ -1,0 +1,8 @@
+[package]
+name = "dofus-protocol"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dofus-io = { workspace = true }
+anyhow = { workspace = true }

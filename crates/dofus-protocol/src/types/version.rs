@@ -1,0 +1,37 @@
+use dofus_io::{BigEndianReader, BigEndianWriter, DofusDeserialize, DofusSerialize, DofusType};
+
+/// Protocol type ID: 6752
+#[derive(Debug, Clone, Default)]
+pub struct Version {
+    pub major: u8,
+    pub minor: u8,
+    pub code: u8,
+    pub build: i32,
+    pub build_type: u8,
+}
+
+impl DofusSerialize for Version {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.major);
+        writer.write_byte(self.minor);
+        writer.write_byte(self.code);
+        writer.write_int(self.build);
+        writer.write_byte(self.build_type);
+    }
+}
+
+impl DofusDeserialize for Version {
+    fn deserialize(reader: &mut BigEndianReader) -> anyhow::Result<Self> {
+        Ok(Self {
+            major: reader.read_byte()?,
+            minor: reader.read_byte()?,
+            code: reader.read_byte()?,
+            build: reader.read_int()?,
+            build_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusType for Version {
+    const TYPE_ID: u16 = 6752;
+}
