@@ -72,7 +72,7 @@ impl D2OReader {
         let mut magic = [0u8; 3];
         cursor.read_exact(&mut magic)?;
 
-        let content_offset;
+        let mut content_offset;
         if &magic == b"AKS" {
             // Signed file — skip signature
             let mut f = [0u8; 1];
@@ -93,11 +93,12 @@ impl D2OReader {
             bail!("Invalid D2O file: bad magic {:?}", magic);
         }
 
-        // Read indexes pointer (relative to content_offset)
         let indexes_pointer = cursor.read_i32::<BigEndian>()? as u64;
+        // Object offsets in index are absolute from start of byte stream
+        // (no offset needed for non-signed files)
 
-        // Seek to index table
-        cursor.seek(SeekFrom::Start(content_offset + indexes_pointer))?;
+        // indexes_pointer is ABSOLUTE in the byte stream
+        cursor.seek(SeekFrom::Start(indexes_pointer))?;
 
         // Read index entries
         let indexes_length = cursor.read_i32::<BigEndian>()?;
