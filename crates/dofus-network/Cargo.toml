@@ -1,0 +1,14 @@
+[package]
+name = "dofus-network"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dofus-io = { workspace = true }
+dofus-protocol = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+bytes = { workspace = true }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+futures-util = "0.3"

@@ -1,0 +1,17 @@
+[package]
+name = "dofus-world"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dofus-io = { workspace = true }
+dofus-protocol = { workspace = true }
+dofus-common = { workspace = true }
+dofus-database = { workspace = true }
+dofus-network = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+sqlx = { workspace = true }

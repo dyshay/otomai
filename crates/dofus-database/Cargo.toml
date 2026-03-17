@@ -1,0 +1,11 @@
+[package]
+name = "dofus-database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dofus-common = { workspace = true }
+sqlx = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+chrono = { workspace = true }
