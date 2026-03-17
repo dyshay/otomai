@@ -1,0 +1,43 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/dofus-io",
+    "crates/dofus-protocol",
+    "crates/dofus-common",
+    "crates/dofus-database",
+    "crates/dofus-network",
+    "crates/dofus-auth",
+    "crates/dofus-world",
+    "tools/generator-rsa",
+    "tools/protocol-gen",
+]
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["full"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+bytes = "1"
+byteorder = "1"
+clap = { version = "4", features = ["derive"] }
+sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite"] }
+rsa = { version = "0.9", features = ["hazmat"] }
+rand = "0.8"
+base64 = "0.22"
+md5 = "0.7"
+pkcs8 = { version = "0.10", features = ["pem", "alloc"] }
+pkcs1 = { version = "0.7", features = ["pem", "alloc"] }
+sha2 = "0.10"
+uuid = { version = "1", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Internal crates
+dofus-io = { path = "crates/dofus-io" }
+dofus-protocol = { path = "crates/dofus-protocol" }
+dofus-common = { path = "crates/dofus-common" }
+dofus-database = { path = "crates/dofus-database" }
+dofus-network = { path = "crates/dofus-network" }
