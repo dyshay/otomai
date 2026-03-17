@@ -1,0 +1,5 @@
+host = "0.0.0.0"
+port = 5555
+database_url = "sqlite:data/dofus.db?mode=rwc"
+rsa_private_key_path = "keys/private.pem"
+protocol_version = "2.69"

@@ -1,0 +1,15 @@
+[package]
+name = "generator-rsa"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dofus-io = { workspace = true }
+clap = { workspace = true }
+rsa = { workspace = true }
+rand = { workspace = true }
+base64 = { workspace = true }
+md5 = { workspace = true }
+anyhow = { workspace = true }
+pkcs8 = { workspace = true }
+pkcs1 = { workspace = true }
