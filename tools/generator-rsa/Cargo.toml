@@ -13,3 +13,4 @@ md5 = { workspace = true }
 anyhow = { workspace = true }
 pkcs8 = { workspace = true }
 pkcs1 = { workspace = true }
+flate2 = "1"

@@ -694,6 +694,7 @@ dependencies = [
  "base64",
  "clap",
  "dofus-io",
+ "flate2",
  "md5",
  "pkcs1",
  "pkcs8",
