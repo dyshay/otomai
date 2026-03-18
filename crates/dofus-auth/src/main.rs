@@ -1,4 +1,7 @@
+mod crypto;
 mod handler;
+mod identification;
+mod server_selection;
 
 use clap::Parser;
 use dofus_common::config::AuthConfig;
