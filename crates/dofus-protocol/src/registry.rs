@@ -70,6 +70,85 @@ impl ProtocolMessage {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use dofus_io::{BigEndianWriter, DofusSerialize};
+
+    fn serialize_msg<M: DofusSerialize>(msg: &M) -> Vec<u8> {
+        let mut w = BigEndianWriter::new();
+        msg.serialize(&mut w);
+        w.into_data()
+    }
+
+    #[test]
+    fn registry_parse_hello_connect() {
+        let msg = auth::HelloConnectMessage {
+            salt: "test-salt".to_string(),
+            key: vec![1, 2, 3],
+        };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(auth::HelloConnectMessage::MESSAGE_ID, payload).unwrap();
+        match parsed {
+            ProtocolMessage::HelloConnectMessage(m) => {
+                assert_eq!(m.salt, "test-salt");
+                assert_eq!(m.key, vec![1, 2, 3]);
+            }
+            _ => panic!("Wrong variant"),
+        }
+    }
+
+    #[test]
+    fn registry_parse_identification_failed() {
+        let msg = auth::IdentificationFailedMessage { reason: 2 };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(auth::IdentificationFailedMessage::MESSAGE_ID, payload).unwrap();
+        match parsed {
+            ProtocolMessage::IdentificationFailedMessage(m) => assert_eq!(m.reason, 2),
+            _ => panic!("Wrong variant"),
+        }
+    }
+
+    #[test]
+    fn registry_parse_server_selection() {
+        let msg = auth::ServerSelectionMessage { server_id: 7 };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(auth::ServerSelectionMessage::MESSAGE_ID, payload).unwrap();
+        match parsed {
+            ProtocolMessage::ServerSelectionMessage(m) => assert_eq!(m.server_id, 7),
+            _ => panic!("Wrong variant"),
+        }
+    }
+
+    #[test]
+    fn registry_unknown_message() {
+        let parsed = ProtocolMessage::from_raw(65535, vec![1, 2, 3]).unwrap();
+        match parsed {
+            ProtocolMessage::Unknown(id, data) => {
+                assert_eq!(id, 65535);
+                assert_eq!(data, vec![1, 2, 3]);
+            }
+            _ => panic!("Should be Unknown"),
+        }
+    }
+
+    #[test]
+    fn registry_message_id_matches() {
+        let msg = auth::IdentificationFailedMessage { reason: 5 };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(auth::IdentificationFailedMessage::MESSAGE_ID, payload).unwrap();
+        assert_eq!(parsed.message_id(), auth::IdentificationFailedMessage::MESSAGE_ID);
+    }
+
+    #[test]
+    fn registry_display_unknown() {
+        let msg = ProtocolMessage::Unknown(9999, vec![0; 10]);
+        let s = format!("{}", msg);
+        assert!(s.contains("9999"));
+        assert!(s.contains("10"));
+    }
+}
+
 impl fmt::Display for ProtocolMessage {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

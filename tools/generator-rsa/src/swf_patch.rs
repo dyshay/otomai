@@ -185,3 +185,164 @@ fn write_binary_data_tag(output: &mut Vec<u8>, character_id_bytes: &[u8], new_da
 fn contains_pattern(data: &[u8], pattern: &[u8]) -> bool {
     data.windows(pattern.len()).any(|w| w == pattern)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn contains_pattern_found() {
+        assert!(contains_pattern(b"hello DofusPublicKey world", b"DofusPublicKey"));
+    }
+
+    #[test]
+    fn contains_pattern_not_found() {
+        assert!(!contains_pattern(b"hello world", b"DofusPublicKey"));
+    }
+
+    #[test]
+    fn contains_pattern_at_start() {
+        assert!(contains_pattern(b"DofusPublicKey_rest", b"DofusPublicKey"));
+    }
+
+    #[test]
+    fn contains_pattern_exact() {
+        assert!(contains_pattern(b"abc", b"abc"));
+    }
+
+    #[test]
+    fn write_binary_data_tag_format() {
+        let mut output = Vec::new();
+        let char_id = [0x01, 0x00]; // character_id = 1 (LE)
+        let data = b"test data";
+
+        write_binary_data_tag(&mut output, &char_id, data);
+
+        // Tag header: (87 << 6) | 0x3F = 0x15FF (LE)
+        assert_eq!(output[0], 0xFF);
+        assert_eq!(output[1], 0x15);
+
+        // Tag data length (LE u32): 2 (char_id) + 4 (reserved) + 9 (data) = 15
+        let tag_len = u32::from_le_bytes([output[2], output[3], output[4], output[5]]);
+        assert_eq!(tag_len, 15);
+
+        // Character ID preserved
+        assert_eq!(&output[6..8], &char_id);
+
+        // Reserved = 0
+        assert_eq!(&output[8..12], &[0, 0, 0, 0]);
+
+        // Data
+        assert_eq!(&output[12..], b"test data");
+    }
+
+    #[test]
+    fn patch_swf_uncompressed() {
+        // Build a minimal FWS (uncompressed) SWF with two DefineBinaryData tags
+        let mut swf = Vec::new();
+
+        // SWF header
+        swf.extend_from_slice(b"FWS"); // signature
+        swf.push(10); // version
+        swf.extend_from_slice(&0u32.to_le_bytes()); // placeholder file_length
+
+        // RECT: 5 bits for Nbits=0, so 1 byte total (5 bits + padding)
+        swf.push(0x00); // Nbits=0, all zeros
+
+        // Frame rate + frame count
+        swf.extend_from_slice(&[0, 24]); // frame rate
+        swf.extend_from_slice(&[1, 0]);  // frame count
+
+        // DefineBinaryData tag #1: contains "DofusPublicKey"
+        let sig_data = b"DofusPublicKey\x00old_n\x00old_e";
+        let tag1_data_len = 2 + 4 + sig_data.len();
+        let tag1_header = (TAG_DEFINE_BINARY_DATA << 6) | 0x3F;
+        swf.extend_from_slice(&tag1_header.to_le_bytes());
+        swf.extend_from_slice(&(tag1_data_len as u32).to_le_bytes());
+        swf.extend_from_slice(&[0x01, 0x00]); // char_id
+        swf.extend_from_slice(&[0, 0, 0, 0]); // reserved
+        swf.extend_from_slice(sig_data);
+
+        // DefineBinaryData tag #2: contains PEM key
+        let pem_data = b"-----BEGIN PUBLIC KEY-----\nOLD_KEY\n-----END PUBLIC KEY-----";
+        let tag2_data_len = 2 + 4 + pem_data.len();
+        let tag2_header = (TAG_DEFINE_BINARY_DATA << 6) | 0x3F;
+        swf.extend_from_slice(&tag2_header.to_le_bytes());
+        swf.extend_from_slice(&(tag2_data_len as u32).to_le_bytes());
+        swf.extend_from_slice(&[0x02, 0x00]); // char_id
+        swf.extend_from_slice(&[0, 0, 0, 0]); // reserved
+        swf.extend_from_slice(pem_data);
+
+        // End tag
+        swf.extend_from_slice(&[0, 0]);
+
+        // Fix file_length
+        let total = swf.len() as u32;
+        swf[4..8].copy_from_slice(&total.to_le_bytes());
+
+        // Patch
+        let new_sig = b"DofusPublicKey\x00new_n_hex\x00new_e_hex";
+        let new_pem = b"-----BEGIN PUBLIC KEY-----\nNEW_KEY_DATA\n-----END PUBLIC KEY-----";
+
+        let patched = patch_swf(&swf, new_sig, new_pem).unwrap();
+
+        // Verify it's still valid FWS
+        assert_eq!(&patched[0..3], b"FWS");
+
+        // Verify the new data is present
+        assert!(contains_pattern(&patched, b"new_n_hex"));
+        assert!(contains_pattern(&patched, b"NEW_KEY_DATA"));
+
+        // Verify old data is gone
+        assert!(!contains_pattern(&patched, b"old_n"));
+        assert!(!contains_pattern(&patched, b"OLD_KEY"));
+    }
+
+    #[test]
+    fn patch_swf_compressed_roundtrip() {
+        // Build a minimal CWS (zlib compressed) SWF
+        let mut raw_body = Vec::new();
+
+        // RECT + frame info
+        raw_body.push(0x00); // Nbits=0
+        raw_body.extend_from_slice(&[0, 24, 1, 0]); // frame rate + count
+
+        // A DefineBinaryData with "DofusPublicKey"
+        let sig_data = b"header DofusPublicKey footer";
+        let tag_data_len = 2 + 4 + sig_data.len();
+        let tag_header = (TAG_DEFINE_BINARY_DATA << 6) | 0x3F;
+        raw_body.extend_from_slice(&tag_header.to_le_bytes());
+        raw_body.extend_from_slice(&(tag_data_len as u32).to_le_bytes());
+        raw_body.extend_from_slice(&[0x01, 0x00]);
+        raw_body.extend_from_slice(&[0, 0, 0, 0]);
+        raw_body.extend_from_slice(sig_data);
+
+        // End tag
+        raw_body.extend_from_slice(&[0, 0]);
+
+        // Compress
+        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&raw_body).unwrap();
+        let compressed = encoder.finish().unwrap();
+
+        let uncompressed_len = (8 + raw_body.len()) as u32;
+        let mut swf = Vec::new();
+        swf.extend_from_slice(b"CWS");
+        swf.push(10);
+        swf.extend_from_slice(&uncompressed_len.to_le_bytes());
+        swf.extend_from_slice(&compressed);
+
+        let new_sig = b"replaced DofusPublicKey content";
+        let patched = patch_swf(&swf, new_sig, b"no pem here").unwrap();
+
+        // Should still be CWS
+        assert_eq!(&patched[0..3], b"CWS");
+
+        // Decompress and verify
+        let mut decoder = ZlibDecoder::new(&patched[8..]);
+        let mut decompressed = Vec::new();
+        decoder.read_to_end(&mut decompressed).unwrap();
+
+        assert!(contains_pattern(&decompressed, b"replaced DofusPublicKey content"));
+    }
+}
