@@ -7,7 +7,6 @@ use dofus_protocol::messages::auth::*;
 use dofus_protocol::registry::ProtocolMessage;
 use dofus_protocol::types::GameServerInformations;
 use dofus_network::session::Session;
-use rsa::traits::PublicKeyParts;
 use rsa::BigUint;
 use sha2::{Digest, Sha256};
 use std::net::IpAddr;
@@ -50,14 +49,16 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
         current_version: proto_version,
     }).await?;
 
-    // Step 2: Send HelloConnectMessage (RSA public key + salt)
-    let public_key = state.rsa_private_key.to_public_key();
-    let n_bytes = public_key.n().to_bytes_be();
+    // Step 2: Send HelloConnectMessage (signed session public key + salt)
+    // Two-level key architecture (matching hetwanmod reference):
+    // - Signature key (permanent) signed the session public key DER at startup
+    // - Session key (generated once at startup) encrypts/decrypts credentials
+    // HelloConnectMessage.key = raw PKCS1v15-signed DER (no AKSF wrapper)
     let salt = uuid::Uuid::new_v4().to_string();
 
     session.send(&HelloConnectMessage {
         salt: salt.clone(),
-        key: n_bytes,
+        key: state.signed_session_key.clone(),
     }).await?;
 
     // Step 3: Wait for IdentificationMessage
@@ -87,8 +88,9 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
     // Step 4: Decrypt RSA credentials
     // Format (AS3 cipherRsa): salt(32 padded) + AES_key(32) + [cert_id(4)+cert_hash if cert]
     //                        + username_len(1) + username + password
+    // Decrypt credentials with the session private key (textbook RSA)
     let (username, password) = match decrypt_credentials(
-        &state.rsa_private_key,
+        &state.session_private_key,
         &salt,
         &msg.credentials,
         msg.use_certificate,

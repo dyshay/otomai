@@ -37,7 +37,12 @@ struct Cli {
 pub struct AuthState {
     pub config: AuthConfig,
     pub pool: sqlx::PgPool,
+    /// Permanent signature key — signs the session public key
     pub rsa_private_key: rsa::RsaPrivateKey,
+    /// Ephemeral session private key — decrypts client credentials
+    pub session_private_key: rsa::RsaPrivateKey,
+    /// Session public key DER, signed with the signature key (PKCS1v15)
+    pub signed_session_key: Vec<u8>,
     pub auto_create_accounts: bool,
 
     // Connection queue (semaphore-based)
@@ -203,7 +208,23 @@ async fn main() -> anyhow::Result<()> {
             rsa::RsaPrivateKey::from_pkcs8_pem(&pem)
         })?
     };
-    tracing::info!("RSA private key loaded");
+    tracing::info!("RSA signature key loaded");
+
+    // Generate ephemeral session keypair (like hetwanmod: generated once at startup)
+    let session_private_key = rsa::RsaPrivateKey::new(&mut rand::rngs::OsRng, 1024)?;
+    let session_public_key = session_private_key.to_public_key();
+    let session_der = {
+        use pkcs8::EncodePublicKey;
+        session_public_key
+            .to_public_key_der()
+            .map_err(|e| anyhow::anyhow!("Failed to encode session public key DER: {}", e))?
+    };
+    // Sign session DER with permanent signature key (PKCS1v15, no AKSF)
+    let signed_session_key = {
+        use rsa::pkcs1v15::Pkcs1v15Sign;
+        private_key.sign(Pkcs1v15Sign::new_unprefixed(), session_der.as_bytes())?
+    };
+    tracing::info!("Session keypair generated and signed ({} bytes)", signed_session_key.len());
 
     // Setup database
     let pool = dofus_database::create_pool(&config.database_url).await?;
@@ -217,6 +238,8 @@ async fn main() -> anyhow::Result<()> {
         config: config.clone(),
         pool,
         rsa_private_key: private_key,
+        session_private_key,
+        signed_session_key,
         auto_create_accounts: cli.auto_create,
         connection_semaphore: Semaphore::new(cli.max_connections),
         maintenance: AtomicBool::new(cli.maintenance),
