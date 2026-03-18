@@ -70,7 +70,8 @@ impl Encoder<RawMessage> for DofusCodec {
 
     fn encode(&mut self, item: RawMessage, dst: &mut BytesMut) -> Result<(), Self::Error> {
         let mut writer = BigEndianWriter::new();
-        network::write_header(&mut writer, item.message_id, item.instance_id, item.payload.len());
+        // Server→Client: no instance_id in header (client's lowReceive doesn't read it)
+        network::write_server_header(&mut writer, item.message_id, item.payload.len());
         writer.write_bytes(&item.payload);
         dst.extend_from_slice(writer.data());
         Ok(())
@@ -91,21 +92,39 @@ pub fn encode_message<M: DofusMessage>(msg: &M, instance_id: u32) -> RawMessage 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use dofus_io::BigEndianWriter;
     use tokio_util::codec::{Decoder, Encoder};
 
+    /// Build a client→server frame (WITH instance_id) for decode testing.
+    fn build_client_frame(message_id: u16, instance_id: u32, payload: &[u8]) -> Vec<u8> {
+        let mut writer = BigEndianWriter::new();
+        network::write_header(&mut writer, message_id, instance_id, payload.len());
+        writer.write_bytes(payload);
+        writer.into_data()
+    }
+
     #[test]
-    fn codec_encode_decode_roundtrip() {
+    fn encode_server_message_no_instance_id() {
         let msg = RawMessage {
             message_id: 42,
-            instance_id: 1,
+            instance_id: 0,
             payload: vec![0xDE, 0xAD, 0xBE, 0xEF],
         };
 
         let mut codec = DofusCodec::new();
         let mut buf = BytesMut::new();
+        codec.encode(msg, &mut buf).unwrap();
 
-        codec.encode(msg.clone(), &mut buf).unwrap();
-        assert!(!buf.is_empty());
+        // Server→Client: header_short(2) + payload_len(1) + payload(4) = 7 bytes
+        // NO instance_id
+        assert_eq!(buf.len(), 7);
+    }
+
+    #[test]
+    fn decode_client_message_with_instance_id() {
+        let frame = build_client_frame(42, 1, &[0xDE, 0xAD, 0xBE, 0xEF]);
+        let mut codec = DofusCodec::new();
+        let mut buf = BytesMut::from(&frame[..]);
 
         let decoded = codec.decode(&mut buf).unwrap().unwrap();
         assert_eq!(decoded.message_id, 42);
@@ -114,16 +133,10 @@ mod tests {
     }
 
     #[test]
-    fn codec_decode_empty_payload() {
-        let msg = RawMessage {
-            message_id: 1,
-            instance_id: 0,
-            payload: vec![],
-        };
-
+    fn decode_client_empty_payload() {
+        let frame = build_client_frame(1, 0, &[]);
         let mut codec = DofusCodec::new();
-        let mut buf = BytesMut::new();
-        codec.encode(msg, &mut buf).unwrap();
+        let mut buf = BytesMut::from(&frame[..]);
 
         let decoded = codec.decode(&mut buf).unwrap().unwrap();
         assert_eq!(decoded.message_id, 1);
@@ -131,69 +144,48 @@ mod tests {
     }
 
     #[test]
-    fn codec_decode_incomplete_returns_none() {
+    fn decode_incomplete_returns_none() {
         let mut codec = DofusCodec::new();
-        let mut buf = BytesMut::from(&[0u8; 2][..]); // too small for a full frame
+        let mut buf = BytesMut::from(&[0u8; 2][..]); // too small
         assert!(codec.decode(&mut buf).unwrap().is_none());
     }
 
     #[test]
-    fn codec_decode_partial_payload_returns_none() {
-        let msg = RawMessage {
-            message_id: 100,
-            instance_id: 1,
-            payload: vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        };
+    fn decode_partial_payload_returns_none() {
+        let frame = build_client_frame(100, 1, &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        let half = frame.len() / 2;
 
         let mut codec = DofusCodec::new();
-        let mut full_buf = BytesMut::new();
-        codec.encode(msg, &mut full_buf).unwrap();
-
-        // Give only half the frame
-        let half = full_buf.len() / 2;
-        let mut partial = BytesMut::from(&full_buf[..half]);
+        let mut partial = BytesMut::from(&frame[..half]);
         assert!(codec.decode(&mut partial).unwrap().is_none());
 
-        // Now give the full frame
-        let mut complete = full_buf;
+        let mut complete = BytesMut::from(&frame[..]);
         let decoded = codec.decode(&mut complete).unwrap().unwrap();
         assert_eq!(decoded.payload.len(), 10);
     }
 
     #[test]
-    fn codec_multiple_messages_in_stream() {
-        let mut codec = DofusCodec::new();
+    fn decode_multiple_client_messages() {
         let mut buf = BytesMut::new();
-
-        for i in 0..5 {
-            let msg = RawMessage {
-                message_id: i,
-                instance_id: i as u32,
-                payload: vec![i as u8; (i + 1) as usize],
-            };
-            codec.encode(msg, &mut buf).unwrap();
+        for i in 0u16..5 {
+            buf.extend_from_slice(&build_client_frame(i, i as u32, &vec![i as u8; (i + 1) as usize]));
         }
 
-        for i in 0..5 {
+        let mut codec = DofusCodec::new();
+        for i in 0u16..5 {
             let decoded = codec.decode(&mut buf).unwrap().unwrap();
             assert_eq!(decoded.message_id, i);
             assert_eq!(decoded.payload.len(), (i + 1) as usize);
         }
-
         assert!(codec.decode(&mut buf).unwrap().is_none());
     }
 
     #[test]
-    fn codec_large_payload() {
-        let msg = RawMessage {
-            message_id: 999,
-            instance_id: 42,
-            payload: vec![0xAB; 100_000],
-        };
-
+    fn decode_large_payload() {
+        let payload = vec![0xAB; 100_000];
+        let frame = build_client_frame(999, 42, &payload);
         let mut codec = DofusCodec::new();
-        let mut buf = BytesMut::new();
-        codec.encode(msg, &mut buf).unwrap();
+        let mut buf = BytesMut::from(&frame[..]);
 
         let decoded = codec.decode(&mut buf).unwrap().unwrap();
         assert_eq!(decoded.message_id, 999);
