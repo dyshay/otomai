@@ -39,13 +39,15 @@ pub fn patch_swf(
     };
 
     // Parse and patch tags
-    let (patched_tags, sig_found, verify_found) = patch_tags(&raw, signature_bin, verify_key)?;
+    let (patched_tags, sig_count, pem_count) = patch_tags(&raw, signature_bin, verify_key)?;
+    let sig_found = sig_count > 0;
+    let verify_found = pem_count > 0;
 
     if !sig_found {
-        eprintln!("  Warning: SIGNATURE_KEY_DATA asset not found in SWF");
+        eprintln!("  Warning: no DofusPublicKey assets found in SWF");
     }
     if !verify_found {
-        eprintln!("  Warning: _verifyKey asset not found in SWF");
+        eprintln!("  Warning: no PEM public key assets found in SWF");
     }
 
     // Rebuild SWF
@@ -76,8 +78,8 @@ pub fn patch_swf(
 
     println!("  Patched SWF: {} -> {} bytes (uncompressed tags)",
         swf_data.len(), patched_tags.len() + 8);
-    if sig_found { println!("  Replaced SIGNATURE_KEY_DATA ({} bytes)", signature_bin.len()); }
-    if verify_found { println!("  Replaced _verifyKey ({} bytes)", verify_key.len()); }
+    if sig_found { println!("  Replaced {} DofusPublicKey asset(s) ({} bytes each)", sig_count, signature_bin.len()); }
+    if verify_found { println!("  Replaced {} PEM public key asset(s) ({} bytes each)", pem_count, verify_key.len()); }
 
     Ok(output)
 }
@@ -86,7 +88,7 @@ fn patch_tags(
     raw: &[u8],
     signature_bin: &[u8],
     verify_key: &[u8],
-) -> Result<(Vec<u8>, bool, bool)> {
+) -> Result<(Vec<u8>, u32, u32)> {
     // The raw data starts with a RECT (variable length) + frame info.
     // We need to skip the SWF header (after the 8-byte file header).
     // RECT is encoded as: Nbits (5 bits) then 4 * Nbits bits, rounded up to bytes.
@@ -105,8 +107,8 @@ fn patch_tags(
     output.extend_from_slice(&raw[..header_len]);
 
     let mut pos = header_len;
-    let mut sig_found = false;
-    let mut verify_found = false;
+    let mut sig_replaced = false;
+    let mut pem_replaced = false;
 
     while pos < raw.len() {
         if pos + 2 > raw.len() { break; }
@@ -129,7 +131,6 @@ fn patch_tags(
         let tag_data_end = tag_data_start + tag_length;
 
         if tag_data_end > raw.len() {
-            // Truncated tag — copy remaining bytes as-is
             output.extend_from_slice(&raw[pos..]);
             break;
         }
@@ -137,21 +138,20 @@ fn patch_tags(
         let tag_data = &raw[tag_data_start..tag_data_end];
 
         if tag_type == TAG_DEFINE_BINARY_DATA && tag_length > 6 {
-            // DefineBinaryData: character_id (u16 LE) + reserved (u32 LE) + data
             let binary_data = &tag_data[6..];
 
-            if !sig_found && contains_pattern(binary_data, b"DofusPublicKey") {
-                // Replace with our signature.bin
+            // Replace only the FIRST DofusPublicKey asset (SIGNATURE_KEY_DATA)
+            if !sig_replaced && contains_pattern(binary_data, b"DofusPublicKey") {
                 write_binary_data_tag(&mut output, &tag_data[..2], signature_bin);
-                sig_found = true;
+                sig_replaced = true;
                 pos = tag_data_end;
                 continue;
             }
 
-            if !verify_found && contains_pattern(binary_data, b"BEGIN PUBLIC KEY") {
-                // Replace with our verify key
+            // Replace only the FIRST PEM public key asset (_verifyKey)
+            if !pem_replaced && contains_pattern(binary_data, b"BEGIN PUBLIC KEY") {
                 write_binary_data_tag(&mut output, &tag_data[..2], verify_key);
-                verify_found = true;
+                pem_replaced = true;
                 pos = tag_data_end;
                 continue;
             }
@@ -162,7 +162,7 @@ fn patch_tags(
         pos = tag_data_end;
     }
 
-    Ok((output, sig_found, verify_found))
+    Ok((output, if sig_replaced { 1 } else { 0 }, if pem_replaced { 1 } else { 0 }))
 }
 
 fn write_binary_data_tag(output: &mut Vec<u8>, character_id_bytes: &[u8], new_data: &[u8]) {
