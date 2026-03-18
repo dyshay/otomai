@@ -2,4 +2,4 @@ host = "0.0.0.0"
 port = 5555
 database_url = "postgresql://dofus:dofus@localhost:5433/otomai"
 rsa_private_key_path = "keys/sig_priv.pem"
-protocol_version = "1850"
+protocol_version = "1966"

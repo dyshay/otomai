@@ -219,7 +219,7 @@ async fn main() -> anyhow::Result<()> {
             .to_public_key_der()
             .map_err(|e| anyhow::anyhow!("Failed to encode session public key DER: {}", e))?
     };
-    // Sign session DER with permanent signature key (PKCS1v15, no AKSF)
+    // Sign session DER with permanent signature key (PKCS1v15)
     let signed_session_key = {
         use rsa::pkcs1v15::Pkcs1v15Sign;
         private_key.sign(Pkcs1v15Sign::new_unprefixed(), session_der.as_bytes())?

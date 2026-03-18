@@ -108,7 +108,7 @@ fn patch_tags(
 
     let mut pos = header_len;
     let mut sig_replaced = false;
-    let mut pem_replaced = false;
+    let mut pem_replace_count = 0u32;
 
     while pos < raw.len() {
         if pos + 2 > raw.len() { break; }
@@ -148,10 +148,11 @@ fn patch_tags(
                 continue;
             }
 
-            // Replace only the FIRST PEM public key asset (_verifyKey)
-            if !pem_replaced && contains_pattern(binary_data, b"BEGIN PUBLIC KEY") {
+            // Replace only the FIRST PEM public key (_verifyKey, char_id=115)
+            // Comes before PUBLIC_KEY_V2 (char_id=117) in the SWF tag stream
+            if pem_replace_count == 0 && contains_pattern(binary_data, b"BEGIN PUBLIC KEY") {
                 write_binary_data_tag(&mut output, &tag_data[..2], verify_key);
-                pem_replaced = true;
+                pem_replace_count += 1;
                 pos = tag_data_end;
                 continue;
             }
@@ -162,7 +163,7 @@ fn patch_tags(
         pos = tag_data_end;
     }
 
-    Ok((output, if sig_replaced { 1 } else { 0 }, if pem_replaced { 1 } else { 0 }))
+    Ok((output, if sig_replaced { 1 } else { 0 }, pem_replace_count))
 }
 
 fn write_binary_data_tag(output: &mut Vec<u8>, character_id_bytes: &[u8], new_data: &[u8]) {
