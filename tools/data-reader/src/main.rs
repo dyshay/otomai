@@ -75,6 +75,40 @@ enum Commands {
         #[arg(short, long)]
         output: PathBuf,
     },
+
+    /// Importer les fichiers D2O dans PostgreSQL
+    ImportDb {
+        /// Dossier contenant les fichiers D2O (data/common/)
+        #[arg(short, long)]
+        input: PathBuf,
+
+        /// URL PostgreSQL
+        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5432/otomai")]
+        db: String,
+
+        /// Fichier specifique a importer (sinon tous les .d2o)
+        #[arg(long)]
+        file: Option<String>,
+    },
+
+    /// Exporter des donnees de la DB vers un fichier D2O
+    ExportDb {
+        /// Nom du fichier source (ex: Items.d2o)
+        #[arg(long)]
+        file: String,
+
+        /// Fichier D2O original (pour les class definitions)
+        #[arg(short, long)]
+        template: PathBuf,
+
+        /// Fichier D2O de sortie
+        #[arg(short, long)]
+        output: PathBuf,
+
+        /// URL PostgreSQL
+        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5432/otomai")]
+        db: String,
+    },
 }
 
 fn main() -> anyhow::Result<()> {
@@ -167,6 +201,90 @@ fn main() -> anyhow::Result<()> {
                     println!("\nContent offset: {}", props);
                 }
             }
+        }
+
+        Commands::ImportDb { input, db, file } => {
+            let rt = tokio::runtime::Runtime::new()?;
+            rt.block_on(async {
+                let pool = dofus_database::create_pool(&db).await?;
+                dofus_database::run_migrations(&pool).await?;
+
+                let files_to_import: Vec<std::path::PathBuf> = if let Some(name) = &file {
+                    vec![input.join(name)]
+                } else {
+                    let mut files = Vec::new();
+                    for entry in std::fs::read_dir(&input)? {
+                        let path = entry?.path();
+                        if path.extension().map(|e| e == "d2o").unwrap_or(false) {
+                            files.push(path);
+                        }
+                    }
+                    files.sort();
+                    files
+                };
+
+                let mut total = 0usize;
+                for path in &files_to_import {
+                    let stem = path.file_name().unwrap().to_string_lossy().to_string();
+                    match d2o::D2OReader::open(path) {
+                        Ok(reader) => {
+                            let ids = reader.object_ids();
+                            let mut count = 0;
+                            for id in &ids {
+                                match reader.read_object(*id) {
+                                    Ok(obj) => {
+                                        let class_name = obj.get("_class")
+                                            .and_then(|v| v.as_str())
+                                            .unwrap_or("Unknown")
+                                            .to_string();
+                                        dofus_database::repository::upsert_game_data(
+                                            &pool, &stem, *id, &class_name, &obj,
+                                        ).await?;
+                                        count += 1;
+                                    }
+                                    Err(e) => eprintln!("  {} #{} -> ERROR: {}", stem, id, e),
+                                }
+                            }
+                            eprintln!("  {} -> {} objets importes", stem, count);
+                            total += count;
+                        }
+                        Err(e) => eprintln!("  {} -> ERROR: {}", stem, e),
+                    }
+                }
+
+                eprintln!("\nTotal: {} objets importes dans la DB", total);
+                Ok::<_, anyhow::Error>(())
+            })?;
+        }
+
+        Commands::ExportDb { file, template, output, db } => {
+            let rt = tokio::runtime::Runtime::new()?;
+            rt.block_on(async {
+                let pool = dofus_database::create_pool(&db).await?;
+
+                // Load class definitions from the template D2O
+                let template_reader = d2o::D2OReader::open(&template)?;
+                let classes = template_reader.classes().clone();
+
+                // Fetch all objects from DB
+                let rows = dofus_database::repository::get_all_game_data(&pool, &file).await?;
+
+                if rows.is_empty() {
+                    anyhow::bail!("Aucune donnee trouvee pour '{}' dans la DB", file);
+                }
+
+                let objects: Vec<(i32, serde_json::Value)> = rows
+                    .into_iter()
+                    .map(|r| (r.object_id, r.data))
+                    .collect();
+
+                let bytes = d2o_writer::write_d2o(&classes, &objects)?;
+                std::fs::write(&output, &bytes)?;
+
+                eprintln!("Exporte {} objets -> {} ({} bytes)",
+                    objects.len(), output.display(), bytes.len());
+                Ok::<_, anyhow::Error>(())
+            })?;
         }
 
         Commands::ExportAll { input, output } => {
