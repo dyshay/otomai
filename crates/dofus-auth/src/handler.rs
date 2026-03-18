@@ -7,6 +7,7 @@ use dofus_protocol::messages::auth::*;
 use dofus_protocol::registry::ProtocolMessage;
 use dofus_protocol::types::GameServerInformations;
 use dofus_network::session::Session;
+use rsa::traits::PublicKeyParts;
 use rsa::BigUint;
 use sha2::{Digest, Sha256};
 use std::net::IpAddr;
@@ -159,7 +160,7 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
         secret_question: String::new(),
         account_creation: 0.0,
         subscription_elapsed_duration: 0.0,
-        subscription_end_date: f64::MAX,
+        subscription_end_date: 0.0,
         havenbag_available_room: 0,
     }).await?;
 
@@ -263,10 +264,9 @@ fn decrypt_credentials(
     encrypted: &[u8],
     has_certificate: bool,
 ) -> anyhow::Result<(String, String)> {
-    // RSA raw/textbook decrypt (matching Dofus client RSA.publicEncrypt)
-    let ciphertext = BigUint::from_bytes_be(encrypted);
-    let plaintext = rsa::hazmat::rsa_decrypt(None::<&mut rand::rngs::ThreadRng>, private_key, &ciphertext)?;
-    let decrypted = plaintext.to_bytes_be();
+    // RSA PKCS1 v1.5 decrypt (client uses RSAKey.encrypt with pkcs1pad type 2)
+    use rsa::Pkcs1v15Encrypt;
+    let decrypted = private_key.decrypt(Pkcs1v15Encrypt, encrypted)?;
 
     // Salt is padded to minimum 32 bytes with spaces (AS3: setSalt)
     let salt_len = salt.len().max(SALT_MIN_LENGTH);
