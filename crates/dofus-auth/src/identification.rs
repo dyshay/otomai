@@ -11,13 +11,14 @@ use std::sync::Arc;
 
 /// Steps 3-6: Receive IdentificationMessage, decrypt credentials, verify, respond.
 /// Returns (account_id, username) on success, or sends failure and returns None.
+/// Returns (account_id, username, aes_key) on success.
 pub async fn handle_identification(
     session: &mut Session,
     state: &Arc<AuthState>,
     salt: &str,
     peer: std::net::SocketAddr,
     ip: IpAddr,
-) -> anyhow::Result<Option<(i64, String)>> {
+) -> anyhow::Result<Option<(i64, String, Vec<u8>)>> {
     // Step 3: Wait for IdentificationMessage
     let raw = match session.recv().await? {
         Some(raw) => raw,
@@ -43,7 +44,7 @@ pub async fn handle_identification(
     tracing::debug!(%peer, lang = %msg.lang, "Received identification");
 
     // Step 4: Decrypt RSA credentials
-    let (username, password) = match decrypt_credentials(
+    let (username, password, aes_key) = match decrypt_credentials(
         &state.session_private_key,
         salt,
         &msg.credentials,
@@ -117,5 +118,5 @@ pub async fn handle_identification(
         havenbag_available_room: 0,
     }).await?;
 
-    Ok(Some((account.id, username)))
+    Ok(Some((account.id, username, aes_key)))
 }

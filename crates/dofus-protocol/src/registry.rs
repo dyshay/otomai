@@ -18,6 +18,11 @@ pub enum ProtocolMessage {
     AuthenticationTicketMessage(game::AuthenticationTicketMessage),
     BasicPingMessage(game::BasicPingMessage),
     BasicPongMessage(game::BasicPongMessage),
+    CharactersListRequestMessage(game::CharactersListRequestMessage),
+    CharacterSelectionMessage(game::CharacterSelectionMessage),
+    GameContextCreateRequestMessage(game::GameContextCreateRequestMessage),
+    CharacterNameSuggestionRequestMessage(game::CharacterNameSuggestionRequestMessage),
+    CharacterCreationRequestMessage(game::CharacterCreationRequestMessage),
     // Unknown
     Unknown(u16, Vec<u8>),
 }
@@ -36,6 +41,11 @@ impl ProtocolMessage {
             Self::AuthenticationTicketMessage(_) => game::AuthenticationTicketMessage::MESSAGE_ID,
             Self::BasicPingMessage(_) => game::BasicPingMessage::MESSAGE_ID,
             Self::BasicPongMessage(_) => game::BasicPongMessage::MESSAGE_ID,
+            Self::CharactersListRequestMessage(_) => game::CharactersListRequestMessage::MESSAGE_ID,
+            Self::CharacterSelectionMessage(_) => game::CharacterSelectionMessage::MESSAGE_ID,
+            Self::GameContextCreateRequestMessage(_) => game::GameContextCreateRequestMessage::MESSAGE_ID,
+            Self::CharacterNameSuggestionRequestMessage(_) => game::CharacterNameSuggestionRequestMessage::MESSAGE_ID,
+            Self::CharacterCreationRequestMessage(_) => game::CharacterCreationRequestMessage::MESSAGE_ID,
             Self::Unknown(id, _) => *id,
         }
     }
@@ -65,6 +75,16 @@ impl ProtocolMessage {
                 Ok(Self::BasicPingMessage(game::BasicPingMessage::deserialize(&mut reader)?)),
             id if id == game::BasicPongMessage::MESSAGE_ID =>
                 Ok(Self::BasicPongMessage(game::BasicPongMessage::deserialize(&mut reader)?)),
+            id if id == game::CharactersListRequestMessage::MESSAGE_ID =>
+                Ok(Self::CharactersListRequestMessage(game::CharactersListRequestMessage::deserialize(&mut reader)?)),
+            id if id == game::CharacterSelectionMessage::MESSAGE_ID =>
+                Ok(Self::CharacterSelectionMessage(game::CharacterSelectionMessage::deserialize(&mut reader)?)),
+            id if id == game::GameContextCreateRequestMessage::MESSAGE_ID =>
+                Ok(Self::GameContextCreateRequestMessage(game::GameContextCreateRequestMessage::deserialize(&mut reader)?)),
+            id if id == game::CharacterNameSuggestionRequestMessage::MESSAGE_ID =>
+                Ok(Self::CharacterNameSuggestionRequestMessage(game::CharacterNameSuggestionRequestMessage::deserialize(&mut reader)?)),
+            id if id == game::CharacterCreationRequestMessage::MESSAGE_ID =>
+                Ok(Self::CharacterCreationRequestMessage(game::CharacterCreationRequestMessage::deserialize(&mut reader)?)),
             _ => Ok(Self::Unknown(message_id, payload)),
         }
     }
@@ -146,6 +166,74 @@ mod tests {
         let s = format!("{}", msg);
         assert!(s.contains("9999"));
         assert!(s.contains("10"));
+    }
+
+    #[test]
+    fn registry_parse_characters_list_request() {
+        let msg = game::CharactersListRequestMessage {};
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(150, payload).unwrap();
+        match parsed {
+            ProtocolMessage::CharactersListRequestMessage(_) => {}
+            _ => panic!("Wrong variant"),
+        }
+        assert_eq!(parsed.message_id(), 150);
+    }
+
+    #[test]
+    fn registry_parse_character_selection() {
+        let msg = game::CharacterSelectionMessage { id: 123456789 };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(152, payload).unwrap();
+        match parsed {
+            ProtocolMessage::CharacterSelectionMessage(m) => assert_eq!(m.id, 123456789),
+            _ => panic!("Wrong variant"),
+        }
+    }
+
+    #[test]
+    fn registry_parse_game_context_create_request() {
+        let msg = game::GameContextCreateRequestMessage {};
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(250, payload).unwrap();
+        match parsed {
+            ProtocolMessage::GameContextCreateRequestMessage(_) => {}
+            _ => panic!("Wrong variant"),
+        }
+        assert_eq!(parsed.message_id(), 250);
+    }
+
+    #[test]
+    fn registry_parse_character_name_suggestion_request() {
+        let msg = game::CharacterNameSuggestionRequestMessage {};
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(162, payload).unwrap();
+        match parsed {
+            ProtocolMessage::CharacterNameSuggestionRequestMessage(_) => {}
+            _ => panic!("Wrong variant"),
+        }
+        assert_eq!(parsed.message_id(), 162);
+    }
+
+    #[test]
+    fn registry_parse_character_creation_request() {
+        let msg = game::CharacterCreationRequestMessage {
+            name: "Xelor".to_string(),
+            breed: 11,
+            sex: true,
+            cosmetic_id: 42,
+        };
+        let payload = serialize_msg(&msg);
+        let parsed = ProtocolMessage::from_raw(160, payload).unwrap();
+        match parsed {
+            ProtocolMessage::CharacterCreationRequestMessage(m) => {
+                assert_eq!(m.name, "Xelor");
+                assert_eq!(m.breed, 11);
+                assert_eq!(m.sex, true);
+                assert_eq!(m.cosmetic_id, 42);
+            }
+            _ => panic!("Wrong variant"),
+        }
     }
 }
 

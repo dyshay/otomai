@@ -6,4 +6,10 @@ pub mod auth {
 pub mod game {
     pub use crate::generated::messages::game_approach::*;
     pub use crate::generated::messages::common_basic::*;
+    pub use crate::generated::messages::game_basic::*;
+    pub use crate::generated::messages::game_character_choice::*;
+    pub use crate::generated::messages::game_initialization::*;
+    pub use crate::generated::messages::game_context::*;
+    pub use crate::generated::messages::game_character_creation::*;
+    pub use crate::generated::messages::game_context_roleplay::*;
 }

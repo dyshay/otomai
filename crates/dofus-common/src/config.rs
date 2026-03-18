@@ -17,6 +17,12 @@ pub struct WorldConfig {
     pub server_id: u16,
     pub server_name: String,
     pub database_url: String,
+    #[serde(default = "default_protocol_version")]
+    pub protocol_version: String,
+}
+
+fn default_protocol_version() -> String {
+    "1966".to_string()
 }
 
 impl AuthConfig {

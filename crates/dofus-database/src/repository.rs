@@ -1,4 +1,4 @@
-use crate::models::{Account, GameData, Server, Ticket};
+use crate::models::{Account, Character, GameData, Server, Ticket};
 use sqlx::PgPool;
 
 // --- Accounts ---
@@ -107,6 +107,84 @@ pub async fn consume_ticket(
     .fetch_optional(pool)
     .await?;
     Ok(row)
+}
+
+// --- Characters ---
+
+pub async fn list_characters(
+    pool: &PgPool,
+    account_id: i64,
+) -> anyhow::Result<Vec<Character>> {
+    let characters = sqlx::query_as::<_, Character>(
+        "SELECT * FROM characters WHERE account_id = $1 ORDER BY id",
+    )
+    .bind(account_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(characters)
+}
+
+pub async fn get_character(
+    pool: &PgPool,
+    character_id: i64,
+) -> anyhow::Result<Option<Character>> {
+    let character = sqlx::query_as::<_, Character>(
+        "SELECT * FROM characters WHERE id = $1",
+    )
+    .bind(character_id)
+    .fetch_optional(pool)
+    .await?;
+    Ok(character)
+}
+
+pub async fn get_character_for_account(
+    pool: &PgPool,
+    character_id: i64,
+    account_id: i64,
+) -> anyhow::Result<Option<Character>> {
+    let character = sqlx::query_as::<_, Character>(
+        "SELECT * FROM characters WHERE id = $1 AND account_id = $2",
+    )
+    .bind(character_id)
+    .bind(account_id)
+    .fetch_optional(pool)
+    .await?;
+    Ok(character)
+}
+
+pub async fn create_character(
+    pool: &PgPool,
+    account_id: i64,
+    name: &str,
+    breed_id: i32,
+    sex: i32,
+    colors: &serde_json::Value,
+) -> anyhow::Result<Character> {
+    let character = sqlx::query_as::<_, Character>(
+        "INSERT INTO characters (account_id, name, breed_id, sex, colors)
+         VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    )
+    .bind(account_id)
+    .bind(name)
+    .bind(breed_id)
+    .bind(sex)
+    .bind(colors)
+    .fetch_one(pool)
+    .await?;
+    Ok(character)
+}
+
+pub async fn character_name_exists(
+    pool: &PgPool,
+    name: &str,
+) -> anyhow::Result<bool> {
+    let row: (i64,) = sqlx::query_as(
+        "SELECT COUNT(*) FROM characters WHERE name = $1",
+    )
+    .bind(name)
+    .fetch_one(pool)
+    .await?;
+    Ok(row.0 > 0)
 }
 
 // --- Game Data (D2O import) ---

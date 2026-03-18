@@ -213,7 +213,7 @@ async fn main() -> anyhow::Result<()> {
     };
     tracing::info!("RSA signature key loaded");
 
-    // Generate ephemeral session keypair (like hetwanmod: generated once at startup)
+    // Generate ephemeral session keypair (generated once at startup)
     let session_private_key = rsa::RsaPrivateKey::new(&mut rand::rngs::OsRng, 1024)?;
     let session_public_key = session_private_key.to_public_key();
     let session_der = {

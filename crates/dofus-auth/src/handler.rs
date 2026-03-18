@@ -48,7 +48,7 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
     }).await?;
 
     // Steps 3-6: Identification
-    let (account_id, username) = match identification::handle_identification(
+    let (account_id, username, aes_key) = match identification::handle_identification(
         &mut session, &state, &salt, peer, ip,
     ).await? {
         Some(result) => result,
@@ -57,6 +57,6 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
 
     // Steps 7-9: Server selection & redirect
     server_selection::handle_server_selection(
-        &mut session, &state, account_id, &username, peer,
+        &mut session, &state, account_id, &username, &aes_key, peer,
     ).await
 }

@@ -33,6 +33,8 @@ md5 = "0.7"
 pkcs8 = { version = "0.10", features = ["pem", "alloc"] }
 pkcs1 = { version = "0.7", features = ["pem", "alloc"] }
 sha2 = "0.10"
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc"] }
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 

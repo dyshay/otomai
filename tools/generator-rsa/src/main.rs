@@ -1,12 +1,8 @@
-//! Dofus RSA patcher — faithful Rust port of hetwanmod's two-key architecture.
+//! Dofus RSA patcher — two-key architecture.
 //!
 //! Two separate RSA keys:
 //!   - Patcher key (1024-bit): signs AKSF files/hosts → SIGNATURE_KEY_DATA in SWF
 //!   - Signature key (2048-bit): signs auth session DER → _verifyKey in SWF
-//!
-//! Reference:
-//!   hetwanmod/tools/patcher/src/index.ts (gen + sign)
-//!   hetwanmod/rustbindings/signature/rust/src/lib.rs (get_signed_key)
 
 mod swf_patch;
 
@@ -136,7 +132,7 @@ fn write_private_pem(key: &RsaPrivateKey, path: &PathBuf) -> Result<()> {
 // -- AKSF --
 
 /// Build AKSF signature.
-/// Ref: hetwanmod patcher sign() lines 114-149
+/// Sign a host string as AKSF base64.
 fn build_aksf(key: &RsaPrivateKey, data: &[u8]) -> Result<Vec<u8>> {
     let random: u8 = rand::thread_rng().gen_range(0..256u16) as u8;
     let md5_hex = format!("{:x}", md5::compute(data));
@@ -164,7 +160,7 @@ fn build_aksf(key: &RsaPrivateKey, data: &[u8]) -> Result<Vec<u8>> {
 // -- Commands --
 
 /// gen — Generate both keypairs.
-/// Ref: hetwanmod patcher generate() (1024-bit) + separate 2048-bit for auth
+/// Generate key pairs: patcher (1024-bit) + signature (2048-bit).
 fn cmd_generate(output_path: &PathBuf) -> Result<()> {
     fs::create_dir_all(output_path)?;
     let mut rng = rand::thread_rng();
@@ -200,7 +196,7 @@ fn cmd_generate(output_path: &PathBuf) -> Result<()> {
 }
 
 /// sign — AKSF signing with 1024-bit patcher key.
-/// Ref: hetwanmod patcher sign() lines 91-163
+/// Sign a file with AKSF binary format.
 fn cmd_sign(
     private_key_path: &PathBuf,
     hosts: &Option<String>,
@@ -233,7 +229,7 @@ fn cmd_sign(
 }
 
 /// auth-keys — Generate session keypair, sign with 2048-bit signature key.
-/// Ref: hetwanmod/rustbindings/signature/rust/src/lib.rs get_signed_key()
+/// Generate auth session keys: ephemeral keypair signed with the signature key.
 ///
 ///   let signature_key = Rsa::private_key_from_pem(private_key);
 ///   let keypair = Rsa::generate(RSA_KEY_SIZE);  // 1024

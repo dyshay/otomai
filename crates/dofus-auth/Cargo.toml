@@ -22,3 +22,5 @@ pkcs1 = { workspace = true }
 pkcs8 = { workspace = true }
 chrono = { workspace = true }
 sqlx = { workspace = true }
+aes = { workspace = true }
+cbc = { workspace = true }

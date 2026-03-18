@@ -1,4 +1,7 @@
+mod character_selection;
+mod game_context;
 mod handler;
+mod ticket;
 
 use clap::Parser;
 use dofus_common::config::WorldConfig;

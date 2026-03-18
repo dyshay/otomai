@@ -1,3 +1,4 @@
+use crate::crypto::encrypt_ticket_aes;
 use crate::AuthState;
 use dofus_database::repository;
 use dofus_io::DofusMessage as _;
@@ -14,6 +15,7 @@ pub async fn handle_server_selection(
     state: &Arc<AuthState>,
     account_id: i64,
     username: &str,
+    aes_key: &[u8],
     peer: std::net::SocketAddr,
 ) -> anyhow::Result<()> {
     // Step 7: Send server list
@@ -90,12 +92,13 @@ pub async fn handle_server_selection(
     )
     .await?;
 
+    let encrypted_ticket = encrypt_ticket_aes(aes_key, &ticket)?;
     session.send(&SelectedServerDataMessage {
         server_id: server.id as i16,
         address: server.address.clone(),
         ports: vec![server.port as i16],
         can_create_new_character: true,
-        ticket: ticket.as_bytes().to_vec(),
+        ticket: encrypted_ticket,
     }).await?;
 
     tracing::info!(%peer, %username, %ticket, "Client redirected to {}", server.name);

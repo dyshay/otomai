@@ -1,6 +1,6 @@
-use crate::WorldState;
-use dofus_database::repository;
+use crate::{character_selection, game_context, ticket, WorldState};
 use dofus_io::DofusMessage as _;
+use dofus_protocol::messages::auth::ProtocolRequired;
 use dofus_protocol::messages::game::*;
 use dofus_protocol::registry::ProtocolMessage;
 use dofus_network::session::Session;
@@ -10,7 +10,19 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     let peer = session.peer_addr()?;
     tracing::info!(%peer, "World client connected");
 
-    // Step 1: Wait for AuthenticationTicketMessage
+    // Step 1: Send ProtocolRequired
+    let proto_version: i32 = state.config.protocol_version.parse().unwrap_or(1966);
+    session
+        .send(&ProtocolRequired {
+            required_version: proto_version,
+            current_version: proto_version,
+        })
+        .await?;
+
+    // Step 2: Send HelloGameMessage
+    session.send(&HelloGameMessage {}).await?;
+
+    // Step 3: Wait for AuthenticationTicketMessage
     let raw = match session.recv().await? {
         Some(raw) => raw,
         None => {
@@ -34,18 +46,13 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
 
     tracing::debug!(%peer, lang = %ticket_msg.lang, "Received ticket");
 
-    // Step 2: Validate ticket
-    let ticket = match repository::consume_ticket(&state.pool, &ticket_msg.ticket).await? {
-        Some(t) => t,
-        None => {
-            tracing::warn!(%peer, "Invalid or expired ticket");
-            return Ok(());
-        }
+    // Step 4-5: Validate ticket, send acceptance + capabilities + time
+    let account_id = match ticket::handle_ticket(&mut session, &state, &ticket_msg).await? {
+        Some(id) => id,
+        None => return Ok(()),
     };
 
-    tracing::info!(%peer, account_id = ticket.account_id, "Ticket validated");
-
-    // Step 3: Main game loop (placeholder — just handle pings)
+    // Step 6: Main game loop — dispatch messages
     loop {
         let raw = match session.recv().await? {
             Some(raw) => raw,
@@ -54,8 +61,43 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
 
         match ProtocolMessage::from_raw(raw.message_id, raw.payload.clone()) {
             Ok(ProtocolMessage::BasicPingMessage(ping)) => {
-                let pong = BasicPongMessage { quiet: ping.quiet };
-                session.send(&pong).await?;
+                session.send(&BasicPongMessage { quiet: ping.quiet }).await?;
+            }
+            Ok(ProtocolMessage::CharactersListRequestMessage(_)) => {
+                character_selection::handle_characters_list_request(
+                    &mut session,
+                    &state,
+                    account_id,
+                )
+                .await?;
+            }
+            Ok(ProtocolMessage::CharacterSelectionMessage(sel)) => {
+                if character_selection::handle_character_selection(
+                    &mut session,
+                    &state,
+                    account_id,
+                    sel.id,
+                )
+                .await?
+                {
+                    // Character selected — wait for GameContextCreateRequestMessage
+                    // (the client may also send other messages in between)
+                }
+            }
+            Ok(ProtocolMessage::CharacterNameSuggestionRequestMessage(_)) => {
+                character_selection::handle_name_suggestion(&mut session).await?;
+            }
+            Ok(ProtocolMessage::CharacterCreationRequestMessage(msg)) => {
+                character_selection::handle_character_creation(
+                    &mut session,
+                    &state,
+                    account_id,
+                    &msg,
+                )
+                .await?;
+            }
+            Ok(ProtocolMessage::GameContextCreateRequestMessage(_)) => {
+                game_context::handle_game_context_create(&mut session).await?;
             }
             Ok(msg) => {
                 tracing::debug!(%peer, message = %msg, "Unhandled message");

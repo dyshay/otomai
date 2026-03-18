@@ -11,23 +11,25 @@ const SALT_MIN_LENGTH: usize = 32;
 ///   + username_len (1 byte)
 ///   + username (UTF-8 bytes)
 ///   + password (UTF-8 bytes, remaining data)
+/// Returns (username, password, aes_key).
 pub fn decrypt_credentials(
     private_key: &rsa::RsaPrivateKey,
     salt: &str,
     encrypted: &[u8],
     has_certificate: bool,
-) -> anyhow::Result<(String, String)> {
+) -> anyhow::Result<(String, String, Vec<u8>)> {
     use rsa::Pkcs1v15Encrypt;
     let decrypted = private_key.decrypt(Pkcs1v15Encrypt, encrypted)?;
     parse_credential_bytes(&decrypted, salt, has_certificate)
 }
 
 /// Parse decrypted credential bytes (after RSA decryption).
+/// Returns (username, password, aes_key).
 pub fn parse_credential_bytes(
     decrypted: &[u8],
     salt: &str,
     has_certificate: bool,
-) -> anyhow::Result<(String, String)> {
+) -> anyhow::Result<(String, String, Vec<u8>)> {
     let salt_len = salt.len().max(SALT_MIN_LENGTH);
     let mut offset = salt_len;
 
@@ -39,6 +41,7 @@ pub fn parse_credential_bytes(
             offset + AES_KEY_LENGTH
         );
     }
+    let aes_key = decrypted[offset..offset + AES_KEY_LENGTH].to_vec();
     offset += AES_KEY_LENGTH;
 
     if has_certificate {
@@ -77,7 +80,28 @@ pub fn parse_credential_bytes(
         anyhow::bail!("Empty username");
     }
 
-    Ok((username, password))
+    Ok((username, password, aes_key))
+}
+
+/// Encrypt ticket bytes with AES-256-CBC.
+/// The client's decodeWithAES prepends IV = aes_key[0..16] then decrypts.
+/// So we encrypt with: key = aes_key (32 bytes), IV = aes_key[0..16].
+pub fn encrypt_ticket_aes(aes_key: &[u8], ticket: &str) -> anyhow::Result<Vec<u8>> {
+    use aes::cipher::{BlockEncryptMut, KeyIvInit};
+    type Aes256CbcEnc = cbc::Encryptor<aes::Aes256>;
+
+    let iv: &[u8; 16] = aes_key[..16].try_into()?;
+    let key: &[u8; 32] = aes_key[..32].try_into()?;
+
+    let plaintext = ticket.as_bytes();
+    // Pad to 16-byte boundary with zeros (NullPad in AS3)
+    let pad_len = (16 - (plaintext.len() % 16)) % 16;
+    let mut buf = plaintext.to_vec();
+    buf.resize(buf.len() + pad_len, 0);
+
+    let cipher = Aes256CbcEnc::new(key.into(), iv.into());
+    let ciphertext = cipher.encrypt_padded_vec_mut::<cbc::cipher::block_padding::NoPadding>(&buf);
+    Ok(ciphertext)
 }
 
 pub fn hash_password(password: &str) -> String {
@@ -92,6 +116,8 @@ mod tests {
 
     const SALT_MIN: usize = 32;
 
+    const FAKE_AES: [u8; 32] = [0xAA; 32];
+
     fn build_credentials(salt: &str, username: &str, password: &str) -> Vec<u8> {
         let mut buf = Vec::new();
         let mut padded_salt = salt.to_string();
@@ -99,7 +125,7 @@ mod tests {
             padded_salt.push(' ');
         }
         buf.extend_from_slice(padded_salt.as_bytes());
-        buf.extend_from_slice(&[0xAA; 32]);
+        buf.extend_from_slice(&FAKE_AES);
         buf.push(username.len() as u8);
         buf.extend_from_slice(username.as_bytes());
         buf.extend_from_slice(password.as_bytes());
@@ -125,7 +151,7 @@ mod tests {
     fn parse_credentials_basic() {
         let salt = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
         let data = build_credentials(salt, "testuser", "mypassword");
-        let (user, pass) = parse_credential_bytes(&data, salt, false).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&data, salt, false).unwrap();
         assert_eq!(user, "testuser");
         assert_eq!(pass, "mypassword");
     }
@@ -134,7 +160,7 @@ mod tests {
     fn parse_credentials_short_salt() {
         let salt = "short";
         let data = build_credentials(salt, "admin", "secret123");
-        let (user, pass) = parse_credential_bytes(&data, salt, false).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&data, salt, false).unwrap();
         assert_eq!(user, "admin");
         assert_eq!(pass, "secret123");
     }
@@ -148,7 +174,7 @@ mod tests {
         buf.push(4);
         buf.extend_from_slice(b"user");
         buf.extend_from_slice(b"pass");
-        let (user, pass) = parse_credential_bytes(&buf, salt, false).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&buf, salt, false).unwrap();
         assert_eq!(user, "user");
         assert_eq!(pass, "pass");
     }
@@ -157,7 +183,7 @@ mod tests {
     fn parse_credentials_unicode() {
         let salt = "12345678901234567890123456789012";
         let data = build_credentials(salt, "joueur", "motdepasse123");
-        let (user, pass) = parse_credential_bytes(&data, salt, false).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&data, salt, false).unwrap();
         assert_eq!(user, "joueur");
         assert_eq!(pass, "motdepasse123");
     }
@@ -166,7 +192,7 @@ mod tests {
     fn parse_credentials_empty_password() {
         let salt = "12345678901234567890123456789012";
         let data = build_credentials(salt, "user", "");
-        let (user, pass) = parse_credential_bytes(&data, salt, false).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&data, salt, false).unwrap();
         assert_eq!(user, "user");
         assert_eq!(pass, "");
     }
@@ -189,7 +215,7 @@ mod tests {
     fn parse_credentials_with_certificate() {
         let salt = "12345678901234567890123456789012";
         let data = build_credentials_with_cert(salt, "certuser", "certpass", 12345);
-        let (user, pass) = parse_credential_bytes(&data, salt, true).unwrap();
+        let (user, pass, _aes) = parse_credential_bytes(&data, salt, true).unwrap();
         assert_eq!(user, "certuser");
         assert_eq!(pass, "certpass");
     }
@@ -207,5 +233,51 @@ mod tests {
         let h1 = hash_password("password1");
         let h2 = hash_password("password2");
         assert_ne!(h1, h2);
+    }
+
+    #[test]
+    fn encrypt_ticket_aes_roundtrip() {
+        use aes::cipher::{BlockDecryptMut, KeyIvInit};
+        type Aes256CbcDec = cbc::Decryptor<aes::Aes256>;
+
+        let aes_key = [0x42u8; 32];
+        let ticket = "TKT-abc123-session-token";
+
+        let ciphertext = encrypt_ticket_aes(&aes_key, ticket).unwrap();
+
+        // Ciphertext length must be aligned to 16 bytes (AES block size)
+        assert_eq!(ciphertext.len() % 16, 0);
+
+        // Decrypt and verify roundtrip
+        let iv: &[u8; 16] = aes_key[..16].try_into().unwrap();
+        let key: &[u8; 32] = &aes_key;
+        let cipher = Aes256CbcDec::new(key.into(), iv.into());
+        let mut buf = ciphertext.clone();
+        let decrypted = cipher
+            .decrypt_padded_mut::<cbc::cipher::block_padding::NoPadding>(&mut buf)
+            .unwrap();
+
+        // The decrypted buffer is null-padded; trim trailing zeros
+        let end = decrypted.iter().rposition(|&b| b != 0).map_or(0, |i| i + 1);
+        assert_eq!(&decrypted[..end], ticket.as_bytes());
+    }
+
+    #[test]
+    fn encrypt_ticket_aes_block_aligned() {
+        let aes_key = [0xBB; 32];
+
+        // Test with exact block-size input (16 bytes) — no padding needed
+        let ticket_16 = "0123456789abcdef";
+        let ct = encrypt_ticket_aes(&aes_key, ticket_16).unwrap();
+        assert_eq!(ct.len() % 16, 0);
+        assert_eq!(ct.len(), 16);
+
+        // Test with 1-byte input — padded to 16
+        let ct1 = encrypt_ticket_aes(&aes_key, "x").unwrap();
+        assert_eq!(ct1.len(), 16);
+
+        // Test with 17-byte input — padded to 32
+        let ct17 = encrypt_ticket_aes(&aes_key, "01234567890123456").unwrap();
+        assert_eq!(ct17.len(), 32);
     }
 }
