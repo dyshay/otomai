@@ -172,3 +172,122 @@ pub async fn count_game_data(
     .await?;
     Ok(row.0)
 }
+
+// --- D2I Translations ---
+
+pub async fn upsert_game_text(
+    pool: &PgPool,
+    file_name: &str,
+    text_id: i32,
+    text: &str,
+    undiacritical: Option<&str>,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO game_texts (file_name, text_id, text, undiacritical)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (file_name, text_id) DO UPDATE SET text = $3, undiacritical = $4",
+    )
+    .bind(file_name)
+    .bind(text_id)
+    .bind(text)
+    .bind(undiacritical)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn upsert_game_named_text(
+    pool: &PgPool,
+    file_name: &str,
+    text_key: &str,
+    text: &str,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO game_named_texts (file_name, text_key, text)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (file_name, text_key) DO UPDATE SET text = $3",
+    )
+    .bind(file_name)
+    .bind(text_key)
+    .bind(text)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn get_all_game_texts(
+    pool: &PgPool,
+    file_name: &str,
+) -> anyhow::Result<Vec<(i32, String, Option<String>)>> {
+    let rows: Vec<(i32, String, Option<String>)> = sqlx::query_as(
+        "SELECT text_id, text, undiacritical FROM game_texts WHERE file_name = $1 ORDER BY text_id",
+    )
+    .bind(file_name)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
+pub async fn get_all_game_named_texts(
+    pool: &PgPool,
+    file_name: &str,
+) -> anyhow::Result<Vec<(String, String)>> {
+    let rows: Vec<(String, String)> = sqlx::query_as(
+        "SELECT text_key, text FROM game_named_texts WHERE file_name = $1 ORDER BY text_key",
+    )
+    .bind(file_name)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
+// --- D2P Files ---
+
+pub async fn upsert_game_file(
+    pool: &PgPool,
+    archive: &str,
+    file_path: &str,
+    file_size: i32,
+    data: Option<&[u8]>,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO game_files (archive, file_path, file_size, data)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (archive, file_path) DO UPDATE SET file_size = $3, data = $4",
+    )
+    .bind(archive)
+    .bind(file_path)
+    .bind(file_size)
+    .bind(data)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn get_all_game_files(
+    pool: &PgPool,
+    archive: &str,
+) -> anyhow::Result<Vec<(String, i32)>> {
+    let rows: Vec<(String, i32)> = sqlx::query_as(
+        "SELECT file_path, file_size FROM game_files WHERE archive = $1 ORDER BY file_path",
+    )
+    .bind(archive)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
+}
+
+pub async fn get_game_file_data(
+    pool: &PgPool,
+    archive: &str,
+    file_path: &str,
+) -> anyhow::Result<Option<Vec<u8>>> {
+    let row: Option<(Option<Vec<u8>>,)> = sqlx::query_as(
+        "SELECT data FROM game_files WHERE archive = $1 AND file_path = $2",
+    )
+    .bind(archive)
+    .bind(file_path)
+    .fetch_optional(pool)
+    .await?;
+    Ok(row.and_then(|r| r.0))
+}

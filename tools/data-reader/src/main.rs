@@ -76,19 +76,23 @@ enum Commands {
         output: PathBuf,
     },
 
-    /// Importer les fichiers D2O dans PostgreSQL
+    /// Importer les fichiers de donnees (D2O, D2I, D2P) dans PostgreSQL
     ImportDb {
-        /// Dossier contenant les fichiers D2O (data/common/)
+        /// Dossier racine des donnees (Resources/)
         #[arg(short, long)]
         input: PathBuf,
 
         /// URL PostgreSQL
-        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5432/otomai")]
+        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5433/otomai")]
         db: String,
 
-        /// Fichier specifique a importer (sinon tous les .d2o)
+        /// Importer uniquement D2O, D2I ou D2P
         #[arg(long)]
-        file: Option<String>,
+        only: Option<String>,
+
+        /// Stocker le contenu des fichiers D2P dans la DB (peut etre volumineux)
+        #[arg(long)]
+        store_d2p_data: bool,
     },
 
     /// Exporter des donnees de la DB vers un fichier D2O
@@ -106,7 +110,7 @@ enum Commands {
         output: PathBuf,
 
         /// URL PostgreSQL
-        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5432/otomai")]
+        #[arg(long, default_value = "postgresql://dofus:dofus@localhost:5433/otomai")]
         db: String,
     },
 }
@@ -203,56 +207,122 @@ fn main() -> anyhow::Result<()> {
             }
         }
 
-        Commands::ImportDb { input, db, file } => {
+        Commands::ImportDb { input, db, only, store_d2p_data } => {
             let rt = tokio::runtime::Runtime::new()?;
             rt.block_on(async {
                 let pool = dofus_database::create_pool(&db).await?;
                 dofus_database::run_migrations(&pool).await?;
 
-                let files_to_import: Vec<std::path::PathBuf> = if let Some(name) = &file {
-                    vec![input.join(name)]
-                } else {
-                    let mut files = Vec::new();
-                    for entry in std::fs::read_dir(&input)? {
-                        let path = entry?.path();
-                        if path.extension().map(|e| e == "d2o").unwrap_or(false) {
-                            files.push(path);
-                        }
-                    }
-                    files.sort();
-                    files
-                };
+                let import_d2o = only.as_ref().map(|o| o == "d2o").unwrap_or(true);
+                let import_d2i = only.as_ref().map(|o| o == "d2i").unwrap_or(true);
+                let import_d2p = only.as_ref().map(|o| o == "d2p").unwrap_or(true);
 
-                let mut total = 0usize;
-                for path in &files_to_import {
-                    let stem = path.file_name().unwrap().to_string_lossy().to_string();
-                    match d2o::D2OReader::open(path) {
-                        Ok(reader) => {
-                            let ids = reader.object_ids();
-                            let mut count = 0;
-                            for id in &ids {
-                                match reader.read_object(*id) {
-                                    Ok(obj) => {
-                                        let class_name = obj.get("_class")
-                                            .and_then(|v| v.as_str())
-                                            .unwrap_or("Unknown")
-                                            .to_string();
-                                        dofus_database::repository::upsert_game_data(
-                                            &pool, &stem, *id, &class_name, &obj,
-                                        ).await?;
-                                        count += 1;
+                // Scan all files recursively
+                let mut d2o_files = Vec::new();
+                let mut d2i_files = Vec::new();
+                let mut d2p_files = Vec::new();
+                scan_files_recursive(&input, &mut d2o_files, &mut d2i_files, &mut d2p_files)?;
+
+                // --- D2O ---
+                if import_d2o && !d2o_files.is_empty() {
+                    eprintln!("=== D2O ({} fichiers) ===", d2o_files.len());
+                    let mut total = 0usize;
+                    for path in &d2o_files {
+                        let name = path.file_name().unwrap().to_string_lossy().to_string();
+                        match d2o::D2OReader::open(path) {
+                            Ok(reader) => {
+                                let ids = reader.object_ids();
+                                let mut count = 0;
+                                for id in &ids {
+                                    match reader.read_object(*id) {
+                                        Ok(obj) => {
+                                            let class_name = obj.get("_class")
+                                                .and_then(|v| v.as_str())
+                                                .unwrap_or("Unknown")
+                                                .to_string();
+                                            dofus_database::repository::upsert_game_data(
+                                                &pool, &name, *id, &class_name, &obj,
+                                            ).await?;
+                                            count += 1;
+                                        }
+                                        Err(e) => eprintln!("  {} #{} -> ERROR: {}", name, id, e),
                                     }
-                                    Err(e) => eprintln!("  {} #{} -> ERROR: {}", stem, id, e),
                                 }
+                                eprintln!("  {} -> {} objets", name, count);
+                                total += count;
                             }
-                            eprintln!("  {} -> {} objets importes", stem, count);
-                            total += count;
+                            Err(e) => eprintln!("  {} -> ERROR: {}", name, e),
                         }
-                        Err(e) => eprintln!("  {} -> ERROR: {}", stem, e),
                     }
+                    eprintln!("  Total D2O: {}", total);
                 }
 
-                eprintln!("\nTotal: {} objets importes dans la DB", total);
+                // --- D2I ---
+                if import_d2i && !d2i_files.is_empty() {
+                    eprintln!("=== D2I ({} fichiers) ===", d2i_files.len());
+                    let mut total = 0usize;
+                    for path in &d2i_files {
+                        let name = path.file_name().unwrap().to_string_lossy().to_string();
+                        match d2i::D2IReader::open(path) {
+                            Ok(reader) => {
+                                let texts = reader.all_texts()?;
+                                for (&id, text) in &texts {
+                                    let undiacritical = reader.get_undiacritical_text(id)
+                                        .ok().flatten();
+                                    dofus_database::repository::upsert_game_text(
+                                        &pool, &name, id, text,
+                                        undiacritical.as_deref(),
+                                    ).await?;
+                                }
+                                // Named texts
+                                let named_keys = reader.named_text_keys();
+                                for key in &named_keys {
+                                    if let Ok(text) = reader.get_named_text(key) {
+                                        dofus_database::repository::upsert_game_named_text(
+                                            &pool, &name, key, &text,
+                                        ).await?;
+                                    }
+                                }
+                                eprintln!("  {} -> {} textes, {} named", name, texts.len(), named_keys.len());
+                                total += texts.len() + named_keys.len();
+                            }
+                            Err(e) => eprintln!("  {} -> ERROR: {}", name, e),
+                        }
+                    }
+                    eprintln!("  Total D2I: {}", total);
+                }
+
+                // --- D2P ---
+                if import_d2p && !d2p_files.is_empty() {
+                    eprintln!("=== D2P ({} fichiers) ===", d2p_files.len());
+                    let mut total = 0usize;
+                    for path in &d2p_files {
+                        let name = path.file_name().unwrap().to_string_lossy().to_string();
+                        match d2p::D2PReader::open(path) {
+                            Ok(reader) => {
+                                let filenames = reader.filenames();
+                                for fname in &filenames {
+                                    let data = if store_d2p_data {
+                                        reader.read_file(fname).ok()
+                                    } else {
+                                        None
+                                    };
+                                    let size = data.as_ref().map(|d| d.len() as i32).unwrap_or(0);
+                                    dofus_database::repository::upsert_game_file(
+                                        &pool, &name, fname, size,
+                                        data.as_deref(),
+                                    ).await?;
+                                }
+                                eprintln!("  {} -> {} fichiers", name, filenames.len());
+                                total += filenames.len();
+                            }
+                            Err(e) => eprintln!("  {} -> ERROR: {}", name, e),
+                        }
+                    }
+                    eprintln!("  Total D2P: {}", total);
+                }
+
+                eprintln!("\nImport termine.");
                 Ok::<_, anyhow::Error>(())
             })?;
         }
@@ -319,6 +389,32 @@ fn main() -> anyhow::Result<()> {
         }
     }
 
+    Ok(())
+}
+
+fn scan_files_recursive(
+    dir: &std::path::Path,
+    d2o: &mut Vec<PathBuf>,
+    d2i: &mut Vec<PathBuf>,
+    d2p: &mut Vec<PathBuf>,
+) -> anyhow::Result<()> {
+    if !dir.is_dir() { return Ok(()); }
+    for entry in std::fs::read_dir(dir)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            scan_files_recursive(&path, d2o, d2i, d2p)?;
+        } else if let Some(ext) = path.extension() {
+            match ext.to_str().unwrap_or("") {
+                "d2o" => d2o.push(path),
+                "d2i" => d2i.push(path),
+                "d2p" => d2p.push(path),
+                _ => {}
+            }
+        }
+    }
+    d2o.sort();
+    d2i.sort();
+    d2p.sort();
     Ok(())
 }
 

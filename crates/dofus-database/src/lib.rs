@@ -114,7 +114,9 @@ pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     .execute(pool)
     .await?;
 
-    // Add a table for game data assets (D2O import cache)
+    // --- Game data tables ---
+
+    // D2O objects (Items, Spells, Monsters, etc.)
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS game_data (
@@ -123,6 +125,50 @@ pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
             class_name TEXT NOT NULL,
             data JSONB NOT NULL,
             PRIMARY KEY (file_name, object_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // D2I translations
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS game_texts (
+            file_name TEXT NOT NULL,
+            text_id INT NOT NULL,
+            text TEXT NOT NULL,
+            undiacritical TEXT,
+            PRIMARY KEY (file_name, text_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // D2I named texts (UI strings)
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS game_named_texts (
+            file_name TEXT NOT NULL,
+            text_key TEXT NOT NULL,
+            text TEXT NOT NULL,
+            PRIMARY KEY (file_name, text_key)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // D2P archive index
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS game_files (
+            archive TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_size INT NOT NULL,
+            data BYTEA,
+            PRIMARY KEY (archive, file_path)
         )
         "#,
     )
