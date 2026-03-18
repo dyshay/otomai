@@ -34,23 +34,27 @@ impl D2PReader {
 
     pub fn from_bytes(data: Vec<u8>) -> Result<Self> {
         let len = data.len();
-        if len < 2 {
+        if len < 26 {
             bail!("D2P file too small");
         }
 
         let mut cursor = Cursor::new(&data);
 
-        // Read base offset and base length from end of file
-        // The last 24 bytes contain: properties_offset(u32), properties_count(u32),
-        //   index_offset(u32), index_count(u32), properties_size(u32), index_size(u32)
+        // Header: 2 bytes (vMax, vMin)
+        let _v_max = cursor.read_u8()?;
+        let _v_min = cursor.read_u8()?;
+
+        // Footer: last 24 bytes
+        // Order per AS3 PakProtocol2: dataOffset, dataCount, indexOffset, indexCount,
+        //   propertiesOffset, propertiesCount
         cursor.seek(SeekFrom::End(-24))?;
 
-        let properties_offset = cursor.read_u32::<BigEndian>()?;
-        let properties_count = cursor.read_u32::<BigEndian>()?;
+        let data_offset = cursor.read_u32::<BigEndian>()?;
+        let _data_count = cursor.read_u32::<BigEndian>()?;
         let index_offset = cursor.read_u32::<BigEndian>()?;
         let index_count = cursor.read_u32::<BigEndian>()?;
-        let _properties_size = cursor.read_u32::<BigEndian>()?;
-        let _index_size = cursor.read_u32::<BigEndian>()?;
+        let properties_offset = cursor.read_u32::<BigEndian>()?;
+        let properties_count = cursor.read_u32::<BigEndian>()?;
 
         // Read properties
         cursor.seek(SeekFrom::Start(properties_offset as u64))?;
@@ -60,12 +64,6 @@ impl D2PReader {
             let value = read_utf(&mut cursor)?;
             properties.insert(key, value);
         }
-
-        // Determine base offset from properties
-        let base_offset: u64 = properties
-            .get("contentOffset")
-            .and_then(|v| v.parse().ok())
-            .unwrap_or(0);
 
         // Read file index
         cursor.seek(SeekFrom::Start(index_offset as u64))?;
@@ -79,7 +77,7 @@ impl D2PReader {
                 filename.clone(),
                 D2PEntry {
                     filename,
-                    offset: offset + base_offset as u32,
+                    offset: offset + data_offset,
                     length,
                 },
             );

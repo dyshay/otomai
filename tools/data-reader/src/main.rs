@@ -1,12 +1,14 @@
 mod d2i;
 mod d2o;
+mod d2o_writer;
 mod d2p;
+mod serve;
 
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "data-reader", about = "Read Dofus 2 data files (D2O, D2I, D2P)")]
+#[command(name = "dofrust-data", about = "Otomai — Lire, editer et exporter les fichiers Dofus 2 (D2O, D2I, D2P)")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -14,70 +16,57 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Read a D2O file and export objects as JSON
+    /// Lancer l'editeur web
+    Serve {
+        /// Dossier contenant les fichiers de donnees (data/, content/, etc.)
+        #[arg(short = 'd', long)]
+        data_dir: PathBuf,
+
+        /// Port du serveur web
+        #[arg(short, long, default_value_t = 8080)]
+        port: u16,
+    },
+
+    /// Lire un fichier D2O et exporter en JSON
     D2o {
-        /// Path to .d2o file
         #[arg(short, long)]
         input: PathBuf,
-
-        /// Output JSON file (default: stdout)
         #[arg(short, long)]
         output: Option<PathBuf>,
-
-        /// Only show class definitions (no data)
         #[arg(long)]
         schema: bool,
-
-        /// Pretty-print JSON
         #[arg(long, default_value_t = true)]
         pretty: bool,
     },
 
-    /// Read a D2I file and export translations as JSON
+    /// Lire un fichier D2I et exporter les traductions en JSON
     D2i {
-        /// Path to .d2i file
         #[arg(short, long)]
         input: PathBuf,
-
-        /// Output JSON file (default: stdout)
         #[arg(short, long)]
         output: Option<PathBuf>,
-
-        /// Look up a specific text ID
         #[arg(long)]
         id: Option<i32>,
-
-        /// Look up a specific named text
         #[arg(long)]
         name: Option<String>,
     },
 
-    /// Read a D2P archive and list/extract files
+    /// Lire une archive D2P et lister/extraire les fichiers
     D2p {
-        /// Path to .d2p file
         #[arg(short, long)]
         input: PathBuf,
-
-        /// Extract all files to this directory
         #[arg(short, long)]
         extract: Option<PathBuf>,
-
-        /// Extract a specific file
         #[arg(long)]
         file: Option<String>,
-
-        /// Output path for single file extraction
         #[arg(short, long)]
         output: Option<PathBuf>,
     },
 
-    /// Batch-export all D2O files in a directory to JSON
+    /// Export batch de tous les D2O d'un dossier en JSON
     ExportAll {
-        /// Directory containing .d2o files
         #[arg(short, long)]
         input: PathBuf,
-
-        /// Output directory for JSON files
         #[arg(short, long)]
         output: PathBuf,
     },
@@ -94,6 +83,11 @@ fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Serve { data_dir, port } => {
+            let rt = tokio::runtime::Runtime::new()?;
+            rt.block_on(serve::run(data_dir, port))?;
+        }
+
         Commands::D2o { input, output, schema, pretty } => {
             let reader = d2o::D2OReader::open(&input)?;
 
@@ -187,13 +181,13 @@ fn main() -> anyhow::Result<()> {
                                 Ok(objects) => {
                                     let json = serde_json::to_string_pretty(&objects)?;
                                     std::fs::write(&out_path, json)?;
-                                    eprintln!("  {} → {} objects", stem, objects.len());
+                                    eprintln!("  {} -> {} objects", stem, objects.len());
                                     total += objects.len();
                                 }
-                                Err(e) => eprintln!("  {} → ERROR: {}", stem, e),
+                                Err(e) => eprintln!("  {} -> ERROR: {}", stem, e),
                             }
                         }
-                        Err(e) => eprintln!("  {} → ERROR: {}", stem, e),
+                        Err(e) => eprintln!("  {} -> ERROR: {}", stem, e),
                     }
                 }
             }

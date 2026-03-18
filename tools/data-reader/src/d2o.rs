@@ -24,7 +24,7 @@ const TYPE_I18N: i32 = -5;
 const TYPE_UINT: i32 = -6;
 const TYPE_VECTOR: i32 = -99;
 
-const NULL_OBJECT_MARKER: i32 = -1431655766; // 0xAAAAAAAA as i32
+pub const NULL_OBJECT_MARKER: i32 = -1431655766; // 0xAAAAAAAA as i32
 
 #[derive(Debug, Clone)]
 pub struct D2OClassDef {
@@ -48,7 +48,7 @@ pub enum D2OFieldType {
     Number,
     I18n,
     UInt,
-    Vector(Box<D2OFieldType>),
+    Vector(String, Box<D2OFieldType>), // (inner_type_name, inner_type)
     Object(i32), // class_id
 }
 
@@ -72,7 +72,7 @@ impl D2OReader {
         let mut magic = [0u8; 3];
         cursor.read_exact(&mut magic)?;
 
-        let mut content_offset;
+        let content_offset: u64;
         if &magic == b"AKS" {
             // Signed file — skip signature
             let mut f = [0u8; 1];
@@ -94,11 +94,9 @@ impl D2OReader {
         }
 
         let indexes_pointer = cursor.read_i32::<BigEndian>()? as u64;
-        // Object offsets in index are absolute from start of byte stream
-        // (no offset needed for non-signed files)
 
-        // indexes_pointer is ABSOLUTE in the byte stream
-        cursor.seek(SeekFrom::Start(indexes_pointer))?;
+        // AS3: stream.position = contentOffset + indexesPointer
+        cursor.seek(SeekFrom::Start(content_offset + indexes_pointer))?;
 
         // Read index entries
         let indexes_length = cursor.read_i32::<BigEndian>()?;
@@ -225,7 +223,7 @@ impl D2OReader {
             D2OFieldType::Number => Ok(json!(cursor.read_f64::<BigEndian>()?)),
             D2OFieldType::I18n => Ok(json!(cursor.read_i32::<BigEndian>()?)),
             D2OFieldType::UInt => Ok(json!(cursor.read_u32::<BigEndian>()?)),
-            D2OFieldType::Vector(inner) => {
+            D2OFieldType::Vector(_, inner) => {
                 let count = cursor.read_i32::<BigEndian>()?;
                 let mut vec = Vec::with_capacity(count.max(0) as usize);
                 for _ in 0..count {
@@ -255,8 +253,10 @@ fn read_field_type<R: Read + ReadBytesExt>(cursor: &mut R) -> Result<D2OFieldTyp
         TYPE_I18N => Ok(D2OFieldType::I18n),
         TYPE_UINT => Ok(D2OFieldType::UInt),
         TYPE_VECTOR => {
+            // AS3: reads inner type name (readUTF) then recursively reads inner type
+            let inner_type_name = read_utf(cursor)?;
             let inner = read_field_type(cursor)?;
-            Ok(D2OFieldType::Vector(Box::new(inner)))
+            Ok(D2OFieldType::Vector(inner_type_name, Box::new(inner)))
         }
         id if id > 0 => Ok(D2OFieldType::Object(id)),
         _ => bail!("Unknown D2O field type: {}", type_id),
