@@ -109,6 +109,38 @@ cargo run -p data-reader -- d2p -i content/maps/maps0.d2p --extract ./maps/
 cargo run -p data-reader -- export-all -i data/common/ -o ./export/
 ```
 
+## Client Patcher
+
+Patch automatique du client Dofus pour se connecter a notre serveur :
+
+```bash
+cargo run -p generator-rsa -- patch \
+  --private-key keys/private.pem \
+  --swf /chemin/vers/DofusInvoker.swf \
+  --config /chemin/vers/config.xml \
+  --host 127.0.0.1 --port 5555 \
+  --output ./patched/
+```
+
+Remplace les cles RSA embarquees dans le SWF et met a jour le config.xml (host, port, signature).
+
+## Base de donnees
+
+PostgreSQL 16+ requis.
+
+```bash
+# Lancer avec Docker
+docker compose up -d
+
+# Ou setup manuel
+createdb otomai
+createuser dofus -P  # password: dofus
+```
+
+Les tables sont creees automatiquement au lancement du serveur.
+
+Connection string par defaut : `postgresql://dofus:dofus@localhost:5432/otomai`
+
 ## Tests
 
 ```bash
