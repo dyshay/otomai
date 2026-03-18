@@ -16,7 +16,7 @@ struct Cli {
 
 pub struct WorldState {
     pub config: WorldConfig,
-    pub pool: sqlx::SqlitePool,
+    pub pool: sqlx::PgPool,
 }
 
 #[tokio::main]

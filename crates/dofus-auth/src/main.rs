@@ -36,7 +36,7 @@ struct Cli {
 
 pub struct AuthState {
     pub config: AuthConfig,
-    pub pool: sqlx::SqlitePool,
+    pub pool: sqlx::PgPool,
     pub rsa_private_key: rsa::RsaPrivateKey,
     pub auto_create_accounts: bool,
 

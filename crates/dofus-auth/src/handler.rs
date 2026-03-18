@@ -230,7 +230,7 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
         &ticket,
         account.id,
         server.id,
-        &expires.format("%Y-%m-%d %H:%M:%S").to_string(),
+        &expires.to_rfc3339(),
     )
     .await?;
 

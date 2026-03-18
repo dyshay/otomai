@@ -1,4 +1,7 @@
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+use sqlx::types::JsonValue;
 
 #[derive(Debug, Clone, FromRow)]
 pub struct Account {
@@ -8,8 +11,8 @@ pub struct Account {
     pub nickname: String,
     pub admin_level: i32,
     pub banned: bool,
-    pub last_login: Option<String>,
-    pub created_at: String,
+    pub last_login: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, FromRow)]
@@ -28,8 +31,8 @@ pub struct Ticket {
     pub ticket: String,
     pub account_id: i64,
     pub server_id: i64,
-    pub created_at: String,
-    pub expires_at: String,
+    pub created_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
 }
 
 #[derive(Debug, Clone, FromRow)]
@@ -45,8 +48,16 @@ pub struct Character {
     pub map_id: i64,
     pub cell_id: i32,
     pub direction: i32,
-    pub colors: String,
-    pub stats: String,
-    pub created_at: String,
-    pub last_login: Option<String>,
+    pub colors: JsonValue,
+    pub stats: JsonValue,
+    pub created_at: DateTime<Utc>,
+    pub last_login: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+pub struct GameData {
+    pub file_name: String,
+    pub object_id: i32,
+    pub class_name: String,
+    pub data: JsonValue,
 }

@@ -2,4 +2,4 @@ host = "0.0.0.0"
 port = 5556
 server_id = 1
 server_name = "Jiva"
-database_url = "sqlite:data/dofus.db?mode=rwc"
+database_url = "postgresql://dofus:dofus@localhost:5432/otomai"

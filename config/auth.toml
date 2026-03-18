@@ -1,5 +1,5 @@
 host = "0.0.0.0"
 port = 5555
-database_url = "sqlite:data/dofus.db?mode=rwc"
+database_url = "postgresql://dofus:dofus@localhost:5432/otomai"
 rsa_private_key_path = "keys/private.pem"
-protocol_version = "2.69"
+protocol_version = "1850"
