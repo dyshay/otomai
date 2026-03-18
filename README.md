@@ -1,6 +1,6 @@
 # Otomai
 
-Emulateur de serveur Dofus 2 ecrit en Rust, avec un toolkit complet pour lire, editer et exporter les fichiers de donnees du jeu.
+Emulateur de serveur Dofus 2.55 ecrit en Rust, avec un toolkit complet pour lire, editer et exporter les fichiers de donnees du jeu.
 
 ## Architecture
 
@@ -8,15 +8,59 @@ Emulateur de serveur Dofus 2 ecrit en Rust, avec un toolkit complet pour lire, e
 crates/
   dofus-auth       Serveur d'authentification (port 5555)
   dofus-world      Serveur de jeu (port 5556)
-  dofus-protocol   Definitions du protocole reseau
+  dofus-protocol   Protocole reseau complet (1081 messages, 327 types, 89 enums)
   dofus-network    Codec reseau + gestion des sessions
   dofus-io         I/O binaire BigEndian (serialization Dofus)
   dofus-common     Types communs, config, erreurs
   dofus-database   Couche SQLite (sqlx)
 tools/
-  data-reader      Lecteur/editeur de fichiers D2O, D2I, D2P
-  protocol-gen     Generateur de code protocole depuis les SWF
+  data-reader      Lecteur/editeur de fichiers D2O, D2I, D2P + interface web
+  protocol-gen     Generateur de code protocole depuis SWF ou sources AS3
   generator-rsa    Generation de cles RSA
+```
+
+## Protocole
+
+Le protocole est genere automatiquement depuis les sources AS3 decompilees du client Dofus 2.55 via `protocol-gen`. Toutes les definitions (messages, types, enums) sont extraites avec les bons IDs et la serialisation exacte.
+
+```bash
+# Regenerer le protocole depuis les sources AS3
+cargo run -p protocol-gen -- generate-from-as \
+  --input /chemin/vers/decompiled-scripts/scripts \
+  --output crates/dofus-protocol/src/generated/
+```
+
+## Serveur d'authentification
+
+Le handler auth implemente le flow complet tel que decrit dans `AuthentificationFrame.as` :
+
+1. `ProtocolRequired` → client
+2. `HelloConnectMessage` (cle RSA + salt) → client
+3. `IdentificationMessage` ← client (credentials chiffres RSA)
+4. Dechiffrement RSA (format : `salt(32) + AES_key(32) + [cert] + username_len(1) + username + password`)
+5. Verification du compte (auto-creation optionnelle en mode dev)
+6. `IdentificationSuccessMessage` → client
+7. `ServersListMessage` → client (multi-serveur via DB)
+8. `ServerSelectionMessage` ← client
+9. `SelectedServerDataMessage` (ticket + redirection) → client
+
+### Features
+
+- **Rate limiting** : max N tentatives/minute par IP, echecs comptent double
+- **Queue de connexion** : semaphore tokio (`--max-connections`)
+- **Mode maintenance** : rejette les connexions avec `IN_MAINTENANCE` (`--maintenance`)
+- **Multi-serveur** : tous les serveurs en DB, statut dynamique
+- **Auto-creation de comptes** : mode dev (`--auto-create`)
+
+```bash
+# Production
+cargo run -p dofus-auth
+
+# Dev (auto-creation de comptes)
+cargo run -p dofus-auth -- --auto-create
+
+# Avec limites custom
+cargo run -p dofus-auth -- --auto-create --max-connections 50 --rate-limit 5
 ```
 
 ## Data Reader / Editor
@@ -28,8 +72,8 @@ Outil CLI + interface web pour manipuler les fichiers de donnees Dofus 2.
 | Format | Description | Read | Write |
 |--------|-------------|------|-------|
 | **D2O** | Game Data Objects (Items, Spells, Breeds, Monsters...) | oui | oui |
-| **D2I** | Internationalization (traductions) | oui | - |
-| **D2P** | Data Packs (archives de maps, gfx...) | oui | - |
+| **D2I** | Internationalization (traductions) | oui | oui |
+| **D2P** | Data Packs (archives de maps, gfx...) | oui | oui |
 
 ### Interface Web
 
@@ -65,31 +109,25 @@ cargo run -p data-reader -- d2p -i content/maps/maps0.d2p --extract ./maps/
 cargo run -p data-reader -- export-all -i data/common/ -o ./export/
 ```
 
-## Serveur
-
-### Configuration
+## Tests
 
 ```bash
-# Auth server
-cargo run -p dofus-auth
+# Tous les tests (70 tests, 15 suites)
+cargo test --workspace
 
-# World server
-cargo run -p dofus-world
+# Tests data-reader uniquement (roundtrip D2O/D2I/D2P)
+cargo test -p data-reader
+
+# Tests auth (credentials, rate limiting, maintenance)
+cargo test -p dofus-auth
 ```
-
-Les fichiers de configuration sont dans `config/auth.toml` et `config/world.toml`.
 
 ## Build
 
 ```bash
-# Tout compiler
 cargo build --workspace
-
-# Juste le data reader
-cargo build -p data-reader
-
-# Release
 cargo build --release -p data-reader
+cargo build --release -p dofus-auth
 ```
 
 ## Licence

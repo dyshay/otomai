@@ -1,8 +1,13 @@
 mod d2i;
+mod d2i_writer;
 mod d2o;
 mod d2o_writer;
 mod d2p;
+mod d2p_writer;
 mod serve;
+
+#[cfg(test)]
+mod tests;
 
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
