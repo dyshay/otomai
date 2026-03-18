@@ -12,11 +12,11 @@ crates/
   dofus-network    Codec reseau + gestion des sessions
   dofus-io         I/O binaire BigEndian (serialization Dofus)
   dofus-common     Types communs, config, erreurs
-  dofus-database   Couche SQLite (sqlx)
+  dofus-database   Couche PostgreSQL (sqlx)
 tools/
   data-reader      Lecteur/editeur de fichiers D2O, D2I, D2P + interface web
   protocol-gen     Generateur de code protocole depuis SWF ou sources AS3
-  generator-rsa    Generation de cles RSA
+  generator-rsa    Patcher RSA : generation de cles, signing AKSF, patching client
 ```
 
 ## Protocole
@@ -32,11 +32,16 @@ cargo run -p protocol-gen -- generate-from-as \
 
 ## Serveur d'authentification
 
+Architecture RSA a deux niveaux (fidele a la reference hetwanmod) :
+
+- **Cle de signature** (2048-bit, `sig_priv.pem`) : signe la cle de session au demarrage
+- **Cle de session** (1024-bit, ephemere) : generee une fois au startup, chiffre/dechiffre les credentials
+
 Le handler auth implemente le flow complet tel que decrit dans `AuthentificationFrame.as` :
 
 1. `ProtocolRequired` → client
-2. `HelloConnectMessage` (cle RSA + salt) → client
-3. `IdentificationMessage` ← client (credentials chiffres RSA)
+2. `HelloConnectMessage` (session key DER signee PKCS1 + salt) → client
+3. `IdentificationMessage` ← client (credentials chiffres RSA textbook avec session key)
 4. Dechiffrement RSA (format : `salt(32) + AES_key(32) + [cert] + username_len(1) + username + password`)
 5. Verification du compte (auto-creation optionnelle en mode dev)
 6. `IdentificationSuccessMessage` → client
@@ -109,20 +114,42 @@ cargo run -p data-reader -- d2p -i content/maps/maps0.d2p --extract ./maps/
 cargo run -p data-reader -- export-all -i data/common/ -o ./export/
 ```
 
-## Client Patcher
+## Client Patcher (generator-rsa)
 
-Patch automatique du client Dofus pour se connecter a notre serveur :
+Architecture deux cles alignee sur la reference hetwanmod :
+
+| Cle | Taille | Fichier | Usage |
+|-----|--------|---------|-------|
+| Patcher | 1024-bit | `priv.pem` | AKSF signing + `SIGNATURE_KEY_DATA` dans SWF |
+| Signature | 2048-bit | `sig_priv.pem` | Auth session signing + `_verifyKey` dans SWF |
+
+Le SWF Dofus embarque 3 assets cles : `SIGNATURE_KEY_DATA` (1024-bit, verification AKSF V1), `_verifyKey` (2048-bit, verification auth session), `PUBLIC_KEY_V2` (2048-bit, verification AKSF V2).
 
 ```bash
+# 1. Generer les deux paires de cles
+cargo run -p generator-rsa -- gen -o keys/
+
+# 2. Signer un host (AKSF, base64)
+cargo run -p generator-rsa -- sign keys/priv.pem --hosts "localhost"
+
+# 3. Signer un fichier (AKSF binaire)
+cargo run -p generator-rsa -- sign keys/priv.pem --file signature.xml -o output/
+
+# 4. Generer les cles de session auth
+cargo run -p generator-rsa -- auth-keys -k keys/sig_priv.pem -o keys/auth/
+
+# 5. Patcher le client complet (SWF + config.xml + signature.xmls)
 cargo run -p generator-rsa -- patch \
-  --private-key keys/private.pem \
-  --swf /chemin/vers/DofusInvoker.swf \
-  --config /chemin/vers/config.xml \
-  --host 127.0.0.1 --port 5555 \
-  --output ./patched/
+  -k keys/priv.pem \
+  --sig-key keys/sig_priv.pem \
+  --swf originals/DofusInvoker.swf \
+  --config originals/config.xml \
+  --signature-xmls originals/signature.xmls \
+  --host localhost --port 5555 \
+  -o patched/
 ```
 
-Remplace les cles RSA embarquees dans le SWF et met a jour le config.xml (host, port, signature).
+Le patcher strip le header AKSF d'Ankama sur `signature.xmls`, retire les entrees pour fichiers manquants/vides, et re-signe avec notre cle.
 
 ## Base de donnees
 
