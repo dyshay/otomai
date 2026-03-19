@@ -328,6 +328,78 @@ pub async fn handle_spell_cast(
                     zone_cells, vec![effect.clone()], effect.duration.max(1), spell_id as i32,
                 );
             }
+            super::effects::EffectType::Summon => {
+                super::summons::summon_creature(
+                    session, fight, player_id, cell_id,
+                    effect.dice_num, // monster_id = param1
+                    effect.dice_side as u8, // grade = param2
+                    fight.get_fighter(player_id).map(|f| f.level).unwrap_or(1),
+                ).await?;
+            }
+            super::effects::EffectType::SelfDamage => {
+                let dmg = damage::calculate_damage(effect, &caster_stats, &caster_stats, is_critical);
+                damage::apply_damage(session, fight, player_id, player_id, dmg, effect.element).await?;
+            }
+            super::effects::EffectType::AddState => {
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                let state_id = effect.dice_num;
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    target.states.add(state_id);
+                }
+            }
+            super::effects::EffectType::RemoveState => {
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                let state_id = effect.dice_num;
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    target.states.remove(state_id);
+                }
+            }
+            super::effects::EffectType::DamageReflect => {
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    target.buffs.add(player_id, effect_type, effect.dice_num, effect.duration.max(1));
+                }
+            }
+            super::effects::EffectType::DamageAbsorbPercent
+            | super::effects::EffectType::DamageReduction
+            | super::effects::EffectType::DamageModifier
+            | super::effects::EffectType::TriggeredDamage => {
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    target.buffs.add(player_id, effect_type, effect.dice_num, effect.duration.max(1));
+                }
+            }
+            super::effects::EffectType::ShieldPercent => {
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    let shield_val = (target.max_life_points as f64 * effect.dice_num as f64 / 100.0) as i32;
+                    target.shield_points += shield_val;
+                    target.buffs.add(player_id, super::effects::EffectType::Shield, shield_val, effect.duration.max(1));
+                }
+            }
+            super::effects::EffectType::SpellModification
+            | super::effects::EffectType::StackingLimit => {
+                // Store as buff — spell modifications tracked via buff system
+                let target_id = fight.fighter_on_cell(cell_id).map(|f| f.id).unwrap_or(player_id);
+                if let Some(target) = fight.get_fighter_mut(target_id) {
+                    target.buffs.add(player_id, effect_type, effect.dice_num, effect.duration.max(1));
+                }
+            }
+            super::effects::EffectType::Portal => {
+                // Eliotrope portal: place a portal mark on the cell
+                fight.marks.place_mark(
+                    super::marks::MarkType::Glyph, player_id, cell_id,
+                    vec![cell_id], vec![], effect.duration.max(1), spell_id as i32,
+                );
+            }
+            super::effects::EffectType::BombCast => {
+                // Roublard bomb: summon a bomb entity
+                super::summons::summon_creature(
+                    session, fight, player_id, cell_id,
+                    effect.dice_num, 1, // bomb = monster_id from param1
+                    fight.get_fighter(player_id).map(|f| f.level).unwrap_or(1),
+                ).await?;
+            }
             _ => {} // Unknown — skip silently
         }
     }

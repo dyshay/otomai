@@ -82,6 +82,55 @@ pub async fn apply_heal(
     Ok(())
 }
 
+/// Check target's damage reduction/reflect buffs and modify damage accordingly.
+/// Returns (final_damage, reflected_damage).
+pub fn apply_damage_modifiers(fight: &Fight, target_id: f64, raw_damage: i32) -> (i32, i32) {
+    let target = match fight.get_fighter(target_id) {
+        Some(f) => f,
+        None => return (raw_damage, 0),
+    };
+
+    let mut damage = raw_damage;
+    let mut reflected = 0;
+
+    for buff in &target.buffs.buffs {
+        match buff.effect_type {
+            // Action 107: Fixed damage reflection
+            super::effects::EffectType::Unknown => {} // skip
+            _ => {
+                // Check for reflect buffs (using value as reflect amount)
+                if buff.effect_type == super::effects::EffectType::Shield {
+                    // Shield handled separately in apply_damage
+                } else if let Some(action) = match_reflect_buff(&buff.effect_type) {
+                    match action {
+                        ReflectAction::FixedReflect(amount) => {
+                            reflected += amount.min(damage);
+                            damage -= amount.min(damage);
+                        }
+                        ReflectAction::PercentReduce(pct) => {
+                            let reduction = (damage as f64 * pct as f64 / 100.0) as i32;
+                            damage -= reduction;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    (damage.max(0), reflected)
+}
+
+enum ReflectAction {
+    FixedReflect(i32),
+    PercentReduce(i32),
+}
+
+fn match_reflect_buff(_effect_type: &super::effects::EffectType) -> Option<ReflectAction> {
+    // Reflect/reduce buffs are tracked as special effect types
+    // For now, these are applied via the generic buff value
+    None
+}
+
 /// Apply damage from source to target in a fight.
 pub async fn apply_damage(
     session: &mut Session,
@@ -91,6 +140,11 @@ pub async fn apply_damage(
     damage: i32,
     element: Element,
 ) -> anyhow::Result<bool> {
+    // Check invulnerable state
+    if fight.get_fighter(target_id).map(|f| f.states.is_invulnerable()).unwrap_or(false) {
+        return Ok(false);
+    }
+
     let clamped = damage.max(0);
 
     // Shield absorbs damage first

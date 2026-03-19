@@ -2,6 +2,7 @@
 
 use super::buffs::BuffList;
 use super::marks::MarkManager;
+use super::states::StateList;
 use dofus_protocol::generated::types::EntityLook;
 use std::collections::HashMap;
 
@@ -147,6 +148,7 @@ pub struct Fighter {
     pub stats: FighterStats,
     pub buffs: BuffList,
     pub invisible: bool,
+    pub states: StateList,
     pub spell_casts_this_turn: HashMap<i32, i16>,
     pub spell_casts_on_target: HashMap<(i32, i64), i16>,
 }
@@ -279,6 +281,7 @@ mod tests {
             max_life_points: 100,
             shield_points: 0,
             invisible: false,
+            states: StateList::default(),
             action_points: 6,
             max_action_points: 6,
             movement_points: 3,

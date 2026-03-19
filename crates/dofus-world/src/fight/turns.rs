@@ -205,6 +205,11 @@ pub async fn handle_fight_movement(
         return Ok(());
     }
 
+    // Check rooted state
+    if current.states.is_rooted() {
+        return Ok(());
+    }
+
     // MP cost = number of cells moved (steps - 1, since first key is start cell)
     let mp_cost = (key_movements.len() as i16 - 1).max(0);
     if mp_cost > current.movement_points {

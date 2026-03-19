@@ -5,6 +5,8 @@ pub mod effects;
 pub mod marks;
 pub mod spells;
 pub mod state;
+pub mod states;
+pub mod summons;
 pub mod turns;
 
 use crate::game_context;
@@ -96,6 +98,7 @@ pub async fn start_pve_fight(
         stats: player_stats,
         shield_points: 0,
         invisible: false,
+        states: states::StateList::default(),
         buffs: BuffList::default(),
         spell_casts_this_turn: HashMap::new(),
         spell_casts_on_target: HashMap::new(),
@@ -132,6 +135,7 @@ pub async fn start_pve_fight(
         stats: FighterStats::default(),
         shield_points: 0,
         invisible: false,
+        states: states::StateList::default(),
         buffs: BuffList::default(),
         spell_casts_this_turn: HashMap::new(),
         spell_casts_on_target: HashMap::new(),

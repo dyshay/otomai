@@ -96,6 +96,19 @@ pub enum EffectType {
     Invisibility,
     PlaceGlyph,
     PlaceTrap,
+    DamageReflect,        // 107: Reflect fixed damage back to attacker
+    DamageAbsorbPercent,  // 220: Absorb % of damage
+    DamageReduction,      // 265: Reduce incoming damage by fixed amount
+    DamageModifier,       // 792/793: Modify damage sent/received %
+    TriggeredDamage,      // 1163/1164: Trigger damage on specific conditions
+    Summon,               // 181: Summon creature
+    SelfDamage,           // 90: Self-inflicted damage
+    AddState,             // 950: Add a state (root, gravity, etc.)
+    RemoveState,          // 952: Remove a state
+    SpellModification,    // 283/293: Modify another spell
+    StackingLimit,        // 1061: Limit buff stacking
+    Portal,               // 1009: Eliotrope portal
+    BombCast,             // 1008: Roublard bomb
     Unknown,
 }
 
@@ -160,6 +173,28 @@ pub fn classify(effect_id: i32) -> EffectType {
         POISON_FIRE => EffectType::Poison(Element::Fire),
         POISON_WATER => EffectType::Poison(Element::Water),
         POISON_AIR => EffectType::Poison(Element::Air),
+
+        107 => EffectType::DamageReflect,
+        220 => EffectType::DamageAbsorbPercent,
+        265 => EffectType::DamageReduction,
+        792 | 793 => EffectType::DamageModifier,
+        1163 | 1164 => EffectType::TriggeredDamage,
+        1223 | 1123 => EffectType::DamageModifier,
+
+        181 => EffectType::Summon,
+        90 => EffectType::SelfDamage,
+
+        950 => EffectType::AddState,
+        952 => EffectType::RemoveState,
+        780 | 782 | 783 | 1027 | 1181 => EffectType::AddState, // State-related checks
+
+        283 | 293 => EffectType::SpellModification,
+        1061 => EffectType::StackingLimit,
+
+        1009 => EffectType::Portal,
+        1008 => EffectType::BombCast,
+
+        1097 | 2023 => EffectType::DamageModifier, // Ranged bonus, special check
 
         PUSH => EffectType::Push,
         PULL => EffectType::Pull,
