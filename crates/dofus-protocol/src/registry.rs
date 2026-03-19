@@ -71,6 +71,14 @@ protocol_registry! {
     LifePointsRegenBeginMessage(game::LifePointsRegenBeginMessage),
     ServerExperienceModificatorMessage(game::ServerExperienceModificatorMessage),
     GameContextRemoveElementMessage(game::GameContextRemoveElementMessage),
+    // Phase 2 — Movement + map transitions
+    GameMapMovementRequestMessage(game::GameMapMovementRequestMessage),
+    GameMapMovementMessage(game::GameMapMovementMessage),
+    GameMapMovementConfirmMessage(game::GameMapMovementConfirmMessage),
+    GameMapMovementCancelMessage(game::GameMapMovementCancelMessage),
+    ChangeMapMessage(game::ChangeMapMessage),
+    GameMapChangeOrientationRequestMessage(game::GameMapChangeOrientationRequestMessage),
+    GameMapChangeOrientationMessage(game::GameMapChangeOrientationMessage),
 }
 
 #[cfg(test)]

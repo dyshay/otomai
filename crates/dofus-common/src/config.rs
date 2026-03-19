@@ -19,6 +19,9 @@ pub struct WorldConfig {
     pub database_url: String,
     #[serde(default = "default_protocol_version")]
     pub protocol_version: String,
+    /// Path to the client content/maps/ directory containing maps*.d2p files.
+    #[serde(default)]
+    pub maps_dir: Option<String>,
 }
 
 fn default_protocol_version() -> String {

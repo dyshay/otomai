@@ -92,6 +92,16 @@ impl World {
             .map(|m| m.players.values().cloned().collect())
             .unwrap_or_default()
     }
+
+    /// Update a player's cell position on their current map.
+    pub async fn update_player_cell(&self, map_id: i64, character_id: i64, cell_id: i16) {
+        let mut maps = self.maps.write().await;
+        if let Some(world_map) = maps.get_mut(&map_id) {
+            if let Some(player) = world_map.players.get_mut(&character_id) {
+                player.cell_id = cell_id;
+            }
+        }
+    }
 }
 
 /// Build a GameRolePlayShowActorMessage (ID 3267) as raw bytes.

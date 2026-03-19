@@ -2,6 +2,8 @@ mod character_selection;
 mod game_context;
 mod handler;
 mod inventory;
+pub mod map_cache;
+mod movement;
 mod spells;
 mod stats;
 mod ticket;
@@ -11,7 +13,7 @@ use clap::Parser;
 use dofus_common::config::WorldConfig;
 use dofus_database;
 use dofus_network::server;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 #[derive(Parser)]
@@ -25,6 +27,7 @@ pub struct WorldState {
     pub config: WorldConfig,
     pub pool: sqlx::PgPool,
     pub world: world::World,
+    pub maps: map_cache::MapCache,
 }
 
 #[tokio::main]
@@ -45,10 +48,21 @@ async fn main() -> anyhow::Result<()> {
     dofus_database::run_migrations(&pool).await?;
     tracing::info!("Database ready");
 
+    // Load map data from D2P archives
+    let maps = if let Some(ref maps_dir) = config.maps_dir {
+        tracing::info!("Loading maps from {}", maps_dir);
+        map_cache::MapCache::load_from_dir(Path::new(maps_dir))?
+    } else {
+        tracing::warn!("No maps_dir configured — map transitions will be disabled");
+        map_cache::MapCache::empty()
+    };
+    tracing::info!("Map cache: {} raw maps loaded", maps.raw_count());
+
     let state = Arc::new(WorldState {
         config: config.clone(),
         pool,
         world: world::World::new(),
+        maps,
     });
 
     let addr = format!("{}:{}", config.host, config.port);

@@ -72,8 +72,8 @@ pub fn build_entity_look(c: &Character) -> EntityLook {
     }
 }
 
-/// Build MapComplementaryInformationsDataMessage with actors from the world state.
-fn build_map_complementary(sub_area_id: i16, map_id: f64, players: &[MapPlayer]) -> Vec<u8> {
+/// Build MapComplementaryInformationsDataMessage payload with actors.
+pub fn build_map_complementary_payload(sub_area_id: i16, map_id: f64, players: &[MapPlayer]) -> Vec<u8> {
     let mut w = BigEndianWriter::new();
     w.write_var_short(sub_area_id);
     w.write_double(map_id);
@@ -142,9 +142,14 @@ pub async fn handle_game_context_create(
 
     // Get all players on the map (including self) for MapComplementary
     let players = state.world.get_players_on_map(map_id).await;
+    let sub_area_id = state
+        .maps
+        .get(map_id)
+        .map(|m| m.sub_area_id as i16)
+        .unwrap_or(DEFAULT_SUB_AREA_ID);
 
     // 3. MapComplementaryInformationsDataMessage — unblocks loading screen
-    let payload = build_map_complementary(DEFAULT_SUB_AREA_ID, map_id_f64, &players);
+    let payload = build_map_complementary_payload(sub_area_id, map_id_f64, &players);
     session
         .send_raw(RawMessage {
             message_id: MAP_COMPLEMENTARY_MSG_ID,
@@ -259,7 +264,7 @@ mod tests {
 
     #[test]
     fn map_complementary_empty_is_valid() {
-        let data = build_map_complementary(449, 154010883.0, &[]);
+        let data = build_map_complementary_payload(449, 154010883.0, &[]);
         let mut r = BigEndianReader::new(data);
 
         let sub_area = r.read_var_short().unwrap();
@@ -312,7 +317,7 @@ mod tests {
             tx,
         };
 
-        let data = build_map_complementary(449, 154010883.0, &[player]);
+        let data = build_map_complementary_payload(449, 154010883.0, &[player]);
         let mut r = BigEndianReader::new(data);
 
         let _sub_area = r.read_var_short().unwrap();
