@@ -1,7 +1,11 @@
 mod character_selection;
 mod game_context;
 mod handler;
+mod inventory;
+mod spells;
+mod stats;
 mod ticket;
+pub mod world;
 
 use clap::Parser;
 use dofus_common::config::WorldConfig;
@@ -20,6 +24,7 @@ struct Cli {
 pub struct WorldState {
     pub config: WorldConfig,
     pub pool: sqlx::PgPool,
+    pub world: world::World,
 }
 
 #[tokio::main]
@@ -43,6 +48,7 @@ async fn main() -> anyhow::Result<()> {
     let state = Arc::new(WorldState {
         config: config.clone(),
         pool,
+        world: world::World::new(),
     });
 
     let addr = format!("{}:{}", config.host, config.port);

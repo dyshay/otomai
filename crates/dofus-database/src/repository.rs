@@ -1,4 +1,4 @@
-use crate::models::{Account, Character, GameData, Server, Ticket};
+use crate::models::{Account, Character, GameData, Server, Spell, Ticket};
 use sqlx::PgPool;
 
 // --- Accounts ---
@@ -152,6 +152,10 @@ pub async fn get_character_for_account(
     Ok(character)
 }
 
+/// Default spawn: Incarnam statue.
+const DEFAULT_MAP_ID: i64 = 154010883;
+const DEFAULT_CELL_ID: i32 = 297;
+
 pub async fn create_character(
     pool: &PgPool,
     account_id: i64,
@@ -160,17 +164,32 @@ pub async fn create_character(
     sex: i32,
     colors: &serde_json::Value,
 ) -> anyhow::Result<Character> {
+    let default_stats = serde_json::json!({
+        "vitality": 0,
+        "wisdom": 0,
+        "strength": 0,
+        "intelligence": 0,
+        "chance": 0,
+        "agility": 0
+    });
     let character = sqlx::query_as::<_, Character>(
-        "INSERT INTO characters (account_id, name, breed_id, sex, colors)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        "INSERT INTO characters (account_id, name, breed_id, sex, colors, map_id, cell_id, direction, stats)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 1, $8) RETURNING *",
     )
     .bind(account_id)
     .bind(name)
     .bind(breed_id)
     .bind(sex)
     .bind(colors)
+    .bind(DEFAULT_MAP_ID)
+    .bind(DEFAULT_CELL_ID)
+    .bind(&default_stats)
     .fetch_one(pool)
     .await?;
+
+    // Insert breed starting spells
+    insert_breed_spells(pool, character.id, breed_id).await?;
+
     Ok(character)
 }
 
@@ -368,4 +387,87 @@ pub async fn get_game_file_data(
     .fetch_optional(pool)
     .await?;
     Ok(row.and_then(|r| r.0))
+}
+
+// --- Spells ---
+
+pub async fn list_spells(
+    pool: &PgPool,
+    character_id: i64,
+) -> anyhow::Result<Vec<Spell>> {
+    let spells = sqlx::query_as::<_, Spell>(
+        "SELECT * FROM spells WHERE character_id = $1 ORDER BY spell_id",
+    )
+    .bind(character_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(spells)
+}
+
+/// Breed starting spells — first 3 spells per breed (breed_id 1-18).
+/// Source: Breeds D2O data, spells field.
+const BREED_SPELLS: &[(i32, &[i32])] = &[
+    (1,  &[3, 6, 17]),       // Feca
+    (2,  &[21, 22, 23]),     // Osamodas
+    (3,  &[41, 43, 44]),     // Enutrof
+    (4,  &[61, 62, 65]),     // Sram
+    (5,  &[81, 82, 83]),     // Xelor
+    (6,  &[102, 103, 105]),  // Ecaflip
+    (7,  &[121, 124, 125]),  // Eniripsa
+    (8,  &[141, 142, 143]),  // Iop
+    (9,  &[161, 162, 163]),  // Cra
+    (10, &[183, 184, 189]),  // Sadida
+    (11, &[432, 433, 434]),  // Sacrieur
+    (12, &[686, 687, 688]),  // Pandawa
+    (13, &[2763, 2766, 2769]), // Roublard
+    (14, &[2872, 2876, 2878]), // Zobal
+    (15, &[2980, 2981, 2982]), // Steamer
+    (16, &[3499, 3500, 3501]), // Eliotrope
+    (17, &[4627, 4628, 4629]), // Huppermage
+    (18, &[5084, 5085, 5086]), // Ouginak
+];
+
+pub async fn insert_breed_spells(
+    pool: &PgPool,
+    character_id: i64,
+    breed_id: i32,
+) -> anyhow::Result<()> {
+    let spells = BREED_SPELLS
+        .iter()
+        .find(|(id, _)| *id == breed_id)
+        .map(|(_, s)| *s)
+        .unwrap_or(&[]);
+
+    for (pos, spell_id) in spells.iter().enumerate() {
+        sqlx::query(
+            "INSERT INTO spells (character_id, spell_id, level, position)
+             VALUES ($1, $2, 1, $3)
+             ON CONFLICT (character_id, spell_id) DO NOTHING",
+        )
+        .bind(character_id)
+        .bind(*spell_id)
+        .bind(pos as i32)
+        .execute(pool)
+        .await?;
+    }
+    Ok(())
+}
+
+pub async fn update_character_position(
+    pool: &PgPool,
+    character_id: i64,
+    map_id: i64,
+    cell_id: i32,
+    direction: i32,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "UPDATE characters SET map_id = $2, cell_id = $3, direction = $4 WHERE id = $1",
+    )
+    .bind(character_id)
+    .bind(map_id)
+    .bind(cell_id)
+    .bind(direction)
+    .execute(pool)
+    .await?;
+    Ok(())
 }

@@ -54,6 +54,14 @@ pub struct Character {
     pub last_login: Option<DateTime<Utc>>,
 }
 
+#[derive(Debug, Clone, FromRow)]
+pub struct Spell {
+    pub character_id: i64,
+    pub spell_id: i32,
+    pub level: i32,
+    pub position: i32,
+}
+
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct GameData {
     pub file_name: String,

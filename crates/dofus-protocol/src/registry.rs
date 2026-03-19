@@ -61,6 +61,16 @@ protocol_registry! {
     GameContextCreateRequestMessage(game::GameContextCreateRequestMessage),
     CharacterNameSuggestionRequestMessage(game::CharacterNameSuggestionRequestMessage),
     CharacterCreationRequestMessage(game::CharacterCreationRequestMessage),
+    // Phase 1 — Enter world
+    CharacterStatsListMessage(game::CharacterStatsListMessage),
+    InventoryContentMessage(game::InventoryContentMessage),
+    InventoryWeightMessage(game::InventoryWeightMessage),
+    SpellListMessage(game::SpellListMessage),
+    SetCharacterRestrictionsMessage(game::SetCharacterRestrictionsMessage),
+    CharacterLoadingCompleteMessage(game::CharacterLoadingCompleteMessage),
+    LifePointsRegenBeginMessage(game::LifePointsRegenBeginMessage),
+    ServerExperienceModificatorMessage(game::ServerExperienceModificatorMessage),
+    GameContextRemoveElementMessage(game::GameContextRemoveElementMessage),
 }
 
 #[cfg(test)]

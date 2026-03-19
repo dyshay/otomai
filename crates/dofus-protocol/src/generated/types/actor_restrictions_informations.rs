@@ -34,35 +34,44 @@ pub struct ActorRestrictionsInformations {
 
 impl DofusSerialize for ActorRestrictionsInformations {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.cant_be_aggressed).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.cant_be_challenged).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 2, self.cant_trade).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 3, self.cant_be_attacked_by_mutant).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 4, self.cant_run).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 5, self.force_slow_walk).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 6, self.cant_minimize).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 7, self.cant_move).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 8, self.cant_aggress).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 9, self.cant_challenge).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 10, self.cant_exchange).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 11, self.cant_attack).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 12, self.cant_chat).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 13, self.cant_be_merchant).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 14, self.cant_use_object).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 15, self.cant_use_tax_collector).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 16, self.cant_use_interactive).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 17, self.cant_speak_to_n_p_c).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 18, self.cant_change_zone).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 19, self.cant_attack_monster).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 20, self.cant_walk8_directions).unwrap();
-        writer.write_byte(_flag);
+        // Byte 0: bits 0-7
+        let mut _flag0: u8 = 0;
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 0, self.cant_be_aggressed).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 1, self.cant_be_challenged).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 2, self.cant_trade).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 3, self.cant_be_attacked_by_mutant).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 4, self.cant_run).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 5, self.force_slow_walk).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 6, self.cant_minimize).unwrap();
+        _flag0 = boolean_byte_wrapper::set_flag(_flag0, 7, self.cant_move).unwrap();
+        writer.write_byte(_flag0);
+        // Byte 1: bits 8-15
+        let mut _flag1: u8 = 0;
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 0, self.cant_aggress).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 1, self.cant_challenge).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 2, self.cant_exchange).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 3, self.cant_attack).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 4, self.cant_chat).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 5, self.cant_be_merchant).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 6, self.cant_use_object).unwrap();
+        _flag1 = boolean_byte_wrapper::set_flag(_flag1, 7, self.cant_use_tax_collector).unwrap();
+        writer.write_byte(_flag1);
+        // Byte 2: bits 16-20
+        let mut _flag2: u8 = 0;
+        _flag2 = boolean_byte_wrapper::set_flag(_flag2, 0, self.cant_use_interactive).unwrap();
+        _flag2 = boolean_byte_wrapper::set_flag(_flag2, 1, self.cant_speak_to_n_p_c).unwrap();
+        _flag2 = boolean_byte_wrapper::set_flag(_flag2, 2, self.cant_change_zone).unwrap();
+        _flag2 = boolean_byte_wrapper::set_flag(_flag2, 3, self.cant_attack_monster).unwrap();
+        _flag2 = boolean_byte_wrapper::set_flag(_flag2, 4, self.cant_walk8_directions).unwrap();
+        writer.write_byte(_flag2);
     }
 }
 
 impl DofusDeserialize for ActorRestrictionsInformations {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         let _flag0 = reader.read_byte()?;
+        let _flag1 = reader.read_byte()?;
+        let _flag2 = reader.read_byte()?;
         Ok(Self {
             cant_be_aggressed: boolean_byte_wrapper::get_flag(_flag0, 0)?,
             cant_be_challenged: boolean_byte_wrapper::get_flag(_flag0, 1)?,
@@ -72,19 +81,19 @@ impl DofusDeserialize for ActorRestrictionsInformations {
             force_slow_walk: boolean_byte_wrapper::get_flag(_flag0, 5)?,
             cant_minimize: boolean_byte_wrapper::get_flag(_flag0, 6)?,
             cant_move: boolean_byte_wrapper::get_flag(_flag0, 7)?,
-            cant_aggress: boolean_byte_wrapper::get_flag(_flag0, 8)?,
-            cant_challenge: boolean_byte_wrapper::get_flag(_flag0, 9)?,
-            cant_exchange: boolean_byte_wrapper::get_flag(_flag0, 10)?,
-            cant_attack: boolean_byte_wrapper::get_flag(_flag0, 11)?,
-            cant_chat: boolean_byte_wrapper::get_flag(_flag0, 12)?,
-            cant_be_merchant: boolean_byte_wrapper::get_flag(_flag0, 13)?,
-            cant_use_object: boolean_byte_wrapper::get_flag(_flag0, 14)?,
-            cant_use_tax_collector: boolean_byte_wrapper::get_flag(_flag0, 15)?,
-            cant_use_interactive: boolean_byte_wrapper::get_flag(_flag0, 16)?,
-            cant_speak_to_n_p_c: boolean_byte_wrapper::get_flag(_flag0, 17)?,
-            cant_change_zone: boolean_byte_wrapper::get_flag(_flag0, 18)?,
-            cant_attack_monster: boolean_byte_wrapper::get_flag(_flag0, 19)?,
-            cant_walk8_directions: boolean_byte_wrapper::get_flag(_flag0, 20)?,
+            cant_aggress: boolean_byte_wrapper::get_flag(_flag1, 0)?,
+            cant_challenge: boolean_byte_wrapper::get_flag(_flag1, 1)?,
+            cant_exchange: boolean_byte_wrapper::get_flag(_flag1, 2)?,
+            cant_attack: boolean_byte_wrapper::get_flag(_flag1, 3)?,
+            cant_chat: boolean_byte_wrapper::get_flag(_flag1, 4)?,
+            cant_be_merchant: boolean_byte_wrapper::get_flag(_flag1, 5)?,
+            cant_use_object: boolean_byte_wrapper::get_flag(_flag1, 6)?,
+            cant_use_tax_collector: boolean_byte_wrapper::get_flag(_flag1, 7)?,
+            cant_use_interactive: boolean_byte_wrapper::get_flag(_flag2, 0)?,
+            cant_speak_to_n_p_c: boolean_byte_wrapper::get_flag(_flag2, 1)?,
+            cant_change_zone: boolean_byte_wrapper::get_flag(_flag2, 2)?,
+            cant_attack_monster: boolean_byte_wrapper::get_flag(_flag2, 3)?,
+            cant_walk8_directions: boolean_byte_wrapper::get_flag(_flag2, 4)?,
         })
     }
 }
