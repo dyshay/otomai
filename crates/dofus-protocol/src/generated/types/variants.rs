@@ -5,2747 +5,6 @@ use dofus_io::{BigEndianReader, BigEndianWriter, DofusDeserialize, DofusSerializ
 use super::*;
 use anyhow::Result;
 
-/// Polymorphic enum for Preset hierarchy
-#[derive(Debug, Clone)]
-pub enum PresetVariant {
-    Preset(Preset),
-    StatsPreset(StatsPreset),
-    ItemsPreset(ItemsPreset),
-    IdolsPreset(IdolsPreset),
-    PresetsContainerPreset(PresetsContainerPreset),
-    IconNamedPreset(IconNamedPreset),
-    SpellsPreset(SpellsPreset),
-    EntitiesPreset(EntitiesPreset),
-    ForgettableSpellsPreset(ForgettableSpellsPreset),
-    FullStatsPreset(FullStatsPreset),
-}
-
-impl Default for PresetVariant {
-    fn default() -> Self {
-        Self::Preset(Preset::default())
-    }
-}
-
-impl PresetVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::Preset(_) => 2126,
-            Self::StatsPreset(_) => 440,
-            Self::ItemsPreset(_) => 870,
-            Self::IdolsPreset(_) => 1498,
-            Self::PresetsContainerPreset(_) => 2645,
-            Self::IconNamedPreset(_) => 3146,
-            Self::SpellsPreset(_) => 3404,
-            Self::EntitiesPreset(_) => 4714,
-            Self::ForgettableSpellsPreset(_) => 7096,
-            Self::FullStatsPreset(_) => 7986,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2126 => Ok(Self::Preset(Preset::deserialize(reader)?)),
-            440 => Ok(Self::StatsPreset(StatsPreset::deserialize(reader)?)),
-            870 => Ok(Self::ItemsPreset(ItemsPreset::deserialize(reader)?)),
-            1498 => Ok(Self::IdolsPreset(IdolsPreset::deserialize(reader)?)),
-            2645 => Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?)),
-            3146 => Ok(Self::IconNamedPreset(IconNamedPreset::deserialize(reader)?)),
-            3404 => Ok(Self::SpellsPreset(SpellsPreset::deserialize(reader)?)),
-            4714 => Ok(Self::EntitiesPreset(EntitiesPreset::deserialize(reader)?)),
-            7096 => Ok(Self::ForgettableSpellsPreset(ForgettableSpellsPreset::deserialize(reader)?)),
-            7986 => Ok(Self::FullStatsPreset(FullStatsPreset::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown Preset type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PresetVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::Preset(v) => v.serialize(writer),
-            Self::StatsPreset(v) => v.serialize(writer),
-            Self::ItemsPreset(v) => v.serialize(writer),
-            Self::IdolsPreset(v) => v.serialize(writer),
-            Self::PresetsContainerPreset(v) => v.serialize(writer),
-            Self::IconNamedPreset(v) => v.serialize(writer),
-            Self::SpellsPreset(v) => v.serialize(writer),
-            Self::EntitiesPreset(v) => v.serialize(writer),
-            Self::ForgettableSpellsPreset(v) => v.serialize(writer),
-            Self::FullStatsPreset(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PresetVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::Preset(Preset::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for BasicNamedAllianceInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum BasicNamedAllianceInformationsVariant {
-    BasicNamedAllianceInformations(BasicNamedAllianceInformations),
-    AllianceInformations(AllianceInformations),
-    AllianceFactSheetInformations(AllianceFactSheetInformations),
-}
-
-impl Default for BasicNamedAllianceInformationsVariant {
-    fn default() -> Self {
-        Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::default())
-    }
-}
-
-impl BasicNamedAllianceInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::BasicNamedAllianceInformations(_) => 5935,
-            Self::AllianceInformations(_) => 2484,
-            Self::AllianceFactSheetInformations(_) => 6853,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5935 => Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?)),
-            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
-            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown BasicNamedAllianceInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for BasicNamedAllianceInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::BasicNamedAllianceInformations(v) => v.serialize(writer),
-            Self::AllianceInformations(v) => v.serialize(writer),
-            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for BasicNamedAllianceInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PlayerStatus hierarchy
-#[derive(Debug, Clone)]
-pub enum PlayerStatusVariant {
-    PlayerStatus(PlayerStatus),
-    PlayerStatusExtended(PlayerStatusExtended),
-}
-
-impl Default for PlayerStatusVariant {
-    fn default() -> Self {
-        Self::PlayerStatus(PlayerStatus::default())
-    }
-}
-
-impl PlayerStatusVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PlayerStatus(_) => 6513,
-            Self::PlayerStatusExtended(_) => 2943,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6513 => Ok(Self::PlayerStatus(PlayerStatus::deserialize(reader)?)),
-            2943 => Ok(Self::PlayerStatusExtended(PlayerStatusExtended::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PlayerStatus type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PlayerStatusVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PlayerStatus(v) => v.serialize(writer),
-            Self::PlayerStatusExtended(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PlayerStatusVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PlayerStatus(PlayerStatus::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for QuestActiveInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum QuestActiveInformationsVariant {
-    QuestActiveInformations(QuestActiveInformations),
-    QuestActiveDetailedInformations(QuestActiveDetailedInformations),
-}
-
-impl Default for QuestActiveInformationsVariant {
-    fn default() -> Self {
-        Self::QuestActiveInformations(QuestActiveInformations::default())
-    }
-}
-
-impl QuestActiveInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::QuestActiveInformations(_) => 2513,
-            Self::QuestActiveDetailedInformations(_) => 3438,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2513 => Ok(Self::QuestActiveInformations(QuestActiveInformations::deserialize(reader)?)),
-            3438 => Ok(Self::QuestActiveDetailedInformations(QuestActiveDetailedInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown QuestActiveInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for QuestActiveInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::QuestActiveInformations(v) => v.serialize(writer),
-            Self::QuestActiveDetailedInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for QuestActiveInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::QuestActiveInformations(QuestActiveInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameContextActorInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameContextActorInformationsVariant {
-    GameContextActorInformations(GameContextActorInformations),
-    GameRolePlayActorInformations(GameRolePlayActorInformations),
-    GameRolePlayPrismInformations(GameRolePlayPrismInformations),
-    GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations),
-    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
-    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
-    GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations),
-    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
-    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
-    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
-    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
-    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
-    GameRolePlayMountInformations(GameRolePlayMountInformations),
-    GameRolePlayPortalInformations(GameRolePlayPortalInformations),
-    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
-    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
-    GameFightFighterInformations(GameFightFighterInformations),
-    GameFightAIInformations(GameFightAIInformations),
-    GameFightMonsterInformations(GameFightMonsterInformations),
-    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
-    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
-    GameFightFighterNamedInformations(GameFightFighterNamedInformations),
-    GameFightMutantInformations(GameFightMutantInformations),
-    GameFightCharacterInformations(GameFightCharacterInformations),
-    GameFightEntityInformation(GameFightEntityInformation),
-}
-
-impl Default for GameContextActorInformationsVariant {
-    fn default() -> Self {
-        Self::GameContextActorInformations(GameContextActorInformations::default())
-    }
-}
-
-impl GameContextActorInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameContextActorInformations(_) => 424,
-            Self::GameRolePlayActorInformations(_) => 2333,
-            Self::GameRolePlayPrismInformations(_) => 7,
-            Self::GameRolePlayTaxCollectorInformations(_) => 3424,
-            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
-            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
-            Self::GameRolePlayTreasureHintInformations(_) => 5073,
-            Self::GameRolePlayNamedActorInformations(_) => 5940,
-            Self::GameRolePlayMerchantInformations(_) => 1204,
-            Self::GameRolePlayHumanoidInformations(_) => 2640,
-            Self::GameRolePlayCharacterInformations(_) => 5268,
-            Self::GameRolePlayMutantInformations(_) => 8271,
-            Self::GameRolePlayMountInformations(_) => 4944,
-            Self::GameRolePlayPortalInformations(_) => 6138,
-            Self::GameRolePlayNpcInformations(_) => 8307,
-            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
-            Self::GameFightFighterInformations(_) => 8400,
-            Self::GameFightAIInformations(_) => 950,
-            Self::GameFightMonsterInformations(_) => 6096,
-            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
-            Self::GameFightTaxCollectorInformations(_) => 6975,
-            Self::GameFightFighterNamedInformations(_) => 6665,
-            Self::GameFightMutantInformations(_) => 4633,
-            Self::GameFightCharacterInformations(_) => 7807,
-            Self::GameFightEntityInformation(_) => 9631,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            424 => Ok(Self::GameContextActorInformations(GameContextActorInformations::deserialize(reader)?)),
-            2333 => Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?)),
-            7 => Ok(Self::GameRolePlayPrismInformations(GameRolePlayPrismInformations::deserialize(reader)?)),
-            3424 => Ok(Self::GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations::deserialize(reader)?)),
-            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
-            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
-            5073 => Ok(Self::GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations::deserialize(reader)?)),
-            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
-            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
-            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
-            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
-            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
-            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
-            6138 => Ok(Self::GameRolePlayPortalInformations(GameRolePlayPortalInformations::deserialize(reader)?)),
-            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
-            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
-            8400 => Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?)),
-            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
-            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
-            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
-            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
-            6665 => Ok(Self::GameFightFighterNamedInformations(GameFightFighterNamedInformations::deserialize(reader)?)),
-            4633 => Ok(Self::GameFightMutantInformations(GameFightMutantInformations::deserialize(reader)?)),
-            7807 => Ok(Self::GameFightCharacterInformations(GameFightCharacterInformations::deserialize(reader)?)),
-            9631 => Ok(Self::GameFightEntityInformation(GameFightEntityInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameContextActorInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameContextActorInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameContextActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayPrismInformations(v) => v.serialize(writer),
-            Self::GameRolePlayTaxCollectorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
-            Self::GameRolePlayTreasureHintInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
-            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
-            Self::GameRolePlayPortalInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
-            Self::GameFightFighterInformations(v) => v.serialize(writer),
-            Self::GameFightAIInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
-            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
-            Self::GameFightFighterNamedInformations(v) => v.serialize(writer),
-            Self::GameFightMutantInformations(v) => v.serialize(writer),
-            Self::GameFightCharacterInformations(v) => v.serialize(writer),
-            Self::GameFightEntityInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameContextActorInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameContextActorInformations(GameContextActorInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameRolePlayActorInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameRolePlayActorInformationsVariant {
-    GameRolePlayActorInformations(GameRolePlayActorInformations),
-    GameRolePlayPrismInformations(GameRolePlayPrismInformations),
-    GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations),
-    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
-    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
-    GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations),
-    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
-    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
-    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
-    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
-    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
-    GameRolePlayMountInformations(GameRolePlayMountInformations),
-    GameRolePlayPortalInformations(GameRolePlayPortalInformations),
-    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
-    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
-}
-
-impl Default for GameRolePlayActorInformationsVariant {
-    fn default() -> Self {
-        Self::GameRolePlayActorInformations(GameRolePlayActorInformations::default())
-    }
-}
-
-impl GameRolePlayActorInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameRolePlayActorInformations(_) => 2333,
-            Self::GameRolePlayPrismInformations(_) => 7,
-            Self::GameRolePlayTaxCollectorInformations(_) => 3424,
-            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
-            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
-            Self::GameRolePlayTreasureHintInformations(_) => 5073,
-            Self::GameRolePlayNamedActorInformations(_) => 5940,
-            Self::GameRolePlayMerchantInformations(_) => 1204,
-            Self::GameRolePlayHumanoidInformations(_) => 2640,
-            Self::GameRolePlayCharacterInformations(_) => 5268,
-            Self::GameRolePlayMutantInformations(_) => 8271,
-            Self::GameRolePlayMountInformations(_) => 4944,
-            Self::GameRolePlayPortalInformations(_) => 6138,
-            Self::GameRolePlayNpcInformations(_) => 8307,
-            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2333 => Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?)),
-            7 => Ok(Self::GameRolePlayPrismInformations(GameRolePlayPrismInformations::deserialize(reader)?)),
-            3424 => Ok(Self::GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations::deserialize(reader)?)),
-            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
-            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
-            5073 => Ok(Self::GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations::deserialize(reader)?)),
-            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
-            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
-            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
-            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
-            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
-            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
-            6138 => Ok(Self::GameRolePlayPortalInformations(GameRolePlayPortalInformations::deserialize(reader)?)),
-            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
-            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameRolePlayActorInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameRolePlayActorInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameRolePlayActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayPrismInformations(v) => v.serialize(writer),
-            Self::GameRolePlayTaxCollectorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
-            Self::GameRolePlayTreasureHintInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
-            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
-            Self::GameRolePlayPortalInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameRolePlayActorInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for MapCoordinates hierarchy
-#[derive(Debug, Clone)]
-pub enum MapCoordinatesVariant {
-    MapCoordinates(MapCoordinates),
-    MapCoordinatesAndId(MapCoordinatesAndId),
-    MapCoordinatesExtended(MapCoordinatesExtended),
-}
-
-impl Default for MapCoordinatesVariant {
-    fn default() -> Self {
-        Self::MapCoordinates(MapCoordinates::default())
-    }
-}
-
-impl MapCoordinatesVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::MapCoordinates(_) => 2571,
-            Self::MapCoordinatesAndId(_) => 5358,
-            Self::MapCoordinatesExtended(_) => 1591,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2571 => Ok(Self::MapCoordinates(MapCoordinates::deserialize(reader)?)),
-            5358 => Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?)),
-            1591 => Ok(Self::MapCoordinatesExtended(MapCoordinatesExtended::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown MapCoordinates type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for MapCoordinatesVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::MapCoordinates(v) => v.serialize(writer),
-            Self::MapCoordinatesAndId(v) => v.serialize(writer),
-            Self::MapCoordinatesExtended(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for MapCoordinatesVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::MapCoordinates(MapCoordinates::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ObjectItemMinimalInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum ObjectItemMinimalInformationVariant {
-    ObjectItemMinimalInformation(ObjectItemMinimalInformation),
-    ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop),
-    ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity),
-}
-
-impl Default for ObjectItemMinimalInformationVariant {
-    fn default() -> Self {
-        Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::default())
-    }
-}
-
-impl ObjectItemMinimalInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ObjectItemMinimalInformation(_) => 4416,
-            Self::ObjectItemToSellInNpcShop(_) => 2852,
-            Self::ObjectItemInformationWithQuantity(_) => 6404,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4416 => Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?)),
-            2852 => Ok(Self::ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop::deserialize(reader)?)),
-            6404 => Ok(Self::ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectItemMinimalInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ObjectItemMinimalInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ObjectItemMinimalInformation(v) => v.serialize(writer),
-            Self::ObjectItemToSellInNpcShop(v) => v.serialize(writer),
-            Self::ObjectItemInformationWithQuantity(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ObjectItemMinimalInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for BasicAllianceInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum BasicAllianceInformationsVariant {
-    BasicAllianceInformations(BasicAllianceInformations),
-    BasicNamedAllianceInformations(BasicNamedAllianceInformations),
-    AllianceInformations(AllianceInformations),
-    AllianceFactSheetInformations(AllianceFactSheetInformations),
-}
-
-impl Default for BasicAllianceInformationsVariant {
-    fn default() -> Self {
-        Self::BasicAllianceInformations(BasicAllianceInformations::default())
-    }
-}
-
-impl BasicAllianceInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::BasicAllianceInformations(_) => 3988,
-            Self::BasicNamedAllianceInformations(_) => 5935,
-            Self::AllianceInformations(_) => 2484,
-            Self::AllianceFactSheetInformations(_) => 6853,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            3988 => Ok(Self::BasicAllianceInformations(BasicAllianceInformations::deserialize(reader)?)),
-            5935 => Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?)),
-            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
-            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown BasicAllianceInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for BasicAllianceInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::BasicAllianceInformations(v) => v.serialize(writer),
-            Self::BasicNamedAllianceInformations(v) => v.serialize(writer),
-            Self::AllianceInformations(v) => v.serialize(writer),
-            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for BasicAllianceInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::BasicAllianceInformations(BasicAllianceInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightTemporaryBoostEffect hierarchy
-#[derive(Debug, Clone)]
-pub enum FightTemporaryBoostEffectVariant {
-    FightTemporaryBoostEffect(FightTemporaryBoostEffect),
-    FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect),
-    FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect),
-    FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect),
-}
-
-impl Default for FightTemporaryBoostEffectVariant {
-    fn default() -> Self {
-        Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::default())
-    }
-}
-
-impl FightTemporaryBoostEffectVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightTemporaryBoostEffect(_) => 2668,
-            Self::FightTemporaryBoostWeaponDamagesEffect(_) => 4451,
-            Self::FightTemporarySpellBoostEffect(_) => 5674,
-            Self::FightTemporaryBoostStateEffect(_) => 7115,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2668 => Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?)),
-            4451 => Ok(Self::FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect::deserialize(reader)?)),
-            5674 => Ok(Self::FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect::deserialize(reader)?)),
-            7115 => Ok(Self::FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightTemporaryBoostEffect type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightTemporaryBoostEffectVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightTemporaryBoostEffect(v) => v.serialize(writer),
-            Self::FightTemporaryBoostWeaponDamagesEffect(v) => v.serialize(writer),
-            Self::FightTemporarySpellBoostEffect(v) => v.serialize(writer),
-            Self::FightTemporaryBoostStateEffect(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightTemporaryBoostEffectVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for QuestObjectiveInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum QuestObjectiveInformationsVariant {
-    QuestObjectiveInformations(QuestObjectiveInformations),
-    QuestObjectiveInformationsWithCompletion(QuestObjectiveInformationsWithCompletion),
-}
-
-impl Default for QuestObjectiveInformationsVariant {
-    fn default() -> Self {
-        Self::QuestObjectiveInformations(QuestObjectiveInformations::default())
-    }
-}
-
-impl QuestObjectiveInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::QuestObjectiveInformations(_) => 8695,
-            Self::QuestObjectiveInformationsWithCompletion(_) => 5778,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            8695 => Ok(Self::QuestObjectiveInformations(QuestObjectiveInformations::deserialize(reader)?)),
-            5778 => Ok(Self::QuestObjectiveInformationsWithCompletion(QuestObjectiveInformationsWithCompletion::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown QuestObjectiveInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for QuestObjectiveInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::QuestObjectiveInformations(v) => v.serialize(writer),
-            Self::QuestObjectiveInformationsWithCompletion(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for QuestObjectiveInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::QuestObjectiveInformations(QuestObjectiveInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PartyMemberInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum PartyMemberInformationsVariant {
-    PartyMemberInformations(PartyMemberInformations),
-    PartyMemberArenaInformations(PartyMemberArenaInformations),
-}
-
-impl Default for PartyMemberInformationsVariant {
-    fn default() -> Self {
-        Self::PartyMemberInformations(PartyMemberInformations::default())
-    }
-}
-
-impl PartyMemberInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PartyMemberInformations(_) => 8246,
-            Self::PartyMemberArenaInformations(_) => 1101,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
-            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PartyMemberInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PartyMemberInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PartyMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PartyMemberInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GuildVersatileInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GuildVersatileInformationsVariant {
-    GuildVersatileInformations(GuildVersatileInformations),
-    GuildInAllianceVersatileInformations(GuildInAllianceVersatileInformations),
-}
-
-impl Default for GuildVersatileInformationsVariant {
-    fn default() -> Self {
-        Self::GuildVersatileInformations(GuildVersatileInformations::default())
-    }
-}
-
-impl GuildVersatileInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GuildVersatileInformations(_) => 7908,
-            Self::GuildInAllianceVersatileInformations(_) => 5949,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            7908 => Ok(Self::GuildVersatileInformations(GuildVersatileInformations::deserialize(reader)?)),
-            5949 => Ok(Self::GuildInAllianceVersatileInformations(GuildInAllianceVersatileInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GuildVersatileInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GuildVersatileInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GuildVersatileInformations(v) => v.serialize(writer),
-            Self::GuildInAllianceVersatileInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GuildVersatileInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GuildVersatileInformations(GuildVersatileInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GuildFactSheetInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GuildFactSheetInformationsVariant {
-    GuildFactSheetInformations(GuildFactSheetInformations),
-    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
-}
-
-impl Default for GuildFactSheetInformationsVariant {
-    fn default() -> Self {
-        Self::GuildFactSheetInformations(GuildFactSheetInformations::default())
-    }
-}
-
-impl GuildFactSheetInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GuildFactSheetInformations(_) => 5100,
-            Self::GuildInsiderFactSheetInformations(_) => 6301,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
-            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GuildFactSheetInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GuildFactSheetInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GuildFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GuildFactSheetInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ObjectEffectCreature hierarchy
-#[derive(Debug, Clone)]
-pub enum ObjectEffectCreatureVariant {
-    ObjectEffectCreature(ObjectEffectCreature),
-    ObjectEffectLadder(ObjectEffectLadder),
-}
-
-impl Default for ObjectEffectCreatureVariant {
-    fn default() -> Self {
-        Self::ObjectEffectCreature(ObjectEffectCreature::default())
-    }
-}
-
-impl ObjectEffectCreatureVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ObjectEffectCreature(_) => 9295,
-            Self::ObjectEffectLadder(_) => 6916,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9295 => Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?)),
-            6916 => Ok(Self::ObjectEffectLadder(ObjectEffectLadder::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectEffectCreature type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ObjectEffectCreatureVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ObjectEffectCreature(v) => v.serialize(writer),
-            Self::ObjectEffectLadder(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ObjectEffectCreatureVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ExtendedBreachBranch hierarchy
-#[derive(Debug, Clone)]
-pub enum ExtendedBreachBranchVariant {
-    ExtendedBreachBranch(ExtendedBreachBranch),
-    ExtendedLockedBreachBranch(ExtendedLockedBreachBranch),
-}
-
-impl Default for ExtendedBreachBranchVariant {
-    fn default() -> Self {
-        Self::ExtendedBreachBranch(ExtendedBreachBranch::default())
-    }
-}
-
-impl ExtendedBreachBranchVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ExtendedBreachBranch(_) => 4962,
-            Self::ExtendedLockedBreachBranch(_) => 3547,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4962 => Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?)),
-            3547 => Ok(Self::ExtendedLockedBreachBranch(ExtendedLockedBreachBranch::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ExtendedBreachBranch type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ExtendedBreachBranchVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ExtendedBreachBranch(v) => v.serialize(writer),
-            Self::ExtendedLockedBreachBranch(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ExtendedBreachBranchVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FriendInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum FriendInformationsVariant {
-    FriendInformations(FriendInformations),
-    FriendOnlineInformations(FriendOnlineInformations),
-}
-
-impl Default for FriendInformationsVariant {
-    fn default() -> Self {
-        Self::FriendInformations(FriendInformations::default())
-    }
-}
-
-impl FriendInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FriendInformations(_) => 3453,
-            Self::FriendOnlineInformations(_) => 450,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            3453 => Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?)),
-            450 => Ok(Self::FriendOnlineInformations(FriendOnlineInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FriendInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FriendInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FriendInformations(v) => v.serialize(writer),
-            Self::FriendOnlineInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FriendInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameFightMinimalStats hierarchy
-#[derive(Debug, Clone)]
-pub enum GameFightMinimalStatsVariant {
-    GameFightMinimalStats(GameFightMinimalStats),
-    GameFightMinimalStatsPreparation(GameFightMinimalStatsPreparation),
-}
-
-impl Default for GameFightMinimalStatsVariant {
-    fn default() -> Self {
-        Self::GameFightMinimalStats(GameFightMinimalStats::default())
-    }
-}
-
-impl GameFightMinimalStatsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameFightMinimalStats(_) => 8253,
-            Self::GameFightMinimalStatsPreparation(_) => 9464,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            8253 => Ok(Self::GameFightMinimalStats(GameFightMinimalStats::deserialize(reader)?)),
-            9464 => Ok(Self::GameFightMinimalStatsPreparation(GameFightMinimalStatsPreparation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameFightMinimalStats type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameFightMinimalStatsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameFightMinimalStats(v) => v.serialize(writer),
-            Self::GameFightMinimalStatsPreparation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightMinimalStatsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameFightMinimalStats(GameFightMinimalStats::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ObjectItemInRolePlay hierarchy
-#[derive(Debug, Clone)]
-pub enum ObjectItemInRolePlayVariant {
-    ObjectItemInRolePlay(ObjectItemInRolePlay),
-    PaddockItem(PaddockItem),
-}
-
-impl Default for ObjectItemInRolePlayVariant {
-    fn default() -> Self {
-        Self::ObjectItemInRolePlay(ObjectItemInRolePlay::default())
-    }
-}
-
-impl ObjectItemInRolePlayVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ObjectItemInRolePlay(_) => 9311,
-            Self::PaddockItem(_) => 5602,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9311 => Ok(Self::ObjectItemInRolePlay(ObjectItemInRolePlay::deserialize(reader)?)),
-            5602 => Ok(Self::PaddockItem(PaddockItem::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectItemInRolePlay type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ObjectItemInRolePlayVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ObjectItemInRolePlay(v) => v.serialize(writer),
-            Self::PaddockItem(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ObjectItemInRolePlayVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectItemInRolePlay(ObjectItemInRolePlay::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GuildInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GuildInformationsVariant {
-    GuildInformations(GuildInformations),
-    AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations),
-    GuildFactSheetInformations(GuildFactSheetInformations),
-    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
-    GuildInAllianceInformations(GuildInAllianceInformations),
-}
-
-impl Default for GuildInformationsVariant {
-    fn default() -> Self {
-        Self::GuildInformations(GuildInformations::default())
-    }
-}
-
-impl GuildInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GuildInformations(_) => 6928,
-            Self::AlliancedGuildFactSheetInformations(_) => 920,
-            Self::GuildFactSheetInformations(_) => 5100,
-            Self::GuildInsiderFactSheetInformations(_) => 6301,
-            Self::GuildInAllianceInformations(_) => 8268,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6928 => Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?)),
-            920 => Ok(Self::AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations::deserialize(reader)?)),
-            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
-            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
-            8268 => Ok(Self::GuildInAllianceInformations(GuildInAllianceInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GuildInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GuildInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GuildInformations(v) => v.serialize(writer),
-            Self::AlliancedGuildFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildInAllianceInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GuildInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for HouseInstanceInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum HouseInstanceInformationsVariant {
-    HouseInstanceInformations(HouseInstanceInformations),
-    HouseGuildedInformations(HouseGuildedInformations),
-}
-
-impl Default for HouseInstanceInformationsVariant {
-    fn default() -> Self {
-        Self::HouseInstanceInformations(HouseInstanceInformations::default())
-    }
-}
-
-impl HouseInstanceInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::HouseInstanceInformations(_) => 9271,
-            Self::HouseGuildedInformations(_) => 2823,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9271 => Ok(Self::HouseInstanceInformations(HouseInstanceInformations::deserialize(reader)?)),
-            2823 => Ok(Self::HouseGuildedInformations(HouseGuildedInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown HouseInstanceInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for HouseInstanceInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::HouseInstanceInformations(v) => v.serialize(writer),
-            Self::HouseGuildedInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for HouseInstanceInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::HouseInstanceInformations(HouseInstanceInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ActorAlignmentInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum ActorAlignmentInformationsVariant {
-    ActorAlignmentInformations(ActorAlignmentInformations),
-    ActorExtendedAlignmentInformations(ActorExtendedAlignmentInformations),
-}
-
-impl Default for ActorAlignmentInformationsVariant {
-    fn default() -> Self {
-        Self::ActorAlignmentInformations(ActorAlignmentInformations::default())
-    }
-}
-
-impl ActorAlignmentInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ActorAlignmentInformations(_) => 1230,
-            Self::ActorExtendedAlignmentInformations(_) => 5506,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1230 => Ok(Self::ActorAlignmentInformations(ActorAlignmentInformations::deserialize(reader)?)),
-            5506 => Ok(Self::ActorExtendedAlignmentInformations(ActorExtendedAlignmentInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ActorAlignmentInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ActorAlignmentInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ActorAlignmentInformations(v) => v.serialize(writer),
-            Self::ActorExtendedAlignmentInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ActorAlignmentInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ActorAlignmentInformations(ActorAlignmentInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterBasicMinimalInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterBasicMinimalInformationsVariant {
-    CharacterBasicMinimalInformations(CharacterBasicMinimalInformations),
-    CharacterMinimalInformations(CharacterMinimalInformations),
-    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
-    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
-    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
-    CharacterBaseInformations(CharacterBaseInformations),
-    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
-    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
-    PartyMemberInformations(PartyMemberInformations),
-    PartyMemberArenaInformations(PartyMemberArenaInformations),
-    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
-    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
-    GuildMember(GuildMember),
-}
-
-impl Default for CharacterBasicMinimalInformationsVariant {
-    fn default() -> Self {
-        Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::default())
-    }
-}
-
-impl CharacterBasicMinimalInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::CharacterBasicMinimalInformations(_) => 9273,
-            Self::CharacterMinimalInformations(_) => 8058,
-            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
-            Self::CharacterMinimalPlusLookInformations(_) => 8237,
-            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
-            Self::CharacterBaseInformations(_) => 6238,
-            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
-            Self::PartyInvitationMemberInformations(_) => 7145,
-            Self::PartyMemberInformations(_) => 8246,
-            Self::PartyMemberArenaInformations(_) => 1101,
-            Self::CharacterMinimalGuildInformations(_) => 6416,
-            Self::CharacterMinimalAllianceInformations(_) => 9412,
-            Self::GuildMember(_) => 8512,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9273 => Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?)),
-            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
-            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
-            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
-            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
-            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
-            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
-            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
-            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
-            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
-            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
-            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
-            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterBasicMinimalInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for CharacterBasicMinimalInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::CharacterBasicMinimalInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
-            Self::CharacterBaseInformations(v) => v.serialize(writer),
-            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
-            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
-            Self::GuildMember(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for CharacterBasicMinimalInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterMinimalInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterMinimalInformationsVariant {
-    CharacterMinimalInformations(CharacterMinimalInformations),
-    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
-    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
-    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
-    CharacterBaseInformations(CharacterBaseInformations),
-    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
-    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
-    PartyMemberInformations(PartyMemberInformations),
-    PartyMemberArenaInformations(PartyMemberArenaInformations),
-    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
-    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
-    GuildMember(GuildMember),
-}
-
-impl Default for CharacterMinimalInformationsVariant {
-    fn default() -> Self {
-        Self::CharacterMinimalInformations(CharacterMinimalInformations::default())
-    }
-}
-
-impl CharacterMinimalInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::CharacterMinimalInformations(_) => 8058,
-            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
-            Self::CharacterMinimalPlusLookInformations(_) => 8237,
-            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
-            Self::CharacterBaseInformations(_) => 6238,
-            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
-            Self::PartyInvitationMemberInformations(_) => 7145,
-            Self::PartyMemberInformations(_) => 8246,
-            Self::PartyMemberArenaInformations(_) => 1101,
-            Self::CharacterMinimalGuildInformations(_) => 6416,
-            Self::CharacterMinimalAllianceInformations(_) => 9412,
-            Self::GuildMember(_) => 8512,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
-            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
-            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
-            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
-            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
-            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
-            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
-            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
-            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
-            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
-            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
-            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for CharacterMinimalInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::CharacterMinimalInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
-            Self::CharacterBaseInformations(v) => v.serialize(writer),
-            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
-            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
-            Self::GuildMember(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for CharacterMinimalInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameRolePlayNamedActorInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameRolePlayNamedActorInformationsVariant {
-    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
-    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
-    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
-    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
-    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
-    GameRolePlayMountInformations(GameRolePlayMountInformations),
-}
-
-impl Default for GameRolePlayNamedActorInformationsVariant {
-    fn default() -> Self {
-        Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::default())
-    }
-}
-
-impl GameRolePlayNamedActorInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameRolePlayNamedActorInformations(_) => 5940,
-            Self::GameRolePlayMerchantInformations(_) => 1204,
-            Self::GameRolePlayHumanoidInformations(_) => 2640,
-            Self::GameRolePlayCharacterInformations(_) => 5268,
-            Self::GameRolePlayMutantInformations(_) => 8271,
-            Self::GameRolePlayMountInformations(_) => 4944,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
-            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
-            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
-            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
-            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
-            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameRolePlayNamedActorInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameRolePlayNamedActorInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
-            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameRolePlayNamedActorInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for HouseInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum HouseInformationsVariant {
-    HouseInformations(HouseInformations),
-    HouseInformationsInside(HouseInformationsInside),
-    HouseInformationsForGuild(HouseInformationsForGuild),
-    HouseOnMapInformations(HouseOnMapInformations),
-    AccountHouseInformations(AccountHouseInformations),
-}
-
-impl Default for HouseInformationsVariant {
-    fn default() -> Self {
-        Self::HouseInformations(HouseInformations::default())
-    }
-}
-
-impl HouseInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::HouseInformations(_) => 5826,
-            Self::HouseInformationsInside(_) => 2751,
-            Self::HouseInformationsForGuild(_) => 6667,
-            Self::HouseOnMapInformations(_) => 8830,
-            Self::AccountHouseInformations(_) => 8916,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5826 => Ok(Self::HouseInformations(HouseInformations::deserialize(reader)?)),
-            2751 => Ok(Self::HouseInformationsInside(HouseInformationsInside::deserialize(reader)?)),
-            6667 => Ok(Self::HouseInformationsForGuild(HouseInformationsForGuild::deserialize(reader)?)),
-            8830 => Ok(Self::HouseOnMapInformations(HouseOnMapInformations::deserialize(reader)?)),
-            8916 => Ok(Self::AccountHouseInformations(AccountHouseInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown HouseInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for HouseInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::HouseInformations(v) => v.serialize(writer),
-            Self::HouseInformationsInside(v) => v.serialize(writer),
-            Self::HouseInformationsForGuild(v) => v.serialize(writer),
-            Self::HouseOnMapInformations(v) => v.serialize(writer),
-            Self::AccountHouseInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for HouseInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::HouseInformations(HouseInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for SimpleCharacterCharacteristicForPreset hierarchy
-#[derive(Debug, Clone)]
-pub enum SimpleCharacterCharacteristicForPresetVariant {
-    SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset),
-    CharacterCharacteristicForPreset(CharacterCharacteristicForPreset),
-}
-
-impl Default for SimpleCharacterCharacteristicForPresetVariant {
-    fn default() -> Self {
-        Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::default())
-    }
-}
-
-impl SimpleCharacterCharacteristicForPresetVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::SimpleCharacterCharacteristicForPreset(_) => 1231,
-            Self::CharacterCharacteristicForPreset(_) => 7508,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1231 => Ok(Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::deserialize(reader)?)),
-            7508 => Ok(Self::CharacterCharacteristicForPreset(CharacterCharacteristicForPreset::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown SimpleCharacterCharacteristicForPreset type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for SimpleCharacterCharacteristicForPresetVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::SimpleCharacterCharacteristicForPreset(v) => v.serialize(writer),
-            Self::CharacterCharacteristicForPreset(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for SimpleCharacterCharacteristicForPresetVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterMinimalGuildInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterMinimalGuildInformationsVariant {
-    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
-    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
-}
-
-impl Default for CharacterMinimalGuildInformationsVariant {
-    fn default() -> Self {
-        Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::default())
-    }
-}
-
-impl CharacterMinimalGuildInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::CharacterMinimalGuildInformations(_) => 6416,
-            Self::CharacterMinimalAllianceInformations(_) => 9412,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
-            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalGuildInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for CharacterMinimalGuildInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for CharacterMinimalGuildInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for TaxCollectorComplementaryInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum TaxCollectorComplementaryInformationsVariant {
-    TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations),
-    TaxCollectorGuildInformations(TaxCollectorGuildInformations),
-    TaxCollectorWaitingForHelpInformations(TaxCollectorWaitingForHelpInformations),
-    TaxCollectorLootInformations(TaxCollectorLootInformations),
-}
-
-impl Default for TaxCollectorComplementaryInformationsVariant {
-    fn default() -> Self {
-        Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::default())
-    }
-}
-
-impl TaxCollectorComplementaryInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::TaxCollectorComplementaryInformations(_) => 1561,
-            Self::TaxCollectorGuildInformations(_) => 343,
-            Self::TaxCollectorWaitingForHelpInformations(_) => 3744,
-            Self::TaxCollectorLootInformations(_) => 4070,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1561 => Ok(Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::deserialize(reader)?)),
-            343 => Ok(Self::TaxCollectorGuildInformations(TaxCollectorGuildInformations::deserialize(reader)?)),
-            3744 => Ok(Self::TaxCollectorWaitingForHelpInformations(TaxCollectorWaitingForHelpInformations::deserialize(reader)?)),
-            4070 => Ok(Self::TaxCollectorLootInformations(TaxCollectorLootInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown TaxCollectorComplementaryInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for TaxCollectorComplementaryInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::TaxCollectorComplementaryInformations(v) => v.serialize(writer),
-            Self::TaxCollectorGuildInformations(v) => v.serialize(writer),
-            Self::TaxCollectorWaitingForHelpInformations(v) => v.serialize(writer),
-            Self::TaxCollectorLootInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for TaxCollectorComplementaryInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for Item hierarchy
-#[derive(Debug, Clone)]
-pub enum ItemVariant {
-    Item(Item),
-    ObjectItemToSell(ObjectItemToSell),
-    ObjectItemToSellInBid(ObjectItemToSellInBid),
-    SpellItem(SpellItem),
-    ForgettableSpellItem(ForgettableSpellItem),
-    ObjectItemNotInContainer(ObjectItemNotInContainer),
-    GoldItem(GoldItem),
-    ObjectItemMinimalInformation(ObjectItemMinimalInformation),
-    ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop),
-    ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity),
-    ObjectItem(ObjectItem),
-    ObjectItemToSellInHumanVendorShop(ObjectItemToSellInHumanVendorShop),
-    ObjectItemGenericQuantity(ObjectItemGenericQuantity),
-    ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects),
-    ObjectItemQuantity(ObjectItemQuantity),
-}
-
-impl Default for ItemVariant {
-    fn default() -> Self {
-        Self::Item(Item::default())
-    }
-}
-
-impl ItemVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::Item(_) => 2202,
-            Self::ObjectItemToSell(_) => 446,
-            Self::ObjectItemToSellInBid(_) => 4082,
-            Self::SpellItem(_) => 1759,
-            Self::ForgettableSpellItem(_) => 6454,
-            Self::ObjectItemNotInContainer(_) => 2313,
-            Self::GoldItem(_) => 4296,
-            Self::ObjectItemMinimalInformation(_) => 4416,
-            Self::ObjectItemToSellInNpcShop(_) => 2852,
-            Self::ObjectItemInformationWithQuantity(_) => 6404,
-            Self::ObjectItem(_) => 5598,
-            Self::ObjectItemToSellInHumanVendorShop(_) => 8040,
-            Self::ObjectItemGenericQuantity(_) => 9440,
-            Self::ObjectItemQuantityPriceDateEffects(_) => 6659,
-            Self::ObjectItemQuantity(_) => 9732,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2202 => Ok(Self::Item(Item::deserialize(reader)?)),
-            446 => Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?)),
-            4082 => Ok(Self::ObjectItemToSellInBid(ObjectItemToSellInBid::deserialize(reader)?)),
-            1759 => Ok(Self::SpellItem(SpellItem::deserialize(reader)?)),
-            6454 => Ok(Self::ForgettableSpellItem(ForgettableSpellItem::deserialize(reader)?)),
-            2313 => Ok(Self::ObjectItemNotInContainer(ObjectItemNotInContainer::deserialize(reader)?)),
-            4296 => Ok(Self::GoldItem(GoldItem::deserialize(reader)?)),
-            4416 => Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?)),
-            2852 => Ok(Self::ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop::deserialize(reader)?)),
-            6404 => Ok(Self::ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity::deserialize(reader)?)),
-            5598 => Ok(Self::ObjectItem(ObjectItem::deserialize(reader)?)),
-            8040 => Ok(Self::ObjectItemToSellInHumanVendorShop(ObjectItemToSellInHumanVendorShop::deserialize(reader)?)),
-            9440 => Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?)),
-            6659 => Ok(Self::ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects::deserialize(reader)?)),
-            9732 => Ok(Self::ObjectItemQuantity(ObjectItemQuantity::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown Item type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ItemVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::Item(v) => v.serialize(writer),
-            Self::ObjectItemToSell(v) => v.serialize(writer),
-            Self::ObjectItemToSellInBid(v) => v.serialize(writer),
-            Self::SpellItem(v) => v.serialize(writer),
-            Self::ForgettableSpellItem(v) => v.serialize(writer),
-            Self::ObjectItemNotInContainer(v) => v.serialize(writer),
-            Self::GoldItem(v) => v.serialize(writer),
-            Self::ObjectItemMinimalInformation(v) => v.serialize(writer),
-            Self::ObjectItemToSellInNpcShop(v) => v.serialize(writer),
-            Self::ObjectItemInformationWithQuantity(v) => v.serialize(writer),
-            Self::ObjectItem(v) => v.serialize(writer),
-            Self::ObjectItemToSellInHumanVendorShop(v) => v.serialize(writer),
-            Self::ObjectItemGenericQuantity(v) => v.serialize(writer),
-            Self::ObjectItemQuantityPriceDateEffects(v) => v.serialize(writer),
-            Self::ObjectItemQuantity(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ItemVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::Item(Item::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for InteractiveElement hierarchy
-#[derive(Debug, Clone)]
-pub enum InteractiveElementVariant {
-    InteractiveElement(InteractiveElement),
-    InteractiveElementWithAgeBonus(InteractiveElementWithAgeBonus),
-}
-
-impl Default for InteractiveElementVariant {
-    fn default() -> Self {
-        Self::InteractiveElement(InteractiveElement::default())
-    }
-}
-
-impl InteractiveElementVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::InteractiveElement(_) => 2401,
-            Self::InteractiveElementWithAgeBonus(_) => 1662,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2401 => Ok(Self::InteractiveElement(InteractiveElement::deserialize(reader)?)),
-            1662 => Ok(Self::InteractiveElementWithAgeBonus(InteractiveElementWithAgeBonus::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown InteractiveElement type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for InteractiveElementVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::InteractiveElement(v) => v.serialize(writer),
-            Self::InteractiveElementWithAgeBonus(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for InteractiveElementVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::InteractiveElement(InteractiveElement::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ShortcutObject hierarchy
-#[derive(Debug, Clone)]
-pub enum ShortcutObjectVariant {
-    ShortcutObject(ShortcutObject),
-    ShortcutObjectPreset(ShortcutObjectPreset),
-    ShortcutObjectItem(ShortcutObjectItem),
-    ShortcutObjectIdolsPreset(ShortcutObjectIdolsPreset),
-}
-
-impl Default for ShortcutObjectVariant {
-    fn default() -> Self {
-        Self::ShortcutObject(ShortcutObject::default())
-    }
-}
-
-impl ShortcutObjectVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ShortcutObject(_) => 5832,
-            Self::ShortcutObjectPreset(_) => 1783,
-            Self::ShortcutObjectItem(_) => 2604,
-            Self::ShortcutObjectIdolsPreset(_) => 9809,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5832 => Ok(Self::ShortcutObject(ShortcutObject::deserialize(reader)?)),
-            1783 => Ok(Self::ShortcutObjectPreset(ShortcutObjectPreset::deserialize(reader)?)),
-            2604 => Ok(Self::ShortcutObjectItem(ShortcutObjectItem::deserialize(reader)?)),
-            9809 => Ok(Self::ShortcutObjectIdolsPreset(ShortcutObjectIdolsPreset::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ShortcutObject type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ShortcutObjectVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ShortcutObject(v) => v.serialize(writer),
-            Self::ShortcutObjectPreset(v) => v.serialize(writer),
-            Self::ShortcutObjectItem(v) => v.serialize(writer),
-            Self::ShortcutObjectIdolsPreset(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ShortcutObjectVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ShortcutObject(ShortcutObject::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for InteractiveElementSkill hierarchy
-#[derive(Debug, Clone)]
-pub enum InteractiveElementSkillVariant {
-    InteractiveElementSkill(InteractiveElementSkill),
-    InteractiveElementNamedSkill(InteractiveElementNamedSkill),
-}
-
-impl Default for InteractiveElementSkillVariant {
-    fn default() -> Self {
-        Self::InteractiveElementSkill(InteractiveElementSkill::default())
-    }
-}
-
-impl InteractiveElementSkillVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::InteractiveElementSkill(_) => 6462,
-            Self::InteractiveElementNamedSkill(_) => 3347,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6462 => Ok(Self::InteractiveElementSkill(InteractiveElementSkill::deserialize(reader)?)),
-            3347 => Ok(Self::InteractiveElementNamedSkill(InteractiveElementNamedSkill::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown InteractiveElementSkill type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for InteractiveElementSkillVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::InteractiveElementSkill(v) => v.serialize(writer),
-            Self::InteractiveElementNamedSkill(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for InteractiveElementSkillVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::InteractiveElementSkill(InteractiveElementSkill::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AbstractFightDispellableEffect hierarchy
-#[derive(Debug, Clone)]
-pub enum AbstractFightDispellableEffectVariant {
-    AbstractFightDispellableEffect(AbstractFightDispellableEffect),
-    FightTemporaryBoostEffect(FightTemporaryBoostEffect),
-    FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect),
-    FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect),
-    FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect),
-    FightTriggeredEffect(FightTriggeredEffect),
-    FightTemporarySpellImmunityEffect(FightTemporarySpellImmunityEffect),
-}
-
-impl Default for AbstractFightDispellableEffectVariant {
-    fn default() -> Self {
-        Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::default())
-    }
-}
-
-impl AbstractFightDispellableEffectVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AbstractFightDispellableEffect(_) => 9836,
-            Self::FightTemporaryBoostEffect(_) => 2668,
-            Self::FightTemporaryBoostWeaponDamagesEffect(_) => 4451,
-            Self::FightTemporarySpellBoostEffect(_) => 5674,
-            Self::FightTemporaryBoostStateEffect(_) => 7115,
-            Self::FightTriggeredEffect(_) => 3040,
-            Self::FightTemporarySpellImmunityEffect(_) => 8464,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9836 => Ok(Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::deserialize(reader)?)),
-            2668 => Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?)),
-            4451 => Ok(Self::FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect::deserialize(reader)?)),
-            5674 => Ok(Self::FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect::deserialize(reader)?)),
-            7115 => Ok(Self::FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect::deserialize(reader)?)),
-            3040 => Ok(Self::FightTriggeredEffect(FightTriggeredEffect::deserialize(reader)?)),
-            8464 => Ok(Self::FightTemporarySpellImmunityEffect(FightTemporarySpellImmunityEffect::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AbstractFightDispellableEffect type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AbstractFightDispellableEffectVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AbstractFightDispellableEffect(v) => v.serialize(writer),
-            Self::FightTemporaryBoostEffect(v) => v.serialize(writer),
-            Self::FightTemporaryBoostWeaponDamagesEffect(v) => v.serialize(writer),
-            Self::FightTemporarySpellBoostEffect(v) => v.serialize(writer),
-            Self::FightTemporaryBoostStateEffect(v) => v.serialize(writer),
-            Self::FightTriggeredEffect(v) => v.serialize(writer),
-            Self::FightTemporarySpellImmunityEffect(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AbstractFightDispellableEffectVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FriendSpouseInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum FriendSpouseInformationsVariant {
-    FriendSpouseInformations(FriendSpouseInformations),
-    FriendSpouseOnlineInformations(FriendSpouseOnlineInformations),
-}
-
-impl Default for FriendSpouseInformationsVariant {
-    fn default() -> Self {
-        Self::FriendSpouseInformations(FriendSpouseInformations::default())
-    }
-}
-
-impl FriendSpouseInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FriendSpouseInformations(_) => 4533,
-            Self::FriendSpouseOnlineInformations(_) => 7417,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4533 => Ok(Self::FriendSpouseInformations(FriendSpouseInformations::deserialize(reader)?)),
-            7417 => Ok(Self::FriendSpouseOnlineInformations(FriendSpouseOnlineInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FriendSpouseInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FriendSpouseInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FriendSpouseInformations(v) => v.serialize(writer),
-            Self::FriendSpouseOnlineInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FriendSpouseInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FriendSpouseInformations(FriendSpouseInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PartyEntityBaseInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum PartyEntityBaseInformationVariant {
-    PartyEntityBaseInformation(PartyEntityBaseInformation),
-    PartyEntityMemberInformation(PartyEntityMemberInformation),
-}
-
-impl Default for PartyEntityBaseInformationVariant {
-    fn default() -> Self {
-        Self::PartyEntityBaseInformation(PartyEntityBaseInformation::default())
-    }
-}
-
-impl PartyEntityBaseInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PartyEntityBaseInformation(_) => 4252,
-            Self::PartyEntityMemberInformation(_) => 4347,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4252 => Ok(Self::PartyEntityBaseInformation(PartyEntityBaseInformation::deserialize(reader)?)),
-            4347 => Ok(Self::PartyEntityMemberInformation(PartyEntityMemberInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PartyEntityBaseInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PartyEntityBaseInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PartyEntityBaseInformation(v) => v.serialize(writer),
-            Self::PartyEntityMemberInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PartyEntityBaseInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PartyEntityBaseInformation(PartyEntityBaseInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameRolePlayGroupMonsterInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameRolePlayGroupMonsterInformationsVariant {
-    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
-    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
-}
-
-impl Default for GameRolePlayGroupMonsterInformationsVariant {
-    fn default() -> Self {
-        Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::default())
-    }
-}
-
-impl GameRolePlayGroupMonsterInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
-            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
-            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameRolePlayGroupMonsterInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameRolePlayGroupMonsterInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameRolePlayGroupMonsterInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameRolePlayHumanoidInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameRolePlayHumanoidInformationsVariant {
-    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
-    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
-    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
-}
-
-impl Default for GameRolePlayHumanoidInformationsVariant {
-    fn default() -> Self {
-        Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::default())
-    }
-}
-
-impl GameRolePlayHumanoidInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameRolePlayHumanoidInformations(_) => 2640,
-            Self::GameRolePlayCharacterInformations(_) => 5268,
-            Self::GameRolePlayMutantInformations(_) => 8271,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
-            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
-            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameRolePlayHumanoidInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameRolePlayHumanoidInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
-            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
-            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameRolePlayHumanoidInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for TaxCollectorStaticInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum TaxCollectorStaticInformationsVariant {
-    TaxCollectorStaticInformations(TaxCollectorStaticInformations),
-    TaxCollectorStaticExtendedInformations(TaxCollectorStaticExtendedInformations),
-}
-
-impl Default for TaxCollectorStaticInformationsVariant {
-    fn default() -> Self {
-        Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::default())
-    }
-}
-
-impl TaxCollectorStaticInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::TaxCollectorStaticInformations(_) => 2842,
-            Self::TaxCollectorStaticExtendedInformations(_) => 6436,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2842 => Ok(Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::deserialize(reader)?)),
-            6436 => Ok(Self::TaxCollectorStaticExtendedInformations(TaxCollectorStaticExtendedInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown TaxCollectorStaticInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for TaxCollectorStaticInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::TaxCollectorStaticInformations(v) => v.serialize(writer),
-            Self::TaxCollectorStaticExtendedInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for TaxCollectorStaticInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightTeamInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum FightTeamInformationsVariant {
-    FightTeamInformations(FightTeamInformations),
-    FightAllianceTeamInformations(FightAllianceTeamInformations),
-}
-
-impl Default for FightTeamInformationsVariant {
-    fn default() -> Self {
-        Self::FightTeamInformations(FightTeamInformations::default())
-    }
-}
-
-impl FightTeamInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightTeamInformations(_) => 4426,
-            Self::FightAllianceTeamInformations(_) => 5175,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4426 => Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?)),
-            5175 => Ok(Self::FightAllianceTeamInformations(FightAllianceTeamInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightTeamInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightTeamInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightTeamInformations(v) => v.serialize(writer),
-            Self::FightAllianceTeamInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightTeamInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AbstractCharacterInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum AbstractCharacterInformationVariant {
-    AbstractCharacterInformation(AbstractCharacterInformation),
-    CharacterRemodelingInformation(CharacterRemodelingInformation),
-    CharacterToRemodelInformations(CharacterToRemodelInformations),
-    CharacterBasicMinimalInformations(CharacterBasicMinimalInformations),
-    CharacterMinimalInformations(CharacterMinimalInformations),
-    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
-    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
-    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
-    CharacterBaseInformations(CharacterBaseInformations),
-    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
-    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
-    PartyMemberInformations(PartyMemberInformations),
-    PartyMemberArenaInformations(PartyMemberArenaInformations),
-    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
-    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
-    GuildMember(GuildMember),
-}
-
-impl Default for AbstractCharacterInformationVariant {
-    fn default() -> Self {
-        Self::AbstractCharacterInformation(AbstractCharacterInformation::default())
-    }
-}
-
-impl AbstractCharacterInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AbstractCharacterInformation(_) => 120,
-            Self::CharacterRemodelingInformation(_) => 2924,
-            Self::CharacterToRemodelInformations(_) => 1292,
-            Self::CharacterBasicMinimalInformations(_) => 9273,
-            Self::CharacterMinimalInformations(_) => 8058,
-            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
-            Self::CharacterMinimalPlusLookInformations(_) => 8237,
-            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
-            Self::CharacterBaseInformations(_) => 6238,
-            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
-            Self::PartyInvitationMemberInformations(_) => 7145,
-            Self::PartyMemberInformations(_) => 8246,
-            Self::PartyMemberArenaInformations(_) => 1101,
-            Self::CharacterMinimalGuildInformations(_) => 6416,
-            Self::CharacterMinimalAllianceInformations(_) => 9412,
-            Self::GuildMember(_) => 8512,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            120 => Ok(Self::AbstractCharacterInformation(AbstractCharacterInformation::deserialize(reader)?)),
-            2924 => Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?)),
-            1292 => Ok(Self::CharacterToRemodelInformations(CharacterToRemodelInformations::deserialize(reader)?)),
-            9273 => Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?)),
-            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
-            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
-            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
-            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
-            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
-            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
-            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
-            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
-            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
-            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
-            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
-            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AbstractCharacterInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AbstractCharacterInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AbstractCharacterInformation(v) => v.serialize(writer),
-            Self::CharacterRemodelingInformation(v) => v.serialize(writer),
-            Self::CharacterToRemodelInformations(v) => v.serialize(writer),
-            Self::CharacterBasicMinimalInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
-            Self::CharacterBaseInformations(v) => v.serialize(writer),
-            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
-            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
-            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
-            Self::GuildMember(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AbstractCharacterInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AbstractCharacterInformation(AbstractCharacterInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for SpawnInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum SpawnInformationVariant {
-    SpawnInformation(SpawnInformation),
-    BaseSpawnMonsterInformation(BaseSpawnMonsterInformation),
-    SpawnMonsterInformation(SpawnMonsterInformation),
-    SpawnScaledMonsterInformation(SpawnScaledMonsterInformation),
-    SpawnCharacterInformation(SpawnCharacterInformation),
-    SpawnCompanionInformation(SpawnCompanionInformation),
-}
-
-impl Default for SpawnInformationVariant {
-    fn default() -> Self {
-        Self::SpawnInformation(SpawnInformation::default())
-    }
-}
-
-impl SpawnInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::SpawnInformation(_) => 2131,
-            Self::BaseSpawnMonsterInformation(_) => 1071,
-            Self::SpawnMonsterInformation(_) => 3264,
-            Self::SpawnScaledMonsterInformation(_) => 8617,
-            Self::SpawnCharacterInformation(_) => 1888,
-            Self::SpawnCompanionInformation(_) => 7811,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2131 => Ok(Self::SpawnInformation(SpawnInformation::deserialize(reader)?)),
-            1071 => Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?)),
-            3264 => Ok(Self::SpawnMonsterInformation(SpawnMonsterInformation::deserialize(reader)?)),
-            8617 => Ok(Self::SpawnScaledMonsterInformation(SpawnScaledMonsterInformation::deserialize(reader)?)),
-            1888 => Ok(Self::SpawnCharacterInformation(SpawnCharacterInformation::deserialize(reader)?)),
-            7811 => Ok(Self::SpawnCompanionInformation(SpawnCompanionInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown SpawnInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for SpawnInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::SpawnInformation(v) => v.serialize(writer),
-            Self::BaseSpawnMonsterInformation(v) => v.serialize(writer),
-            Self::SpawnMonsterInformation(v) => v.serialize(writer),
-            Self::SpawnScaledMonsterInformation(v) => v.serialize(writer),
-            Self::SpawnCharacterInformation(v) => v.serialize(writer),
-            Self::SpawnCompanionInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for SpawnInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::SpawnInformation(SpawnInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightTeamMemberInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum FightTeamMemberInformationsVariant {
-    FightTeamMemberInformations(FightTeamMemberInformations),
-    FightTeamMemberTaxCollectorInformations(FightTeamMemberTaxCollectorInformations),
-    FightTeamMemberEntityInformation(FightTeamMemberEntityInformation),
-    FightTeamMemberMonsterInformations(FightTeamMemberMonsterInformations),
-    FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations),
-    FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations),
-}
-
-impl Default for FightTeamMemberInformationsVariant {
-    fn default() -> Self {
-        Self::FightTeamMemberInformations(FightTeamMemberInformations::default())
-    }
-}
-
-impl FightTeamMemberInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightTeamMemberInformations(_) => 5931,
-            Self::FightTeamMemberTaxCollectorInformations(_) => 431,
-            Self::FightTeamMemberEntityInformation(_) => 6288,
-            Self::FightTeamMemberMonsterInformations(_) => 8081,
-            Self::FightTeamMemberCharacterInformations(_) => 9851,
-            Self::FightTeamMemberWithAllianceCharacterInformations(_) => 8004,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5931 => Ok(Self::FightTeamMemberInformations(FightTeamMemberInformations::deserialize(reader)?)),
-            431 => Ok(Self::FightTeamMemberTaxCollectorInformations(FightTeamMemberTaxCollectorInformations::deserialize(reader)?)),
-            6288 => Ok(Self::FightTeamMemberEntityInformation(FightTeamMemberEntityInformation::deserialize(reader)?)),
-            8081 => Ok(Self::FightTeamMemberMonsterInformations(FightTeamMemberMonsterInformations::deserialize(reader)?)),
-            9851 => Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?)),
-            8004 => Ok(Self::FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightTeamMemberInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightTeamMemberInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightTeamMemberInformations(v) => v.serialize(writer),
-            Self::FightTeamMemberTaxCollectorInformations(v) => v.serialize(writer),
-            Self::FightTeamMemberEntityInformation(v) => v.serialize(writer),
-            Self::FightTeamMemberMonsterInformations(v) => v.serialize(writer),
-            Self::FightTeamMemberCharacterInformations(v) => v.serialize(writer),
-            Self::FightTeamMemberWithAllianceCharacterInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightTeamMemberInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightTeamMemberInformations(FightTeamMemberInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AcquaintanceInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum AcquaintanceInformationVariant {
-    AcquaintanceInformation(AcquaintanceInformation),
-    AcquaintanceOnlineInformation(AcquaintanceOnlineInformation),
-}
-
-impl Default for AcquaintanceInformationVariant {
-    fn default() -> Self {
-        Self::AcquaintanceInformation(AcquaintanceInformation::default())
-    }
-}
-
-impl AcquaintanceInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AcquaintanceInformation(_) => 4492,
-            Self::AcquaintanceOnlineInformation(_) => 5184,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4492 => Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?)),
-            5184 => Ok(Self::AcquaintanceOnlineInformation(AcquaintanceOnlineInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AcquaintanceInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AcquaintanceInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AcquaintanceInformation(v) => v.serialize(writer),
-            Self::AcquaintanceOnlineInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AcquaintanceInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for SkillActionDescriptionTimed hierarchy
-#[derive(Debug, Clone)]
-pub enum SkillActionDescriptionTimedVariant {
-    SkillActionDescriptionTimed(SkillActionDescriptionTimed),
-    SkillActionDescriptionCollect(SkillActionDescriptionCollect),
-}
-
-impl Default for SkillActionDescriptionTimedVariant {
-    fn default() -> Self {
-        Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::default())
-    }
-}
-
-impl SkillActionDescriptionTimedVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::SkillActionDescriptionTimed(_) => 263,
-            Self::SkillActionDescriptionCollect(_) => 6581,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            263 => Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?)),
-            6581 => Ok(Self::SkillActionDescriptionCollect(SkillActionDescriptionCollect::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown SkillActionDescriptionTimed type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for SkillActionDescriptionTimedVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::SkillActionDescriptionTimed(v) => v.serialize(writer),
-            Self::SkillActionDescriptionCollect(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for SkillActionDescriptionTimedVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for SpellItem hierarchy
-#[derive(Debug, Clone)]
-pub enum SpellItemVariant {
-    SpellItem(SpellItem),
-    ForgettableSpellItem(ForgettableSpellItem),
-}
-
-impl Default for SpellItemVariant {
-    fn default() -> Self {
-        Self::SpellItem(SpellItem::default())
-    }
-}
-
-impl SpellItemVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::SpellItem(_) => 1759,
-            Self::ForgettableSpellItem(_) => 6454,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1759 => Ok(Self::SpellItem(SpellItem::deserialize(reader)?)),
-            6454 => Ok(Self::ForgettableSpellItem(ForgettableSpellItem::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown SpellItem type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for SpellItemVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::SpellItem(v) => v.serialize(writer),
-            Self::ForgettableSpellItem(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for SpellItemVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::SpellItem(SpellItem::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for BreachBranch hierarchy
-#[derive(Debug, Clone)]
-pub enum BreachBranchVariant {
-    BreachBranch(BreachBranch),
-    ExtendedBreachBranch(ExtendedBreachBranch),
-    ExtendedLockedBreachBranch(ExtendedLockedBreachBranch),
-}
-
-impl Default for BreachBranchVariant {
-    fn default() -> Self {
-        Self::BreachBranch(BreachBranch::default())
-    }
-}
-
-impl BreachBranchVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::BreachBranch(_) => 4379,
-            Self::ExtendedBreachBranch(_) => 4962,
-            Self::ExtendedLockedBreachBranch(_) => 3547,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4379 => Ok(Self::BreachBranch(BreachBranch::deserialize(reader)?)),
-            4962 => Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?)),
-            3547 => Ok(Self::ExtendedLockedBreachBranch(ExtendedLockedBreachBranch::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown BreachBranch type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for BreachBranchVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::BreachBranch(v) => v.serialize(writer),
-            Self::ExtendedBreachBranch(v) => v.serialize(writer),
-            Self::ExtendedLockedBreachBranch(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for BreachBranchVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::BreachBranch(BreachBranch::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AbstractContactInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum AbstractContactInformationsVariant {
-    AbstractContactInformations(AbstractContactInformations),
-    LeagueFriendInformations(LeagueFriendInformations),
-    FriendInformations(FriendInformations),
-    FriendOnlineInformations(FriendOnlineInformations),
-    IgnoredInformations(IgnoredInformations),
-    IgnoredOnlineInformations(IgnoredOnlineInformations),
-    AcquaintanceInformation(AcquaintanceInformation),
-    AcquaintanceOnlineInformation(AcquaintanceOnlineInformation),
-}
-
-impl Default for AbstractContactInformationsVariant {
-    fn default() -> Self {
-        Self::AbstractContactInformations(AbstractContactInformations::default())
-    }
-}
-
-impl AbstractContactInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AbstractContactInformations(_) => 5170,
-            Self::LeagueFriendInformations(_) => 1189,
-            Self::FriendInformations(_) => 3453,
-            Self::FriendOnlineInformations(_) => 450,
-            Self::IgnoredInformations(_) => 4160,
-            Self::IgnoredOnlineInformations(_) => 5101,
-            Self::AcquaintanceInformation(_) => 4492,
-            Self::AcquaintanceOnlineInformation(_) => 5184,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5170 => Ok(Self::AbstractContactInformations(AbstractContactInformations::deserialize(reader)?)),
-            1189 => Ok(Self::LeagueFriendInformations(LeagueFriendInformations::deserialize(reader)?)),
-            3453 => Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?)),
-            450 => Ok(Self::FriendOnlineInformations(FriendOnlineInformations::deserialize(reader)?)),
-            4160 => Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?)),
-            5101 => Ok(Self::IgnoredOnlineInformations(IgnoredOnlineInformations::deserialize(reader)?)),
-            4492 => Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?)),
-            5184 => Ok(Self::AcquaintanceOnlineInformation(AcquaintanceOnlineInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AbstractContactInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AbstractContactInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AbstractContactInformations(v) => v.serialize(writer),
-            Self::LeagueFriendInformations(v) => v.serialize(writer),
-            Self::FriendInformations(v) => v.serialize(writer),
-            Self::FriendOnlineInformations(v) => v.serialize(writer),
-            Self::IgnoredInformations(v) => v.serialize(writer),
-            Self::IgnoredOnlineInformations(v) => v.serialize(writer),
-            Self::AcquaintanceInformation(v) => v.serialize(writer),
-            Self::AcquaintanceOnlineInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AbstractContactInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AbstractContactInformations(AbstractContactInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for MonsterInGroupLightInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum MonsterInGroupLightInformationsVariant {
-    MonsterInGroupLightInformations(MonsterInGroupLightInformations),
-    MonsterInGroupInformations(MonsterInGroupInformations),
-}
-
-impl Default for MonsterInGroupLightInformationsVariant {
-    fn default() -> Self {
-        Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::default())
-    }
-}
-
-impl MonsterInGroupLightInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::MonsterInGroupLightInformations(_) => 7146,
-            Self::MonsterInGroupInformations(_) => 3232,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            7146 => Ok(Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::deserialize(reader)?)),
-            3232 => Ok(Self::MonsterInGroupInformations(MonsterInGroupInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown MonsterInGroupLightInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for MonsterInGroupLightInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::MonsterInGroupLightInformations(v) => v.serialize(writer),
-            Self::MonsterInGroupInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for MonsterInGroupLightInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::deserialize(reader)?))
-    }
-}
-
 /// Polymorphic enum for GameContextActorPositionInformations hierarchy
 #[derive(Debug, Clone)]
 pub enum GameContextActorPositionInformationsVariant {
@@ -2887,6 +146,2427 @@ impl DofusDeserialize for GameContextActorPositionInformationsVariant {
     }
 }
 
+/// Polymorphic enum for FightTeamInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum FightTeamInformationsVariant {
+    FightTeamInformations(FightTeamInformations),
+    FightAllianceTeamInformations(FightAllianceTeamInformations),
+}
+
+impl Default for FightTeamInformationsVariant {
+    fn default() -> Self {
+        Self::FightTeamInformations(FightTeamInformations::default())
+    }
+}
+
+impl FightTeamInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightTeamInformations(_) => 4426,
+            Self::FightAllianceTeamInformations(_) => 5175,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4426 => Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?)),
+            5175 => Ok(Self::FightAllianceTeamInformations(FightAllianceTeamInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightTeamInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightTeamInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightTeamInformations(v) => v.serialize(writer),
+            Self::FightAllianceTeamInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightTeamInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightTeamMemberCharacterInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum FightTeamMemberCharacterInformationsVariant {
+    FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations),
+    FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations),
+}
+
+impl Default for FightTeamMemberCharacterInformationsVariant {
+    fn default() -> Self {
+        Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::default())
+    }
+}
+
+impl FightTeamMemberCharacterInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightTeamMemberCharacterInformations(_) => 9851,
+            Self::FightTeamMemberWithAllianceCharacterInformations(_) => 8004,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9851 => Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?)),
+            8004 => Ok(Self::FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightTeamMemberCharacterInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightTeamMemberCharacterInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightTeamMemberCharacterInformations(v) => v.serialize(writer),
+            Self::FightTeamMemberWithAllianceCharacterInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightTeamMemberCharacterInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for Preset hierarchy
+#[derive(Debug, Clone)]
+pub enum PresetVariant {
+    Preset(Preset),
+    StatsPreset(StatsPreset),
+    ItemsPreset(ItemsPreset),
+    IdolsPreset(IdolsPreset),
+    PresetsContainerPreset(PresetsContainerPreset),
+    IconNamedPreset(IconNamedPreset),
+    SpellsPreset(SpellsPreset),
+    EntitiesPreset(EntitiesPreset),
+    ForgettableSpellsPreset(ForgettableSpellsPreset),
+    FullStatsPreset(FullStatsPreset),
+}
+
+impl Default for PresetVariant {
+    fn default() -> Self {
+        Self::Preset(Preset::default())
+    }
+}
+
+impl PresetVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::Preset(_) => 2126,
+            Self::StatsPreset(_) => 440,
+            Self::ItemsPreset(_) => 870,
+            Self::IdolsPreset(_) => 1498,
+            Self::PresetsContainerPreset(_) => 2645,
+            Self::IconNamedPreset(_) => 3146,
+            Self::SpellsPreset(_) => 3404,
+            Self::EntitiesPreset(_) => 4714,
+            Self::ForgettableSpellsPreset(_) => 7096,
+            Self::FullStatsPreset(_) => 7986,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2126 => Ok(Self::Preset(Preset::deserialize(reader)?)),
+            440 => Ok(Self::StatsPreset(StatsPreset::deserialize(reader)?)),
+            870 => Ok(Self::ItemsPreset(ItemsPreset::deserialize(reader)?)),
+            1498 => Ok(Self::IdolsPreset(IdolsPreset::deserialize(reader)?)),
+            2645 => Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?)),
+            3146 => Ok(Self::IconNamedPreset(IconNamedPreset::deserialize(reader)?)),
+            3404 => Ok(Self::SpellsPreset(SpellsPreset::deserialize(reader)?)),
+            4714 => Ok(Self::EntitiesPreset(EntitiesPreset::deserialize(reader)?)),
+            7096 => Ok(Self::ForgettableSpellsPreset(ForgettableSpellsPreset::deserialize(reader)?)),
+            7986 => Ok(Self::FullStatsPreset(FullStatsPreset::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown Preset type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PresetVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::Preset(v) => v.serialize(writer),
+            Self::StatsPreset(v) => v.serialize(writer),
+            Self::ItemsPreset(v) => v.serialize(writer),
+            Self::IdolsPreset(v) => v.serialize(writer),
+            Self::PresetsContainerPreset(v) => v.serialize(writer),
+            Self::IconNamedPreset(v) => v.serialize(writer),
+            Self::SpellsPreset(v) => v.serialize(writer),
+            Self::EntitiesPreset(v) => v.serialize(writer),
+            Self::ForgettableSpellsPreset(v) => v.serialize(writer),
+            Self::FullStatsPreset(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PresetVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::Preset(Preset::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for QuestActiveInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum QuestActiveInformationsVariant {
+    QuestActiveInformations(QuestActiveInformations),
+    QuestActiveDetailedInformations(QuestActiveDetailedInformations),
+}
+
+impl Default for QuestActiveInformationsVariant {
+    fn default() -> Self {
+        Self::QuestActiveInformations(QuestActiveInformations::default())
+    }
+}
+
+impl QuestActiveInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::QuestActiveInformations(_) => 2513,
+            Self::QuestActiveDetailedInformations(_) => 3438,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2513 => Ok(Self::QuestActiveInformations(QuestActiveInformations::deserialize(reader)?)),
+            3438 => Ok(Self::QuestActiveDetailedInformations(QuestActiveDetailedInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown QuestActiveInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for QuestActiveInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::QuestActiveInformations(v) => v.serialize(writer),
+            Self::QuestActiveDetailedInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for QuestActiveInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::QuestActiveInformations(QuestActiveInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FriendInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum FriendInformationsVariant {
+    FriendInformations(FriendInformations),
+    FriendOnlineInformations(FriendOnlineInformations),
+}
+
+impl Default for FriendInformationsVariant {
+    fn default() -> Self {
+        Self::FriendInformations(FriendInformations::default())
+    }
+}
+
+impl FriendInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FriendInformations(_) => 3453,
+            Self::FriendOnlineInformations(_) => 450,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            3453 => Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?)),
+            450 => Ok(Self::FriendOnlineInformations(FriendOnlineInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FriendInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FriendInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FriendInformations(v) => v.serialize(writer),
+            Self::FriendOnlineInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FriendInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ActorAlignmentInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum ActorAlignmentInformationsVariant {
+    ActorAlignmentInformations(ActorAlignmentInformations),
+    ActorExtendedAlignmentInformations(ActorExtendedAlignmentInformations),
+}
+
+impl Default for ActorAlignmentInformationsVariant {
+    fn default() -> Self {
+        Self::ActorAlignmentInformations(ActorAlignmentInformations::default())
+    }
+}
+
+impl ActorAlignmentInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ActorAlignmentInformations(_) => 1230,
+            Self::ActorExtendedAlignmentInformations(_) => 5506,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            1230 => Ok(Self::ActorAlignmentInformations(ActorAlignmentInformations::deserialize(reader)?)),
+            5506 => Ok(Self::ActorExtendedAlignmentInformations(ActorExtendedAlignmentInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ActorAlignmentInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ActorAlignmentInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ActorAlignmentInformations(v) => v.serialize(writer),
+            Self::ActorExtendedAlignmentInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ActorAlignmentInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ActorAlignmentInformations(ActorAlignmentInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PrismInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum PrismInformationVariant {
+    PrismInformation(PrismInformation),
+    AlliancePrismInformation(AlliancePrismInformation),
+    AllianceInsiderPrismInformation(AllianceInsiderPrismInformation),
+}
+
+impl Default for PrismInformationVariant {
+    fn default() -> Self {
+        Self::PrismInformation(PrismInformation::default())
+    }
+}
+
+impl PrismInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PrismInformation(_) => 5963,
+            Self::AlliancePrismInformation(_) => 5996,
+            Self::AllianceInsiderPrismInformation(_) => 6982,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5963 => Ok(Self::PrismInformation(PrismInformation::deserialize(reader)?)),
+            5996 => Ok(Self::AlliancePrismInformation(AlliancePrismInformation::deserialize(reader)?)),
+            6982 => Ok(Self::AllianceInsiderPrismInformation(AllianceInsiderPrismInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PrismInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PrismInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PrismInformation(v) => v.serialize(writer),
+            Self::AlliancePrismInformation(v) => v.serialize(writer),
+            Self::AllianceInsiderPrismInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PrismInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PrismInformation(PrismInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for CharacterRemodelingInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum CharacterRemodelingInformationVariant {
+    CharacterRemodelingInformation(CharacterRemodelingInformation),
+    CharacterToRemodelInformations(CharacterToRemodelInformations),
+}
+
+impl Default for CharacterRemodelingInformationVariant {
+    fn default() -> Self {
+        Self::CharacterRemodelingInformation(CharacterRemodelingInformation::default())
+    }
+}
+
+impl CharacterRemodelingInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::CharacterRemodelingInformation(_) => 2924,
+            Self::CharacterToRemodelInformations(_) => 1292,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2924 => Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?)),
+            1292 => Ok(Self::CharacterToRemodelInformations(CharacterToRemodelInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterRemodelingInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for CharacterRemodelingInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::CharacterRemodelingInformation(v) => v.serialize(writer),
+            Self::CharacterToRemodelInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for CharacterRemodelingInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for CharacterBaseInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum CharacterBaseInformationsVariant {
+    CharacterBaseInformations(CharacterBaseInformations),
+    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
+    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
+    PartyMemberInformations(PartyMemberInformations),
+    PartyMemberArenaInformations(PartyMemberArenaInformations),
+}
+
+impl Default for CharacterBaseInformationsVariant {
+    fn default() -> Self {
+        Self::CharacterBaseInformations(CharacterBaseInformations::default())
+    }
+}
+
+impl CharacterBaseInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::CharacterBaseInformations(_) => 6238,
+            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
+            Self::PartyInvitationMemberInformations(_) => 7145,
+            Self::PartyMemberInformations(_) => 8246,
+            Self::PartyMemberArenaInformations(_) => 1101,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
+            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
+            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
+            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
+            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterBaseInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for CharacterBaseInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::CharacterBaseInformations(v) => v.serialize(writer),
+            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
+            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for CharacterBaseInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameRolePlayNpcInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameRolePlayNpcInformationsVariant {
+    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
+    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
+}
+
+impl Default for GameRolePlayNpcInformationsVariant {
+    fn default() -> Self {
+        Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::default())
+    }
+}
+
+impl GameRolePlayNpcInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameRolePlayNpcInformations(_) => 8307,
+            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
+            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameRolePlayNpcInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameRolePlayNpcInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameRolePlayNpcInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectItemToSell hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectItemToSellVariant {
+    ObjectItemToSell(ObjectItemToSell),
+    ObjectItemToSellInBid(ObjectItemToSellInBid),
+}
+
+impl Default for ObjectItemToSellVariant {
+    fn default() -> Self {
+        Self::ObjectItemToSell(ObjectItemToSell::default())
+    }
+}
+
+impl ObjectItemToSellVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectItemToSell(_) => 446,
+            Self::ObjectItemToSellInBid(_) => 4082,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            446 => Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?)),
+            4082 => Ok(Self::ObjectItemToSellInBid(ObjectItemToSellInBid::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectItemToSell type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectItemToSellVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectItemToSell(v) => v.serialize(writer),
+            Self::ObjectItemToSellInBid(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectItemToSellVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for InteractiveElementSkill hierarchy
+#[derive(Debug, Clone)]
+pub enum InteractiveElementSkillVariant {
+    InteractiveElementSkill(InteractiveElementSkill),
+    InteractiveElementNamedSkill(InteractiveElementNamedSkill),
+}
+
+impl Default for InteractiveElementSkillVariant {
+    fn default() -> Self {
+        Self::InteractiveElementSkill(InteractiveElementSkill::default())
+    }
+}
+
+impl InteractiveElementSkillVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::InteractiveElementSkill(_) => 6462,
+            Self::InteractiveElementNamedSkill(_) => 3347,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6462 => Ok(Self::InteractiveElementSkill(InteractiveElementSkill::deserialize(reader)?)),
+            3347 => Ok(Self::InteractiveElementNamedSkill(InteractiveElementNamedSkill::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown InteractiveElementSkill type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for InteractiveElementSkillVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::InteractiveElementSkill(v) => v.serialize(writer),
+            Self::InteractiveElementNamedSkill(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for InteractiveElementSkillVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::InteractiveElementSkill(InteractiveElementSkill::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for SkillActionDescriptionTimed hierarchy
+#[derive(Debug, Clone)]
+pub enum SkillActionDescriptionTimedVariant {
+    SkillActionDescriptionTimed(SkillActionDescriptionTimed),
+    SkillActionDescriptionCollect(SkillActionDescriptionCollect),
+}
+
+impl Default for SkillActionDescriptionTimedVariant {
+    fn default() -> Self {
+        Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::default())
+    }
+}
+
+impl SkillActionDescriptionTimedVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::SkillActionDescriptionTimed(_) => 263,
+            Self::SkillActionDescriptionCollect(_) => 6581,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            263 => Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?)),
+            6581 => Ok(Self::SkillActionDescriptionCollect(SkillActionDescriptionCollect::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown SkillActionDescriptionTimed type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for SkillActionDescriptionTimedVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::SkillActionDescriptionTimed(v) => v.serialize(writer),
+            Self::SkillActionDescriptionCollect(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for SkillActionDescriptionTimedVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameContextActorInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameContextActorInformationsVariant {
+    GameContextActorInformations(GameContextActorInformations),
+    GameRolePlayActorInformations(GameRolePlayActorInformations),
+    GameRolePlayPrismInformations(GameRolePlayPrismInformations),
+    GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations),
+    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
+    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
+    GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations),
+    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
+    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
+    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
+    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
+    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
+    GameRolePlayMountInformations(GameRolePlayMountInformations),
+    GameRolePlayPortalInformations(GameRolePlayPortalInformations),
+    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
+    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
+    GameFightFighterInformations(GameFightFighterInformations),
+    GameFightAIInformations(GameFightAIInformations),
+    GameFightMonsterInformations(GameFightMonsterInformations),
+    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
+    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
+    GameFightFighterNamedInformations(GameFightFighterNamedInformations),
+    GameFightMutantInformations(GameFightMutantInformations),
+    GameFightCharacterInformations(GameFightCharacterInformations),
+    GameFightEntityInformation(GameFightEntityInformation),
+}
+
+impl Default for GameContextActorInformationsVariant {
+    fn default() -> Self {
+        Self::GameContextActorInformations(GameContextActorInformations::default())
+    }
+}
+
+impl GameContextActorInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameContextActorInformations(_) => 424,
+            Self::GameRolePlayActorInformations(_) => 2333,
+            Self::GameRolePlayPrismInformations(_) => 7,
+            Self::GameRolePlayTaxCollectorInformations(_) => 3424,
+            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
+            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
+            Self::GameRolePlayTreasureHintInformations(_) => 5073,
+            Self::GameRolePlayNamedActorInformations(_) => 5940,
+            Self::GameRolePlayMerchantInformations(_) => 1204,
+            Self::GameRolePlayHumanoidInformations(_) => 2640,
+            Self::GameRolePlayCharacterInformations(_) => 5268,
+            Self::GameRolePlayMutantInformations(_) => 8271,
+            Self::GameRolePlayMountInformations(_) => 4944,
+            Self::GameRolePlayPortalInformations(_) => 6138,
+            Self::GameRolePlayNpcInformations(_) => 8307,
+            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
+            Self::GameFightFighterInformations(_) => 8400,
+            Self::GameFightAIInformations(_) => 950,
+            Self::GameFightMonsterInformations(_) => 6096,
+            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
+            Self::GameFightTaxCollectorInformations(_) => 6975,
+            Self::GameFightFighterNamedInformations(_) => 6665,
+            Self::GameFightMutantInformations(_) => 4633,
+            Self::GameFightCharacterInformations(_) => 7807,
+            Self::GameFightEntityInformation(_) => 9631,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            424 => Ok(Self::GameContextActorInformations(GameContextActorInformations::deserialize(reader)?)),
+            2333 => Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?)),
+            7 => Ok(Self::GameRolePlayPrismInformations(GameRolePlayPrismInformations::deserialize(reader)?)),
+            3424 => Ok(Self::GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations::deserialize(reader)?)),
+            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
+            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
+            5073 => Ok(Self::GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations::deserialize(reader)?)),
+            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
+            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
+            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
+            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
+            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
+            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
+            6138 => Ok(Self::GameRolePlayPortalInformations(GameRolePlayPortalInformations::deserialize(reader)?)),
+            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
+            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
+            8400 => Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?)),
+            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
+            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
+            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
+            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
+            6665 => Ok(Self::GameFightFighterNamedInformations(GameFightFighterNamedInformations::deserialize(reader)?)),
+            4633 => Ok(Self::GameFightMutantInformations(GameFightMutantInformations::deserialize(reader)?)),
+            7807 => Ok(Self::GameFightCharacterInformations(GameFightCharacterInformations::deserialize(reader)?)),
+            9631 => Ok(Self::GameFightEntityInformation(GameFightEntityInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameContextActorInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameContextActorInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameContextActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayPrismInformations(v) => v.serialize(writer),
+            Self::GameRolePlayTaxCollectorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
+            Self::GameRolePlayTreasureHintInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
+            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
+            Self::GameRolePlayPortalInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
+            Self::GameFightFighterInformations(v) => v.serialize(writer),
+            Self::GameFightAIInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
+            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
+            Self::GameFightFighterNamedInformations(v) => v.serialize(writer),
+            Self::GameFightMutantInformations(v) => v.serialize(writer),
+            Self::GameFightCharacterInformations(v) => v.serialize(writer),
+            Self::GameFightEntityInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameContextActorInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameContextActorInformations(GameContextActorInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for BasicGuildInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum BasicGuildInformationsVariant {
+    BasicGuildInformations(BasicGuildInformations),
+    GuildInformations(GuildInformations),
+    AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations),
+    GuildFactSheetInformations(GuildFactSheetInformations),
+    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
+    GuildInAllianceInformations(GuildInAllianceInformations),
+}
+
+impl Default for BasicGuildInformationsVariant {
+    fn default() -> Self {
+        Self::BasicGuildInformations(BasicGuildInformations::default())
+    }
+}
+
+impl BasicGuildInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::BasicGuildInformations(_) => 492,
+            Self::GuildInformations(_) => 6928,
+            Self::AlliancedGuildFactSheetInformations(_) => 920,
+            Self::GuildFactSheetInformations(_) => 5100,
+            Self::GuildInsiderFactSheetInformations(_) => 6301,
+            Self::GuildInAllianceInformations(_) => 8268,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            492 => Ok(Self::BasicGuildInformations(BasicGuildInformations::deserialize(reader)?)),
+            6928 => Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?)),
+            920 => Ok(Self::AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations::deserialize(reader)?)),
+            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
+            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
+            8268 => Ok(Self::GuildInAllianceInformations(GuildInAllianceInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown BasicGuildInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for BasicGuildInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::BasicGuildInformations(v) => v.serialize(writer),
+            Self::GuildInformations(v) => v.serialize(writer),
+            Self::AlliancedGuildFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildInAllianceInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for BasicGuildInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::BasicGuildInformations(BasicGuildInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for BaseSpawnMonsterInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum BaseSpawnMonsterInformationVariant {
+    BaseSpawnMonsterInformation(BaseSpawnMonsterInformation),
+    SpawnMonsterInformation(SpawnMonsterInformation),
+    SpawnScaledMonsterInformation(SpawnScaledMonsterInformation),
+}
+
+impl Default for BaseSpawnMonsterInformationVariant {
+    fn default() -> Self {
+        Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::default())
+    }
+}
+
+impl BaseSpawnMonsterInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::BaseSpawnMonsterInformation(_) => 1071,
+            Self::SpawnMonsterInformation(_) => 3264,
+            Self::SpawnScaledMonsterInformation(_) => 8617,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            1071 => Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?)),
+            3264 => Ok(Self::SpawnMonsterInformation(SpawnMonsterInformation::deserialize(reader)?)),
+            8617 => Ok(Self::SpawnScaledMonsterInformation(SpawnScaledMonsterInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown BaseSpawnMonsterInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for BaseSpawnMonsterInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::BaseSpawnMonsterInformation(v) => v.serialize(writer),
+            Self::SpawnMonsterInformation(v) => v.serialize(writer),
+            Self::SpawnScaledMonsterInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for BaseSpawnMonsterInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for Idol hierarchy
+#[derive(Debug, Clone)]
+pub enum IdolVariant {
+    Idol(Idol),
+    PartyIdol(PartyIdol),
+}
+
+impl Default for IdolVariant {
+    fn default() -> Self {
+        Self::Idol(Idol::default())
+    }
+}
+
+impl IdolVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::Idol(_) => 5752,
+            Self::PartyIdol(_) => 5714,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5752 => Ok(Self::Idol(Idol::deserialize(reader)?)),
+            5714 => Ok(Self::PartyIdol(PartyIdol::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown Idol type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for IdolVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::Idol(v) => v.serialize(writer),
+            Self::PartyIdol(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for IdolVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::Idol(Idol::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for MonsterInGroupLightInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum MonsterInGroupLightInformationsVariant {
+    MonsterInGroupLightInformations(MonsterInGroupLightInformations),
+    MonsterInGroupInformations(MonsterInGroupInformations),
+}
+
+impl Default for MonsterInGroupLightInformationsVariant {
+    fn default() -> Self {
+        Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::default())
+    }
+}
+
+impl MonsterInGroupLightInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::MonsterInGroupLightInformations(_) => 7146,
+            Self::MonsterInGroupInformations(_) => 3232,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            7146 => Ok(Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::deserialize(reader)?)),
+            3232 => Ok(Self::MonsterInGroupInformations(MonsterInGroupInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown MonsterInGroupLightInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for MonsterInGroupLightInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::MonsterInGroupLightInformations(v) => v.serialize(writer),
+            Self::MonsterInGroupInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for MonsterInGroupLightInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::MonsterInGroupLightInformations(MonsterInGroupLightInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for UpdateMountCharacteristic hierarchy
+#[derive(Debug, Clone)]
+pub enum UpdateMountCharacteristicVariant {
+    UpdateMountCharacteristic(UpdateMountCharacteristic),
+    UpdateMountIntegerCharacteristic(UpdateMountIntegerCharacteristic),
+    UpdateMountBooleanCharacteristic(UpdateMountBooleanCharacteristic),
+}
+
+impl Default for UpdateMountCharacteristicVariant {
+    fn default() -> Self {
+        Self::UpdateMountCharacteristic(UpdateMountCharacteristic::default())
+    }
+}
+
+impl UpdateMountCharacteristicVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::UpdateMountCharacteristic(_) => 3205,
+            Self::UpdateMountIntegerCharacteristic(_) => 4162,
+            Self::UpdateMountBooleanCharacteristic(_) => 4340,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            3205 => Ok(Self::UpdateMountCharacteristic(UpdateMountCharacteristic::deserialize(reader)?)),
+            4162 => Ok(Self::UpdateMountIntegerCharacteristic(UpdateMountIntegerCharacteristic::deserialize(reader)?)),
+            4340 => Ok(Self::UpdateMountBooleanCharacteristic(UpdateMountBooleanCharacteristic::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown UpdateMountCharacteristic type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for UpdateMountCharacteristicVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::UpdateMountCharacteristic(v) => v.serialize(writer),
+            Self::UpdateMountIntegerCharacteristic(v) => v.serialize(writer),
+            Self::UpdateMountBooleanCharacteristic(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for UpdateMountCharacteristicVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::UpdateMountCharacteristic(UpdateMountCharacteristic::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ServerSessionConstant hierarchy
+#[derive(Debug, Clone)]
+pub enum ServerSessionConstantVariant {
+    ServerSessionConstant(ServerSessionConstant),
+    ServerSessionConstantString(ServerSessionConstantString),
+    ServerSessionConstantInteger(ServerSessionConstantInteger),
+    ServerSessionConstantLong(ServerSessionConstantLong),
+}
+
+impl Default for ServerSessionConstantVariant {
+    fn default() -> Self {
+        Self::ServerSessionConstant(ServerSessionConstant::default())
+    }
+}
+
+impl ServerSessionConstantVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ServerSessionConstant(_) => 9452,
+            Self::ServerSessionConstantString(_) => 133,
+            Self::ServerSessionConstantInteger(_) => 292,
+            Self::ServerSessionConstantLong(_) => 2488,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9452 => Ok(Self::ServerSessionConstant(ServerSessionConstant::deserialize(reader)?)),
+            133 => Ok(Self::ServerSessionConstantString(ServerSessionConstantString::deserialize(reader)?)),
+            292 => Ok(Self::ServerSessionConstantInteger(ServerSessionConstantInteger::deserialize(reader)?)),
+            2488 => Ok(Self::ServerSessionConstantLong(ServerSessionConstantLong::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ServerSessionConstant type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ServerSessionConstantVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ServerSessionConstant(v) => v.serialize(writer),
+            Self::ServerSessionConstantString(v) => v.serialize(writer),
+            Self::ServerSessionConstantInteger(v) => v.serialize(writer),
+            Self::ServerSessionConstantLong(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ServerSessionConstantVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ServerSessionConstant(ServerSessionConstant::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameRolePlayHumanoidInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameRolePlayHumanoidInformationsVariant {
+    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
+    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
+    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
+}
+
+impl Default for GameRolePlayHumanoidInformationsVariant {
+    fn default() -> Self {
+        Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::default())
+    }
+}
+
+impl GameRolePlayHumanoidInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameRolePlayHumanoidInformations(_) => 2640,
+            Self::GameRolePlayCharacterInformations(_) => 5268,
+            Self::GameRolePlayMutantInformations(_) => 8271,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
+            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
+            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameRolePlayHumanoidInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameRolePlayHumanoidInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
+            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameRolePlayHumanoidInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AcquaintanceInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum AcquaintanceInformationVariant {
+    AcquaintanceInformation(AcquaintanceInformation),
+    AcquaintanceOnlineInformation(AcquaintanceOnlineInformation),
+}
+
+impl Default for AcquaintanceInformationVariant {
+    fn default() -> Self {
+        Self::AcquaintanceInformation(AcquaintanceInformation::default())
+    }
+}
+
+impl AcquaintanceInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AcquaintanceInformation(_) => 4492,
+            Self::AcquaintanceOnlineInformation(_) => 5184,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4492 => Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?)),
+            5184 => Ok(Self::AcquaintanceOnlineInformation(AcquaintanceOnlineInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AcquaintanceInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AcquaintanceInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AcquaintanceInformation(v) => v.serialize(writer),
+            Self::AcquaintanceOnlineInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AcquaintanceInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameFightFighterInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameFightFighterInformationsVariant {
+    GameFightFighterInformations(GameFightFighterInformations),
+    GameFightAIInformations(GameFightAIInformations),
+    GameFightMonsterInformations(GameFightMonsterInformations),
+    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
+    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
+    GameFightFighterNamedInformations(GameFightFighterNamedInformations),
+    GameFightMutantInformations(GameFightMutantInformations),
+    GameFightCharacterInformations(GameFightCharacterInformations),
+    GameFightEntityInformation(GameFightEntityInformation),
+}
+
+impl Default for GameFightFighterInformationsVariant {
+    fn default() -> Self {
+        Self::GameFightFighterInformations(GameFightFighterInformations::default())
+    }
+}
+
+impl GameFightFighterInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameFightFighterInformations(_) => 8400,
+            Self::GameFightAIInformations(_) => 950,
+            Self::GameFightMonsterInformations(_) => 6096,
+            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
+            Self::GameFightTaxCollectorInformations(_) => 6975,
+            Self::GameFightFighterNamedInformations(_) => 6665,
+            Self::GameFightMutantInformations(_) => 4633,
+            Self::GameFightCharacterInformations(_) => 7807,
+            Self::GameFightEntityInformation(_) => 9631,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8400 => Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?)),
+            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
+            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
+            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
+            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
+            6665 => Ok(Self::GameFightFighterNamedInformations(GameFightFighterNamedInformations::deserialize(reader)?)),
+            4633 => Ok(Self::GameFightMutantInformations(GameFightMutantInformations::deserialize(reader)?)),
+            7807 => Ok(Self::GameFightCharacterInformations(GameFightCharacterInformations::deserialize(reader)?)),
+            9631 => Ok(Self::GameFightEntityInformation(GameFightEntityInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameFightFighterInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameFightFighterInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameFightFighterInformations(v) => v.serialize(writer),
+            Self::GameFightAIInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
+            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
+            Self::GameFightFighterNamedInformations(v) => v.serialize(writer),
+            Self::GameFightMutantInformations(v) => v.serialize(writer),
+            Self::GameFightCharacterInformations(v) => v.serialize(writer),
+            Self::GameFightEntityInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightFighterInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PartyMemberInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum PartyMemberInformationsVariant {
+    PartyMemberInformations(PartyMemberInformations),
+    PartyMemberArenaInformations(PartyMemberArenaInformations),
+}
+
+impl Default for PartyMemberInformationsVariant {
+    fn default() -> Self {
+        Self::PartyMemberInformations(PartyMemberInformations::default())
+    }
+}
+
+impl PartyMemberInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PartyMemberInformations(_) => 8246,
+            Self::PartyMemberArenaInformations(_) => 1101,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
+            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PartyMemberInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PartyMemberInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PartyMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PartyMemberInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AchievementAchieved hierarchy
+#[derive(Debug, Clone)]
+pub enum AchievementAchievedVariant {
+    AchievementAchieved(AchievementAchieved),
+    AchievementAchievedRewardable(AchievementAchievedRewardable),
+}
+
+impl Default for AchievementAchievedVariant {
+    fn default() -> Self {
+        Self::AchievementAchieved(AchievementAchieved::default())
+    }
+}
+
+impl AchievementAchievedVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AchievementAchieved(_) => 9231,
+            Self::AchievementAchievedRewardable(_) => 2164,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9231 => Ok(Self::AchievementAchieved(AchievementAchieved::deserialize(reader)?)),
+            2164 => Ok(Self::AchievementAchievedRewardable(AchievementAchievedRewardable::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AchievementAchieved type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AchievementAchievedVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AchievementAchieved(v) => v.serialize(writer),
+            Self::AchievementAchievedRewardable(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AchievementAchievedVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AchievementAchieved(AchievementAchieved::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectEffect hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectEffectVariant {
+    ObjectEffect(ObjectEffect),
+    ObjectEffectDate(ObjectEffectDate),
+    ObjectEffectString(ObjectEffectString),
+    ObjectEffectDuration(ObjectEffectDuration),
+    ObjectEffectMount(ObjectEffectMount),
+    ObjectEffectMinMax(ObjectEffectMinMax),
+    ObjectEffectCreature(ObjectEffectCreature),
+    ObjectEffectLadder(ObjectEffectLadder),
+    ObjectEffectInteger(ObjectEffectInteger),
+    ObjectEffectDice(ObjectEffectDice),
+}
+
+impl Default for ObjectEffectVariant {
+    fn default() -> Self {
+        Self::ObjectEffect(ObjectEffect::default())
+    }
+}
+
+impl ObjectEffectVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectEffect(_) => 6577,
+            Self::ObjectEffectDate(_) => 2036,
+            Self::ObjectEffectString(_) => 2216,
+            Self::ObjectEffectDuration(_) => 7748,
+            Self::ObjectEffectMount(_) => 8688,
+            Self::ObjectEffectMinMax(_) => 9076,
+            Self::ObjectEffectCreature(_) => 9295,
+            Self::ObjectEffectLadder(_) => 6916,
+            Self::ObjectEffectInteger(_) => 9369,
+            Self::ObjectEffectDice(_) => 9512,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6577 => Ok(Self::ObjectEffect(ObjectEffect::deserialize(reader)?)),
+            2036 => Ok(Self::ObjectEffectDate(ObjectEffectDate::deserialize(reader)?)),
+            2216 => Ok(Self::ObjectEffectString(ObjectEffectString::deserialize(reader)?)),
+            7748 => Ok(Self::ObjectEffectDuration(ObjectEffectDuration::deserialize(reader)?)),
+            8688 => Ok(Self::ObjectEffectMount(ObjectEffectMount::deserialize(reader)?)),
+            9076 => Ok(Self::ObjectEffectMinMax(ObjectEffectMinMax::deserialize(reader)?)),
+            9295 => Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?)),
+            6916 => Ok(Self::ObjectEffectLadder(ObjectEffectLadder::deserialize(reader)?)),
+            9369 => Ok(Self::ObjectEffectInteger(ObjectEffectInteger::deserialize(reader)?)),
+            9512 => Ok(Self::ObjectEffectDice(ObjectEffectDice::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectEffect type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectEffectVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectEffect(v) => v.serialize(writer),
+            Self::ObjectEffectDate(v) => v.serialize(writer),
+            Self::ObjectEffectString(v) => v.serialize(writer),
+            Self::ObjectEffectDuration(v) => v.serialize(writer),
+            Self::ObjectEffectMount(v) => v.serialize(writer),
+            Self::ObjectEffectMinMax(v) => v.serialize(writer),
+            Self::ObjectEffectCreature(v) => v.serialize(writer),
+            Self::ObjectEffectLadder(v) => v.serialize(writer),
+            Self::ObjectEffectInteger(v) => v.serialize(writer),
+            Self::ObjectEffectDice(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectEffectVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectEffect(ObjectEffect::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for MapCoordinatesAndId hierarchy
+#[derive(Debug, Clone)]
+pub enum MapCoordinatesAndIdVariant {
+    MapCoordinatesAndId(MapCoordinatesAndId),
+    MapCoordinatesExtended(MapCoordinatesExtended),
+}
+
+impl Default for MapCoordinatesAndIdVariant {
+    fn default() -> Self {
+        Self::MapCoordinatesAndId(MapCoordinatesAndId::default())
+    }
+}
+
+impl MapCoordinatesAndIdVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::MapCoordinatesAndId(_) => 5358,
+            Self::MapCoordinatesExtended(_) => 1591,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5358 => Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?)),
+            1591 => Ok(Self::MapCoordinatesExtended(MapCoordinatesExtended::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown MapCoordinatesAndId type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for MapCoordinatesAndIdVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::MapCoordinatesAndId(v) => v.serialize(writer),
+            Self::MapCoordinatesExtended(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for MapCoordinatesAndIdVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for HouseInstanceInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum HouseInstanceInformationsVariant {
+    HouseInstanceInformations(HouseInstanceInformations),
+    HouseGuildedInformations(HouseGuildedInformations),
+}
+
+impl Default for HouseInstanceInformationsVariant {
+    fn default() -> Self {
+        Self::HouseInstanceInformations(HouseInstanceInformations::default())
+    }
+}
+
+impl HouseInstanceInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::HouseInstanceInformations(_) => 9271,
+            Self::HouseGuildedInformations(_) => 2823,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9271 => Ok(Self::HouseInstanceInformations(HouseInstanceInformations::deserialize(reader)?)),
+            2823 => Ok(Self::HouseGuildedInformations(HouseGuildedInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown HouseInstanceInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for HouseInstanceInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::HouseInstanceInformations(v) => v.serialize(writer),
+            Self::HouseGuildedInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for HouseInstanceInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::HouseInstanceInformations(HouseInstanceInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightResultAdditionalData hierarchy
+#[derive(Debug, Clone)]
+pub enum FightResultAdditionalDataVariant {
+    FightResultAdditionalData(FightResultAdditionalData),
+    FightResultExperienceData(FightResultExperienceData),
+    FightResultPvpData(FightResultPvpData),
+}
+
+impl Default for FightResultAdditionalDataVariant {
+    fn default() -> Self {
+        Self::FightResultAdditionalData(FightResultAdditionalData::default())
+    }
+}
+
+impl FightResultAdditionalDataVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightResultAdditionalData(_) => 5618,
+            Self::FightResultExperienceData(_) => 2135,
+            Self::FightResultPvpData(_) => 3462,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5618 => Ok(Self::FightResultAdditionalData(FightResultAdditionalData::deserialize(reader)?)),
+            2135 => Ok(Self::FightResultExperienceData(FightResultExperienceData::deserialize(reader)?)),
+            3462 => Ok(Self::FightResultPvpData(FightResultPvpData::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightResultAdditionalData type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightResultAdditionalDataVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightResultAdditionalData(v) => v.serialize(writer),
+            Self::FightResultExperienceData(v) => v.serialize(writer),
+            Self::FightResultPvpData(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightResultAdditionalDataVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightResultAdditionalData(FightResultAdditionalData::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for CharacterMinimalInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum CharacterMinimalInformationsVariant {
+    CharacterMinimalInformations(CharacterMinimalInformations),
+    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
+    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
+    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
+    CharacterBaseInformations(CharacterBaseInformations),
+    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
+    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
+    PartyMemberInformations(PartyMemberInformations),
+    PartyMemberArenaInformations(PartyMemberArenaInformations),
+    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
+    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
+    GuildMember(GuildMember),
+}
+
+impl Default for CharacterMinimalInformationsVariant {
+    fn default() -> Self {
+        Self::CharacterMinimalInformations(CharacterMinimalInformations::default())
+    }
+}
+
+impl CharacterMinimalInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::CharacterMinimalInformations(_) => 8058,
+            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
+            Self::CharacterMinimalPlusLookInformations(_) => 8237,
+            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
+            Self::CharacterBaseInformations(_) => 6238,
+            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
+            Self::PartyInvitationMemberInformations(_) => 7145,
+            Self::PartyMemberInformations(_) => 8246,
+            Self::PartyMemberArenaInformations(_) => 1101,
+            Self::CharacterMinimalGuildInformations(_) => 6416,
+            Self::CharacterMinimalAllianceInformations(_) => 9412,
+            Self::GuildMember(_) => 8512,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
+            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
+            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
+            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
+            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
+            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
+            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
+            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
+            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
+            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
+            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
+            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for CharacterMinimalInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::CharacterMinimalInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
+            Self::CharacterBaseInformations(v) => v.serialize(writer),
+            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
+            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
+            Self::GuildMember(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for CharacterMinimalInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PartyEntityBaseInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum PartyEntityBaseInformationVariant {
+    PartyEntityBaseInformation(PartyEntityBaseInformation),
+    PartyEntityMemberInformation(PartyEntityMemberInformation),
+}
+
+impl Default for PartyEntityBaseInformationVariant {
+    fn default() -> Self {
+        Self::PartyEntityBaseInformation(PartyEntityBaseInformation::default())
+    }
+}
+
+impl PartyEntityBaseInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PartyEntityBaseInformation(_) => 4252,
+            Self::PartyEntityMemberInformation(_) => 4347,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4252 => Ok(Self::PartyEntityBaseInformation(PartyEntityBaseInformation::deserialize(reader)?)),
+            4347 => Ok(Self::PartyEntityMemberInformation(PartyEntityMemberInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PartyEntityBaseInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PartyEntityBaseInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PartyEntityBaseInformation(v) => v.serialize(writer),
+            Self::PartyEntityMemberInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PartyEntityBaseInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PartyEntityBaseInformation(PartyEntityBaseInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for HouseInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum HouseInformationsVariant {
+    HouseInformations(HouseInformations),
+    HouseInformationsInside(HouseInformationsInside),
+    HouseInformationsForGuild(HouseInformationsForGuild),
+    HouseOnMapInformations(HouseOnMapInformations),
+    AccountHouseInformations(AccountHouseInformations),
+}
+
+impl Default for HouseInformationsVariant {
+    fn default() -> Self {
+        Self::HouseInformations(HouseInformations::default())
+    }
+}
+
+impl HouseInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::HouseInformations(_) => 5826,
+            Self::HouseInformationsInside(_) => 2751,
+            Self::HouseInformationsForGuild(_) => 6667,
+            Self::HouseOnMapInformations(_) => 8830,
+            Self::AccountHouseInformations(_) => 8916,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5826 => Ok(Self::HouseInformations(HouseInformations::deserialize(reader)?)),
+            2751 => Ok(Self::HouseInformationsInside(HouseInformationsInside::deserialize(reader)?)),
+            6667 => Ok(Self::HouseInformationsForGuild(HouseInformationsForGuild::deserialize(reader)?)),
+            8830 => Ok(Self::HouseOnMapInformations(HouseOnMapInformations::deserialize(reader)?)),
+            8916 => Ok(Self::AccountHouseInformations(AccountHouseInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown HouseInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for HouseInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::HouseInformations(v) => v.serialize(writer),
+            Self::HouseInformationsInside(v) => v.serialize(writer),
+            Self::HouseInformationsForGuild(v) => v.serialize(writer),
+            Self::HouseOnMapInformations(v) => v.serialize(writer),
+            Self::AccountHouseInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for HouseInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::HouseInformations(HouseInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GuildFactSheetInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GuildFactSheetInformationsVariant {
+    GuildFactSheetInformations(GuildFactSheetInformations),
+    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
+}
+
+impl Default for GuildFactSheetInformationsVariant {
+    fn default() -> Self {
+        Self::GuildFactSheetInformations(GuildFactSheetInformations::default())
+    }
+}
+
+impl GuildFactSheetInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GuildFactSheetInformations(_) => 5100,
+            Self::GuildInsiderFactSheetInformations(_) => 6301,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
+            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GuildFactSheetInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GuildFactSheetInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GuildFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GuildFactSheetInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for TaxCollectorStaticInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum TaxCollectorStaticInformationsVariant {
+    TaxCollectorStaticInformations(TaxCollectorStaticInformations),
+    TaxCollectorStaticExtendedInformations(TaxCollectorStaticExtendedInformations),
+}
+
+impl Default for TaxCollectorStaticInformationsVariant {
+    fn default() -> Self {
+        Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::default())
+    }
+}
+
+impl TaxCollectorStaticInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::TaxCollectorStaticInformations(_) => 2842,
+            Self::TaxCollectorStaticExtendedInformations(_) => 6436,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2842 => Ok(Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::deserialize(reader)?)),
+            6436 => Ok(Self::TaxCollectorStaticExtendedInformations(TaxCollectorStaticExtendedInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown TaxCollectorStaticInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for TaxCollectorStaticInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::TaxCollectorStaticInformations(v) => v.serialize(writer),
+            Self::TaxCollectorStaticExtendedInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for TaxCollectorStaticInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::TaxCollectorStaticInformations(TaxCollectorStaticInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FriendSpouseInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum FriendSpouseInformationsVariant {
+    FriendSpouseInformations(FriendSpouseInformations),
+    FriendSpouseOnlineInformations(FriendSpouseOnlineInformations),
+}
+
+impl Default for FriendSpouseInformationsVariant {
+    fn default() -> Self {
+        Self::FriendSpouseInformations(FriendSpouseInformations::default())
+    }
+}
+
+impl FriendSpouseInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FriendSpouseInformations(_) => 4533,
+            Self::FriendSpouseOnlineInformations(_) => 7417,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4533 => Ok(Self::FriendSpouseInformations(FriendSpouseInformations::deserialize(reader)?)),
+            7417 => Ok(Self::FriendSpouseOnlineInformations(FriendSpouseOnlineInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FriendSpouseInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FriendSpouseInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FriendSpouseInformations(v) => v.serialize(writer),
+            Self::FriendSpouseOnlineInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FriendSpouseInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FriendSpouseInformations(FriendSpouseInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for TreasureHuntStep hierarchy
+#[derive(Debug, Clone)]
+pub enum TreasureHuntStepVariant {
+    TreasureHuntStep(TreasureHuntStep),
+    TreasureHuntStepFollowDirection(TreasureHuntStepFollowDirection),
+    TreasureHuntStepDig(TreasureHuntStepDig),
+    TreasureHuntStepFollowDirectionToHint(TreasureHuntStepFollowDirectionToHint),
+    TreasureHuntStepFight(TreasureHuntStepFight),
+    TreasureHuntStepFollowDirectionToPOI(TreasureHuntStepFollowDirectionToPOI),
+}
+
+impl Default for TreasureHuntStepVariant {
+    fn default() -> Self {
+        Self::TreasureHuntStep(TreasureHuntStep::default())
+    }
+}
+
+impl TreasureHuntStepVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::TreasureHuntStep(_) => 5041,
+            Self::TreasureHuntStepFollowDirection(_) => 1881,
+            Self::TreasureHuntStepDig(_) => 3298,
+            Self::TreasureHuntStepFollowDirectionToHint(_) => 5721,
+            Self::TreasureHuntStepFight(_) => 6367,
+            Self::TreasureHuntStepFollowDirectionToPOI(_) => 7951,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5041 => Ok(Self::TreasureHuntStep(TreasureHuntStep::deserialize(reader)?)),
+            1881 => Ok(Self::TreasureHuntStepFollowDirection(TreasureHuntStepFollowDirection::deserialize(reader)?)),
+            3298 => Ok(Self::TreasureHuntStepDig(TreasureHuntStepDig::deserialize(reader)?)),
+            5721 => Ok(Self::TreasureHuntStepFollowDirectionToHint(TreasureHuntStepFollowDirectionToHint::deserialize(reader)?)),
+            6367 => Ok(Self::TreasureHuntStepFight(TreasureHuntStepFight::deserialize(reader)?)),
+            7951 => Ok(Self::TreasureHuntStepFollowDirectionToPOI(TreasureHuntStepFollowDirectionToPOI::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown TreasureHuntStep type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for TreasureHuntStepVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::TreasureHuntStep(v) => v.serialize(writer),
+            Self::TreasureHuntStepFollowDirection(v) => v.serialize(writer),
+            Self::TreasureHuntStepDig(v) => v.serialize(writer),
+            Self::TreasureHuntStepFollowDirectionToHint(v) => v.serialize(writer),
+            Self::TreasureHuntStepFight(v) => v.serialize(writer),
+            Self::TreasureHuntStepFollowDirectionToPOI(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for TreasureHuntStepVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::TreasureHuntStep(TreasureHuntStep::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightResultListEntry hierarchy
+#[derive(Debug, Clone)]
+pub enum FightResultListEntryVariant {
+    FightResultListEntry(FightResultListEntry),
+    FightResultFighterListEntry(FightResultFighterListEntry),
+    FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry),
+    FightResultPlayerListEntry(FightResultPlayerListEntry),
+    FightResultMutantListEntry(FightResultMutantListEntry),
+}
+
+impl Default for FightResultListEntryVariant {
+    fn default() -> Self {
+        Self::FightResultListEntry(FightResultListEntry::default())
+    }
+}
+
+impl FightResultListEntryVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightResultListEntry(_) => 5766,
+            Self::FightResultFighterListEntry(_) => 7733,
+            Self::FightResultTaxCollectorListEntry(_) => 6240,
+            Self::FightResultPlayerListEntry(_) => 6765,
+            Self::FightResultMutantListEntry(_) => 6988,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5766 => Ok(Self::FightResultListEntry(FightResultListEntry::deserialize(reader)?)),
+            7733 => Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?)),
+            6240 => Ok(Self::FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry::deserialize(reader)?)),
+            6765 => Ok(Self::FightResultPlayerListEntry(FightResultPlayerListEntry::deserialize(reader)?)),
+            6988 => Ok(Self::FightResultMutantListEntry(FightResultMutantListEntry::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightResultListEntry type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightResultListEntryVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightResultListEntry(v) => v.serialize(writer),
+            Self::FightResultFighterListEntry(v) => v.serialize(writer),
+            Self::FightResultTaxCollectorListEntry(v) => v.serialize(writer),
+            Self::FightResultPlayerListEntry(v) => v.serialize(writer),
+            Self::FightResultMutantListEntry(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightResultListEntryVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightResultListEntry(FightResultListEntry::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for CharacterMinimalPlusLookInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum CharacterMinimalPlusLookInformationsVariant {
+    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
+    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
+    CharacterBaseInformations(CharacterBaseInformations),
+    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
+    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
+    PartyMemberInformations(PartyMemberInformations),
+    PartyMemberArenaInformations(PartyMemberArenaInformations),
+    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
+    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
+}
+
+impl Default for CharacterMinimalPlusLookInformationsVariant {
+    fn default() -> Self {
+        Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::default())
+    }
+}
+
+impl CharacterMinimalPlusLookInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::CharacterMinimalPlusLookInformations(_) => 8237,
+            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
+            Self::CharacterBaseInformations(_) => 6238,
+            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
+            Self::PartyInvitationMemberInformations(_) => 7145,
+            Self::PartyMemberInformations(_) => 8246,
+            Self::PartyMemberArenaInformations(_) => 1101,
+            Self::CharacterMinimalGuildInformations(_) => 6416,
+            Self::CharacterMinimalAllianceInformations(_) => 9412,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
+            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
+            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
+            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
+            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
+            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
+            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
+            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
+            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalPlusLookInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for CharacterMinimalPlusLookInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
+            Self::CharacterBaseInformations(v) => v.serialize(writer),
+            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
+            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for CharacterMinimalPlusLookInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AllianceInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum AllianceInformationsVariant {
+    AllianceInformations(AllianceInformations),
+    AllianceFactSheetInformations(AllianceFactSheetInformations),
+}
+
+impl Default for AllianceInformationsVariant {
+    fn default() -> Self {
+        Self::AllianceInformations(AllianceInformations::default())
+    }
+}
+
+impl AllianceInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AllianceInformations(_) => 2484,
+            Self::AllianceFactSheetInformations(_) => 6853,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
+            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AllianceInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AllianceInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AllianceInformations(v) => v.serialize(writer),
+            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AllianceInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PaddockBuyableInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum PaddockBuyableInformationsVariant {
+    PaddockBuyableInformations(PaddockBuyableInformations),
+    PaddockGuildedInformations(PaddockGuildedInformations),
+}
+
+impl Default for PaddockBuyableInformationsVariant {
+    fn default() -> Self {
+        Self::PaddockBuyableInformations(PaddockBuyableInformations::default())
+    }
+}
+
+impl PaddockBuyableInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PaddockBuyableInformations(_) => 4662,
+            Self::PaddockGuildedInformations(_) => 5112,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4662 => Ok(Self::PaddockBuyableInformations(PaddockBuyableInformations::deserialize(reader)?)),
+            5112 => Ok(Self::PaddockGuildedInformations(PaddockGuildedInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PaddockBuyableInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PaddockBuyableInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PaddockBuyableInformations(v) => v.serialize(writer),
+            Self::PaddockGuildedInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PaddockBuyableInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PaddockBuyableInformations(PaddockBuyableInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for HumanOption hierarchy
+#[derive(Debug, Clone)]
+pub enum HumanOptionVariant {
+    HumanOption(HumanOption),
+    HumanOptionAlliance(HumanOptionAlliance),
+    HumanOptionObjectUse(HumanOptionObjectUse),
+    HumanOptionFollowers(HumanOptionFollowers),
+    HumanOptionSkillUse(HumanOptionSkillUse),
+    HumanOptionOrnament(HumanOptionOrnament),
+    HumanOptionTitle(HumanOptionTitle),
+    HumanOptionGuild(HumanOptionGuild),
+    HumanOptionEmote(HumanOptionEmote),
+}
+
+impl Default for HumanOptionVariant {
+    fn default() -> Self {
+        Self::HumanOption(HumanOption::default())
+    }
+}
+
+impl HumanOptionVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::HumanOption(_) => 6272,
+            Self::HumanOptionAlliance(_) => 374,
+            Self::HumanOptionObjectUse(_) => 2440,
+            Self::HumanOptionFollowers(_) => 2856,
+            Self::HumanOptionSkillUse(_) => 4888,
+            Self::HumanOptionOrnament(_) => 5651,
+            Self::HumanOptionTitle(_) => 6451,
+            Self::HumanOptionGuild(_) => 7229,
+            Self::HumanOptionEmote(_) => 7370,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6272 => Ok(Self::HumanOption(HumanOption::deserialize(reader)?)),
+            374 => Ok(Self::HumanOptionAlliance(HumanOptionAlliance::deserialize(reader)?)),
+            2440 => Ok(Self::HumanOptionObjectUse(HumanOptionObjectUse::deserialize(reader)?)),
+            2856 => Ok(Self::HumanOptionFollowers(HumanOptionFollowers::deserialize(reader)?)),
+            4888 => Ok(Self::HumanOptionSkillUse(HumanOptionSkillUse::deserialize(reader)?)),
+            5651 => Ok(Self::HumanOptionOrnament(HumanOptionOrnament::deserialize(reader)?)),
+            6451 => Ok(Self::HumanOptionTitle(HumanOptionTitle::deserialize(reader)?)),
+            7229 => Ok(Self::HumanOptionGuild(HumanOptionGuild::deserialize(reader)?)),
+            7370 => Ok(Self::HumanOptionEmote(HumanOptionEmote::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown HumanOption type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for HumanOptionVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::HumanOption(v) => v.serialize(writer),
+            Self::HumanOptionAlliance(v) => v.serialize(writer),
+            Self::HumanOptionObjectUse(v) => v.serialize(writer),
+            Self::HumanOptionFollowers(v) => v.serialize(writer),
+            Self::HumanOptionSkillUse(v) => v.serialize(writer),
+            Self::HumanOptionOrnament(v) => v.serialize(writer),
+            Self::HumanOptionTitle(v) => v.serialize(writer),
+            Self::HumanOptionGuild(v) => v.serialize(writer),
+            Self::HumanOptionEmote(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for HumanOptionVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::HumanOption(HumanOption::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameFightMinimalStats hierarchy
+#[derive(Debug, Clone)]
+pub enum GameFightMinimalStatsVariant {
+    GameFightMinimalStats(GameFightMinimalStats),
+    GameFightMinimalStatsPreparation(GameFightMinimalStatsPreparation),
+}
+
+impl Default for GameFightMinimalStatsVariant {
+    fn default() -> Self {
+        Self::GameFightMinimalStats(GameFightMinimalStats::default())
+    }
+}
+
+impl GameFightMinimalStatsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameFightMinimalStats(_) => 8253,
+            Self::GameFightMinimalStatsPreparation(_) => 9464,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8253 => Ok(Self::GameFightMinimalStats(GameFightMinimalStats::deserialize(reader)?)),
+            9464 => Ok(Self::GameFightMinimalStatsPreparation(GameFightMinimalStatsPreparation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameFightMinimalStats type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameFightMinimalStatsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameFightMinimalStats(v) => v.serialize(writer),
+            Self::GameFightMinimalStatsPreparation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightMinimalStatsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameFightMinimalStats(GameFightMinimalStats::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameRolePlayNamedActorInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameRolePlayNamedActorInformationsVariant {
+    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
+    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
+    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
+    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
+    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
+    GameRolePlayMountInformations(GameRolePlayMountInformations),
+}
+
+impl Default for GameRolePlayNamedActorInformationsVariant {
+    fn default() -> Self {
+        Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::default())
+    }
+}
+
+impl GameRolePlayNamedActorInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameRolePlayNamedActorInformations(_) => 5940,
+            Self::GameRolePlayMerchantInformations(_) => 1204,
+            Self::GameRolePlayHumanoidInformations(_) => 2640,
+            Self::GameRolePlayCharacterInformations(_) => 5268,
+            Self::GameRolePlayMutantInformations(_) => 8271,
+            Self::GameRolePlayMountInformations(_) => 4944,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
+            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
+            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
+            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
+            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
+            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameRolePlayNamedActorInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameRolePlayNamedActorInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
+            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameRolePlayNamedActorInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for SpellItem hierarchy
+#[derive(Debug, Clone)]
+pub enum SpellItemVariant {
+    SpellItem(SpellItem),
+    ForgettableSpellItem(ForgettableSpellItem),
+}
+
+impl Default for SpellItemVariant {
+    fn default() -> Self {
+        Self::SpellItem(SpellItem::default())
+    }
+}
+
+impl SpellItemVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::SpellItem(_) => 1759,
+            Self::ForgettableSpellItem(_) => 6454,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            1759 => Ok(Self::SpellItem(SpellItem::deserialize(reader)?)),
+            6454 => Ok(Self::ForgettableSpellItem(ForgettableSpellItem::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown SpellItem type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for SpellItemVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::SpellItem(v) => v.serialize(writer),
+            Self::ForgettableSpellItem(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for SpellItemVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::SpellItem(SpellItem::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for BasicNamedAllianceInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum BasicNamedAllianceInformationsVariant {
+    BasicNamedAllianceInformations(BasicNamedAllianceInformations),
+    AllianceInformations(AllianceInformations),
+    AllianceFactSheetInformations(AllianceFactSheetInformations),
+}
+
+impl Default for BasicNamedAllianceInformationsVariant {
+    fn default() -> Self {
+        Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::default())
+    }
+}
+
+impl BasicNamedAllianceInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::BasicNamedAllianceInformations(_) => 5935,
+            Self::AllianceInformations(_) => 2484,
+            Self::AllianceFactSheetInformations(_) => 6853,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5935 => Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?)),
+            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
+            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown BasicNamedAllianceInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for BasicNamedAllianceInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::BasicNamedAllianceInformations(v) => v.serialize(writer),
+            Self::AllianceInformations(v) => v.serialize(writer),
+            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for BasicNamedAllianceInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?))
+    }
+}
+
 /// Polymorphic enum for GroupMonsterStaticInformations hierarchy
 #[derive(Debug, Clone)]
 pub enum GroupMonsterStaticInformationsVariant {
@@ -2929,6 +2609,1762 @@ impl DofusSerialize for GroupMonsterStaticInformationsVariant {
 impl DofusDeserialize for GroupMonsterStaticInformationsVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self::GroupMonsterStaticInformations(GroupMonsterStaticInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AbstractContactInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum AbstractContactInformationsVariant {
+    AbstractContactInformations(AbstractContactInformations),
+    LeagueFriendInformations(LeagueFriendInformations),
+    FriendInformations(FriendInformations),
+    FriendOnlineInformations(FriendOnlineInformations),
+    IgnoredInformations(IgnoredInformations),
+    IgnoredOnlineInformations(IgnoredOnlineInformations),
+    AcquaintanceInformation(AcquaintanceInformation),
+    AcquaintanceOnlineInformation(AcquaintanceOnlineInformation),
+}
+
+impl Default for AbstractContactInformationsVariant {
+    fn default() -> Self {
+        Self::AbstractContactInformations(AbstractContactInformations::default())
+    }
+}
+
+impl AbstractContactInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AbstractContactInformations(_) => 5170,
+            Self::LeagueFriendInformations(_) => 1189,
+            Self::FriendInformations(_) => 3453,
+            Self::FriendOnlineInformations(_) => 450,
+            Self::IgnoredInformations(_) => 4160,
+            Self::IgnoredOnlineInformations(_) => 5101,
+            Self::AcquaintanceInformation(_) => 4492,
+            Self::AcquaintanceOnlineInformation(_) => 5184,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5170 => Ok(Self::AbstractContactInformations(AbstractContactInformations::deserialize(reader)?)),
+            1189 => Ok(Self::LeagueFriendInformations(LeagueFriendInformations::deserialize(reader)?)),
+            3453 => Ok(Self::FriendInformations(FriendInformations::deserialize(reader)?)),
+            450 => Ok(Self::FriendOnlineInformations(FriendOnlineInformations::deserialize(reader)?)),
+            4160 => Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?)),
+            5101 => Ok(Self::IgnoredOnlineInformations(IgnoredOnlineInformations::deserialize(reader)?)),
+            4492 => Ok(Self::AcquaintanceInformation(AcquaintanceInformation::deserialize(reader)?)),
+            5184 => Ok(Self::AcquaintanceOnlineInformation(AcquaintanceOnlineInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AbstractContactInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AbstractContactInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AbstractContactInformations(v) => v.serialize(writer),
+            Self::LeagueFriendInformations(v) => v.serialize(writer),
+            Self::FriendInformations(v) => v.serialize(writer),
+            Self::FriendOnlineInformations(v) => v.serialize(writer),
+            Self::IgnoredInformations(v) => v.serialize(writer),
+            Self::IgnoredOnlineInformations(v) => v.serialize(writer),
+            Self::AcquaintanceInformation(v) => v.serialize(writer),
+            Self::AcquaintanceOnlineInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AbstractContactInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AbstractContactInformations(AbstractContactInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GuildVersatileInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GuildVersatileInformationsVariant {
+    GuildVersatileInformations(GuildVersatileInformations),
+    GuildInAllianceVersatileInformations(GuildInAllianceVersatileInformations),
+}
+
+impl Default for GuildVersatileInformationsVariant {
+    fn default() -> Self {
+        Self::GuildVersatileInformations(GuildVersatileInformations::default())
+    }
+}
+
+impl GuildVersatileInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GuildVersatileInformations(_) => 7908,
+            Self::GuildInAllianceVersatileInformations(_) => 5949,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            7908 => Ok(Self::GuildVersatileInformations(GuildVersatileInformations::deserialize(reader)?)),
+            5949 => Ok(Self::GuildInAllianceVersatileInformations(GuildInAllianceVersatileInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GuildVersatileInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GuildVersatileInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GuildVersatileInformations(v) => v.serialize(writer),
+            Self::GuildInAllianceVersatileInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GuildVersatileInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GuildVersatileInformations(GuildVersatileInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightTeamMemberInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum FightTeamMemberInformationsVariant {
+    FightTeamMemberInformations(FightTeamMemberInformations),
+    FightTeamMemberTaxCollectorInformations(FightTeamMemberTaxCollectorInformations),
+    FightTeamMemberEntityInformation(FightTeamMemberEntityInformation),
+    FightTeamMemberMonsterInformations(FightTeamMemberMonsterInformations),
+    FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations),
+    FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations),
+}
+
+impl Default for FightTeamMemberInformationsVariant {
+    fn default() -> Self {
+        Self::FightTeamMemberInformations(FightTeamMemberInformations::default())
+    }
+}
+
+impl FightTeamMemberInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightTeamMemberInformations(_) => 5931,
+            Self::FightTeamMemberTaxCollectorInformations(_) => 431,
+            Self::FightTeamMemberEntityInformation(_) => 6288,
+            Self::FightTeamMemberMonsterInformations(_) => 8081,
+            Self::FightTeamMemberCharacterInformations(_) => 9851,
+            Self::FightTeamMemberWithAllianceCharacterInformations(_) => 8004,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5931 => Ok(Self::FightTeamMemberInformations(FightTeamMemberInformations::deserialize(reader)?)),
+            431 => Ok(Self::FightTeamMemberTaxCollectorInformations(FightTeamMemberTaxCollectorInformations::deserialize(reader)?)),
+            6288 => Ok(Self::FightTeamMemberEntityInformation(FightTeamMemberEntityInformation::deserialize(reader)?)),
+            8081 => Ok(Self::FightTeamMemberMonsterInformations(FightTeamMemberMonsterInformations::deserialize(reader)?)),
+            9851 => Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?)),
+            8004 => Ok(Self::FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightTeamMemberInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightTeamMemberInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightTeamMemberInformations(v) => v.serialize(writer),
+            Self::FightTeamMemberTaxCollectorInformations(v) => v.serialize(writer),
+            Self::FightTeamMemberEntityInformation(v) => v.serialize(writer),
+            Self::FightTeamMemberMonsterInformations(v) => v.serialize(writer),
+            Self::FightTeamMemberCharacterInformations(v) => v.serialize(writer),
+            Self::FightTeamMemberWithAllianceCharacterInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightTeamMemberInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightTeamMemberInformations(FightTeamMemberInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for StatisticData hierarchy
+#[derive(Debug, Clone)]
+pub enum StatisticDataVariant {
+    StatisticData(StatisticData),
+    StatisticDataByte(StatisticDataByte),
+    StatisticDataBoolean(StatisticDataBoolean),
+    StatisticDataInt(StatisticDataInt),
+    StatisticDataShort(StatisticDataShort),
+    StatisticDataString(StatisticDataString),
+}
+
+impl Default for StatisticDataVariant {
+    fn default() -> Self {
+        Self::StatisticData(StatisticData::default())
+    }
+}
+
+impl StatisticDataVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::StatisticData(_) => 7795,
+            Self::StatisticDataByte(_) => 3536,
+            Self::StatisticDataBoolean(_) => 3779,
+            Self::StatisticDataInt(_) => 4640,
+            Self::StatisticDataShort(_) => 4749,
+            Self::StatisticDataString(_) => 9818,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            7795 => Ok(Self::StatisticData(StatisticData::deserialize(reader)?)),
+            3536 => Ok(Self::StatisticDataByte(StatisticDataByte::deserialize(reader)?)),
+            3779 => Ok(Self::StatisticDataBoolean(StatisticDataBoolean::deserialize(reader)?)),
+            4640 => Ok(Self::StatisticDataInt(StatisticDataInt::deserialize(reader)?)),
+            4749 => Ok(Self::StatisticDataShort(StatisticDataShort::deserialize(reader)?)),
+            9818 => Ok(Self::StatisticDataString(StatisticDataString::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown StatisticData type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for StatisticDataVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::StatisticData(v) => v.serialize(writer),
+            Self::StatisticDataByte(v) => v.serialize(writer),
+            Self::StatisticDataBoolean(v) => v.serialize(writer),
+            Self::StatisticDataInt(v) => v.serialize(writer),
+            Self::StatisticDataShort(v) => v.serialize(writer),
+            Self::StatisticDataString(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for StatisticDataVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::StatisticData(StatisticData::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightTemporaryBoostEffect hierarchy
+#[derive(Debug, Clone)]
+pub enum FightTemporaryBoostEffectVariant {
+    FightTemporaryBoostEffect(FightTemporaryBoostEffect),
+    FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect),
+    FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect),
+    FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect),
+}
+
+impl Default for FightTemporaryBoostEffectVariant {
+    fn default() -> Self {
+        Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::default())
+    }
+}
+
+impl FightTemporaryBoostEffectVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightTemporaryBoostEffect(_) => 2668,
+            Self::FightTemporaryBoostWeaponDamagesEffect(_) => 4451,
+            Self::FightTemporarySpellBoostEffect(_) => 5674,
+            Self::FightTemporaryBoostStateEffect(_) => 7115,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2668 => Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?)),
+            4451 => Ok(Self::FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect::deserialize(reader)?)),
+            5674 => Ok(Self::FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect::deserialize(reader)?)),
+            7115 => Ok(Self::FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightTemporaryBoostEffect type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightTemporaryBoostEffectVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightTemporaryBoostEffect(v) => v.serialize(writer),
+            Self::FightTemporaryBoostWeaponDamagesEffect(v) => v.serialize(writer),
+            Self::FightTemporarySpellBoostEffect(v) => v.serialize(writer),
+            Self::FightTemporaryBoostStateEffect(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightTemporaryBoostEffectVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for SpawnInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum SpawnInformationVariant {
+    SpawnInformation(SpawnInformation),
+    BaseSpawnMonsterInformation(BaseSpawnMonsterInformation),
+    SpawnMonsterInformation(SpawnMonsterInformation),
+    SpawnScaledMonsterInformation(SpawnScaledMonsterInformation),
+    SpawnCharacterInformation(SpawnCharacterInformation),
+    SpawnCompanionInformation(SpawnCompanionInformation),
+}
+
+impl Default for SpawnInformationVariant {
+    fn default() -> Self {
+        Self::SpawnInformation(SpawnInformation::default())
+    }
+}
+
+impl SpawnInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::SpawnInformation(_) => 2131,
+            Self::BaseSpawnMonsterInformation(_) => 1071,
+            Self::SpawnMonsterInformation(_) => 3264,
+            Self::SpawnScaledMonsterInformation(_) => 8617,
+            Self::SpawnCharacterInformation(_) => 1888,
+            Self::SpawnCompanionInformation(_) => 7811,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2131 => Ok(Self::SpawnInformation(SpawnInformation::deserialize(reader)?)),
+            1071 => Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?)),
+            3264 => Ok(Self::SpawnMonsterInformation(SpawnMonsterInformation::deserialize(reader)?)),
+            8617 => Ok(Self::SpawnScaledMonsterInformation(SpawnScaledMonsterInformation::deserialize(reader)?)),
+            1888 => Ok(Self::SpawnCharacterInformation(SpawnCharacterInformation::deserialize(reader)?)),
+            7811 => Ok(Self::SpawnCompanionInformation(SpawnCompanionInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown SpawnInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for SpawnInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::SpawnInformation(v) => v.serialize(writer),
+            Self::BaseSpawnMonsterInformation(v) => v.serialize(writer),
+            Self::SpawnMonsterInformation(v) => v.serialize(writer),
+            Self::SpawnScaledMonsterInformation(v) => v.serialize(writer),
+            Self::SpawnCharacterInformation(v) => v.serialize(writer),
+            Self::SpawnCompanionInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for SpawnInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::SpawnInformation(SpawnInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ShortcutObject hierarchy
+#[derive(Debug, Clone)]
+pub enum ShortcutObjectVariant {
+    ShortcutObject(ShortcutObject),
+    ShortcutObjectPreset(ShortcutObjectPreset),
+    ShortcutObjectItem(ShortcutObjectItem),
+    ShortcutObjectIdolsPreset(ShortcutObjectIdolsPreset),
+}
+
+impl Default for ShortcutObjectVariant {
+    fn default() -> Self {
+        Self::ShortcutObject(ShortcutObject::default())
+    }
+}
+
+impl ShortcutObjectVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ShortcutObject(_) => 5832,
+            Self::ShortcutObjectPreset(_) => 1783,
+            Self::ShortcutObjectItem(_) => 2604,
+            Self::ShortcutObjectIdolsPreset(_) => 9809,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5832 => Ok(Self::ShortcutObject(ShortcutObject::deserialize(reader)?)),
+            1783 => Ok(Self::ShortcutObjectPreset(ShortcutObjectPreset::deserialize(reader)?)),
+            2604 => Ok(Self::ShortcutObjectItem(ShortcutObjectItem::deserialize(reader)?)),
+            9809 => Ok(Self::ShortcutObjectIdolsPreset(ShortcutObjectIdolsPreset::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ShortcutObject type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ShortcutObjectVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ShortcutObject(v) => v.serialize(writer),
+            Self::ShortcutObjectPreset(v) => v.serialize(writer),
+            Self::ShortcutObjectItem(v) => v.serialize(writer),
+            Self::ShortcutObjectIdolsPreset(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ShortcutObjectVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ShortcutObject(ShortcutObject::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectItemInRolePlay hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectItemInRolePlayVariant {
+    ObjectItemInRolePlay(ObjectItemInRolePlay),
+    PaddockItem(PaddockItem),
+}
+
+impl Default for ObjectItemInRolePlayVariant {
+    fn default() -> Self {
+        Self::ObjectItemInRolePlay(ObjectItemInRolePlay::default())
+    }
+}
+
+impl ObjectItemInRolePlayVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectItemInRolePlay(_) => 9311,
+            Self::PaddockItem(_) => 5602,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9311 => Ok(Self::ObjectItemInRolePlay(ObjectItemInRolePlay::deserialize(reader)?)),
+            5602 => Ok(Self::PaddockItem(PaddockItem::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectItemInRolePlay type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectItemInRolePlayVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectItemInRolePlay(v) => v.serialize(writer),
+            Self::PaddockItem(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectItemInRolePlayVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectItemInRolePlay(ObjectItemInRolePlay::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for QuestObjectiveInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum QuestObjectiveInformationsVariant {
+    QuestObjectiveInformations(QuestObjectiveInformations),
+    QuestObjectiveInformationsWithCompletion(QuestObjectiveInformationsWithCompletion),
+}
+
+impl Default for QuestObjectiveInformationsVariant {
+    fn default() -> Self {
+        Self::QuestObjectiveInformations(QuestObjectiveInformations::default())
+    }
+}
+
+impl QuestObjectiveInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::QuestObjectiveInformations(_) => 8695,
+            Self::QuestObjectiveInformationsWithCompletion(_) => 5778,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            8695 => Ok(Self::QuestObjectiveInformations(QuestObjectiveInformations::deserialize(reader)?)),
+            5778 => Ok(Self::QuestObjectiveInformationsWithCompletion(QuestObjectiveInformationsWithCompletion::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown QuestObjectiveInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for QuestObjectiveInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::QuestObjectiveInformations(v) => v.serialize(writer),
+            Self::QuestObjectiveInformationsWithCompletion(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for QuestObjectiveInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::QuestObjectiveInformations(QuestObjectiveInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for BasicAllianceInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum BasicAllianceInformationsVariant {
+    BasicAllianceInformations(BasicAllianceInformations),
+    BasicNamedAllianceInformations(BasicNamedAllianceInformations),
+    AllianceInformations(AllianceInformations),
+    AllianceFactSheetInformations(AllianceFactSheetInformations),
+}
+
+impl Default for BasicAllianceInformationsVariant {
+    fn default() -> Self {
+        Self::BasicAllianceInformations(BasicAllianceInformations::default())
+    }
+}
+
+impl BasicAllianceInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::BasicAllianceInformations(_) => 3988,
+            Self::BasicNamedAllianceInformations(_) => 5935,
+            Self::AllianceInformations(_) => 2484,
+            Self::AllianceFactSheetInformations(_) => 6853,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            3988 => Ok(Self::BasicAllianceInformations(BasicAllianceInformations::deserialize(reader)?)),
+            5935 => Ok(Self::BasicNamedAllianceInformations(BasicNamedAllianceInformations::deserialize(reader)?)),
+            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
+            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown BasicAllianceInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for BasicAllianceInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::BasicAllianceInformations(v) => v.serialize(writer),
+            Self::BasicNamedAllianceInformations(v) => v.serialize(writer),
+            Self::AllianceInformations(v) => v.serialize(writer),
+            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for BasicAllianceInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::BasicAllianceInformations(BasicAllianceInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AbstractFightTeamInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum AbstractFightTeamInformationsVariant {
+    AbstractFightTeamInformations(AbstractFightTeamInformations),
+    FightTeamInformations(FightTeamInformations),
+    FightAllianceTeamInformations(FightAllianceTeamInformations),
+    FightTeamLightInformations(FightTeamLightInformations),
+}
+
+impl Default for AbstractFightTeamInformationsVariant {
+    fn default() -> Self {
+        Self::AbstractFightTeamInformations(AbstractFightTeamInformations::default())
+    }
+}
+
+impl AbstractFightTeamInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AbstractFightTeamInformations(_) => 5839,
+            Self::FightTeamInformations(_) => 4426,
+            Self::FightAllianceTeamInformations(_) => 5175,
+            Self::FightTeamLightInformations(_) => 6266,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5839 => Ok(Self::AbstractFightTeamInformations(AbstractFightTeamInformations::deserialize(reader)?)),
+            4426 => Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?)),
+            5175 => Ok(Self::FightAllianceTeamInformations(FightAllianceTeamInformations::deserialize(reader)?)),
+            6266 => Ok(Self::FightTeamLightInformations(FightTeamLightInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AbstractFightTeamInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AbstractFightTeamInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AbstractFightTeamInformations(v) => v.serialize(writer),
+            Self::FightTeamInformations(v) => v.serialize(writer),
+            Self::FightAllianceTeamInformations(v) => v.serialize(writer),
+            Self::FightTeamLightInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AbstractFightTeamInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AbstractFightTeamInformations(AbstractFightTeamInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PlayerStatus hierarchy
+#[derive(Debug, Clone)]
+pub enum PlayerStatusVariant {
+    PlayerStatus(PlayerStatus),
+    PlayerStatusExtended(PlayerStatusExtended),
+}
+
+impl Default for PlayerStatusVariant {
+    fn default() -> Self {
+        Self::PlayerStatus(PlayerStatus::default())
+    }
+}
+
+impl PlayerStatusVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PlayerStatus(_) => 6513,
+            Self::PlayerStatusExtended(_) => 2943,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6513 => Ok(Self::PlayerStatus(PlayerStatus::deserialize(reader)?)),
+            2943 => Ok(Self::PlayerStatusExtended(PlayerStatusExtended::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PlayerStatus type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PlayerStatusVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PlayerStatus(v) => v.serialize(writer),
+            Self::PlayerStatusExtended(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PlayerStatusVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PlayerStatus(PlayerStatus::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for IgnoredInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum IgnoredInformationsVariant {
+    IgnoredInformations(IgnoredInformations),
+    IgnoredOnlineInformations(IgnoredOnlineInformations),
+}
+
+impl Default for IgnoredInformationsVariant {
+    fn default() -> Self {
+        Self::IgnoredInformations(IgnoredInformations::default())
+    }
+}
+
+impl IgnoredInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::IgnoredInformations(_) => 4160,
+            Self::IgnoredOnlineInformations(_) => 5101,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4160 => Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?)),
+            5101 => Ok(Self::IgnoredOnlineInformations(IgnoredOnlineInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown IgnoredInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for IgnoredInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::IgnoredInformations(v) => v.serialize(writer),
+            Self::IgnoredOnlineInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for IgnoredInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for SimpleCharacterCharacteristicForPreset hierarchy
+#[derive(Debug, Clone)]
+pub enum SimpleCharacterCharacteristicForPresetVariant {
+    SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset),
+    CharacterCharacteristicForPreset(CharacterCharacteristicForPreset),
+}
+
+impl Default for SimpleCharacterCharacteristicForPresetVariant {
+    fn default() -> Self {
+        Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::default())
+    }
+}
+
+impl SimpleCharacterCharacteristicForPresetVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::SimpleCharacterCharacteristicForPreset(_) => 1231,
+            Self::CharacterCharacteristicForPreset(_) => 7508,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            1231 => Ok(Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::deserialize(reader)?)),
+            7508 => Ok(Self::CharacterCharacteristicForPreset(CharacterCharacteristicForPreset::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown SimpleCharacterCharacteristicForPreset type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for SimpleCharacterCharacteristicForPresetVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::SimpleCharacterCharacteristicForPreset(v) => v.serialize(writer),
+            Self::CharacterCharacteristicForPreset(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for SimpleCharacterCharacteristicForPresetVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::SimpleCharacterCharacteristicForPreset(SimpleCharacterCharacteristicForPreset::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for DebtInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum DebtInformationVariant {
+    DebtInformation(DebtInformation),
+    KamaDebtInformation(KamaDebtInformation),
+}
+
+impl Default for DebtInformationVariant {
+    fn default() -> Self {
+        Self::DebtInformation(DebtInformation::default())
+    }
+}
+
+impl DebtInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::DebtInformation(_) => 9957,
+            Self::KamaDebtInformation(_) => 9275,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9957 => Ok(Self::DebtInformation(DebtInformation::deserialize(reader)?)),
+            9275 => Ok(Self::KamaDebtInformation(KamaDebtInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown DebtInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for DebtInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::DebtInformation(v) => v.serialize(writer),
+            Self::KamaDebtInformation(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for DebtInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::DebtInformation(DebtInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for InteractiveElement hierarchy
+#[derive(Debug, Clone)]
+pub enum InteractiveElementVariant {
+    InteractiveElement(InteractiveElement),
+    InteractiveElementWithAgeBonus(InteractiveElementWithAgeBonus),
+}
+
+impl Default for InteractiveElementVariant {
+    fn default() -> Self {
+        Self::InteractiveElement(InteractiveElement::default())
+    }
+}
+
+impl InteractiveElementVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::InteractiveElement(_) => 2401,
+            Self::InteractiveElementWithAgeBonus(_) => 1662,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2401 => Ok(Self::InteractiveElement(InteractiveElement::deserialize(reader)?)),
+            1662 => Ok(Self::InteractiveElementWithAgeBonus(InteractiveElementWithAgeBonus::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown InteractiveElement type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for InteractiveElementVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::InteractiveElement(v) => v.serialize(writer),
+            Self::InteractiveElementWithAgeBonus(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for InteractiveElementVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::InteractiveElement(InteractiveElement::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameRolePlayActorInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameRolePlayActorInformationsVariant {
+    GameRolePlayActorInformations(GameRolePlayActorInformations),
+    GameRolePlayPrismInformations(GameRolePlayPrismInformations),
+    GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations),
+    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
+    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
+    GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations),
+    GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations),
+    GameRolePlayMerchantInformations(GameRolePlayMerchantInformations),
+    GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations),
+    GameRolePlayCharacterInformations(GameRolePlayCharacterInformations),
+    GameRolePlayMutantInformations(GameRolePlayMutantInformations),
+    GameRolePlayMountInformations(GameRolePlayMountInformations),
+    GameRolePlayPortalInformations(GameRolePlayPortalInformations),
+    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
+    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
+}
+
+impl Default for GameRolePlayActorInformationsVariant {
+    fn default() -> Self {
+        Self::GameRolePlayActorInformations(GameRolePlayActorInformations::default())
+    }
+}
+
+impl GameRolePlayActorInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameRolePlayActorInformations(_) => 2333,
+            Self::GameRolePlayPrismInformations(_) => 7,
+            Self::GameRolePlayTaxCollectorInformations(_) => 3424,
+            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
+            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
+            Self::GameRolePlayTreasureHintInformations(_) => 5073,
+            Self::GameRolePlayNamedActorInformations(_) => 5940,
+            Self::GameRolePlayMerchantInformations(_) => 1204,
+            Self::GameRolePlayHumanoidInformations(_) => 2640,
+            Self::GameRolePlayCharacterInformations(_) => 5268,
+            Self::GameRolePlayMutantInformations(_) => 8271,
+            Self::GameRolePlayMountInformations(_) => 4944,
+            Self::GameRolePlayPortalInformations(_) => 6138,
+            Self::GameRolePlayNpcInformations(_) => 8307,
+            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2333 => Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?)),
+            7 => Ok(Self::GameRolePlayPrismInformations(GameRolePlayPrismInformations::deserialize(reader)?)),
+            3424 => Ok(Self::GameRolePlayTaxCollectorInformations(GameRolePlayTaxCollectorInformations::deserialize(reader)?)),
+            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
+            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
+            5073 => Ok(Self::GameRolePlayTreasureHintInformations(GameRolePlayTreasureHintInformations::deserialize(reader)?)),
+            5940 => Ok(Self::GameRolePlayNamedActorInformations(GameRolePlayNamedActorInformations::deserialize(reader)?)),
+            1204 => Ok(Self::GameRolePlayMerchantInformations(GameRolePlayMerchantInformations::deserialize(reader)?)),
+            2640 => Ok(Self::GameRolePlayHumanoidInformations(GameRolePlayHumanoidInformations::deserialize(reader)?)),
+            5268 => Ok(Self::GameRolePlayCharacterInformations(GameRolePlayCharacterInformations::deserialize(reader)?)),
+            8271 => Ok(Self::GameRolePlayMutantInformations(GameRolePlayMutantInformations::deserialize(reader)?)),
+            4944 => Ok(Self::GameRolePlayMountInformations(GameRolePlayMountInformations::deserialize(reader)?)),
+            6138 => Ok(Self::GameRolePlayPortalInformations(GameRolePlayPortalInformations::deserialize(reader)?)),
+            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
+            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameRolePlayActorInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameRolePlayActorInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameRolePlayActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayPrismInformations(v) => v.serialize(writer),
+            Self::GameRolePlayTaxCollectorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
+            Self::GameRolePlayTreasureHintInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNamedActorInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMerchantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayHumanoidInformations(v) => v.serialize(writer),
+            Self::GameRolePlayCharacterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMutantInformations(v) => v.serialize(writer),
+            Self::GameRolePlayMountInformations(v) => v.serialize(writer),
+            Self::GameRolePlayPortalInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
+            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameRolePlayActorInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameRolePlayActorInformations(GameRolePlayActorInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectItemMinimalInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectItemMinimalInformationVariant {
+    ObjectItemMinimalInformation(ObjectItemMinimalInformation),
+    ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop),
+    ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity),
+}
+
+impl Default for ObjectItemMinimalInformationVariant {
+    fn default() -> Self {
+        Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::default())
+    }
+}
+
+impl ObjectItemMinimalInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectItemMinimalInformation(_) => 4416,
+            Self::ObjectItemToSellInNpcShop(_) => 2852,
+            Self::ObjectItemInformationWithQuantity(_) => 6404,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4416 => Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?)),
+            2852 => Ok(Self::ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop::deserialize(reader)?)),
+            6404 => Ok(Self::ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectItemMinimalInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectItemMinimalInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectItemMinimalInformation(v) => v.serialize(writer),
+            Self::ObjectItemToSellInNpcShop(v) => v.serialize(writer),
+            Self::ObjectItemInformationWithQuantity(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectItemMinimalInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameFightAIInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameFightAIInformationsVariant {
+    GameFightAIInformations(GameFightAIInformations),
+    GameFightMonsterInformations(GameFightMonsterInformations),
+    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
+    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
+}
+
+impl Default for GameFightAIInformationsVariant {
+    fn default() -> Self {
+        Self::GameFightAIInformations(GameFightAIInformations::default())
+    }
+}
+
+impl GameFightAIInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameFightAIInformations(_) => 950,
+            Self::GameFightMonsterInformations(_) => 6096,
+            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
+            Self::GameFightTaxCollectorInformations(_) => 6975,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
+            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
+            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
+            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameFightAIInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameFightAIInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameFightAIInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
+            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightAIInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for PresetsContainerPreset hierarchy
+#[derive(Debug, Clone)]
+pub enum PresetsContainerPresetVariant {
+    PresetsContainerPreset(PresetsContainerPreset),
+    IconNamedPreset(IconNamedPreset),
+}
+
+impl Default for PresetsContainerPresetVariant {
+    fn default() -> Self {
+        Self::PresetsContainerPreset(PresetsContainerPreset::default())
+    }
+}
+
+impl PresetsContainerPresetVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::PresetsContainerPreset(_) => 2645,
+            Self::IconNamedPreset(_) => 3146,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2645 => Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?)),
+            3146 => Ok(Self::IconNamedPreset(IconNamedPreset::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PresetsContainerPreset type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for PresetsContainerPresetVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::PresetsContainerPreset(v) => v.serialize(writer),
+            Self::IconNamedPreset(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for PresetsContainerPresetVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for Item hierarchy
+#[derive(Debug, Clone)]
+pub enum ItemVariant {
+    Item(Item),
+    ObjectItemToSell(ObjectItemToSell),
+    ObjectItemToSellInBid(ObjectItemToSellInBid),
+    SpellItem(SpellItem),
+    ForgettableSpellItem(ForgettableSpellItem),
+    ObjectItemNotInContainer(ObjectItemNotInContainer),
+    GoldItem(GoldItem),
+    ObjectItemMinimalInformation(ObjectItemMinimalInformation),
+    ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop),
+    ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity),
+    ObjectItem(ObjectItem),
+    ObjectItemToSellInHumanVendorShop(ObjectItemToSellInHumanVendorShop),
+    ObjectItemGenericQuantity(ObjectItemGenericQuantity),
+    ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects),
+    ObjectItemQuantity(ObjectItemQuantity),
+}
+
+impl Default for ItemVariant {
+    fn default() -> Self {
+        Self::Item(Item::default())
+    }
+}
+
+impl ItemVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::Item(_) => 2202,
+            Self::ObjectItemToSell(_) => 446,
+            Self::ObjectItemToSellInBid(_) => 4082,
+            Self::SpellItem(_) => 1759,
+            Self::ForgettableSpellItem(_) => 6454,
+            Self::ObjectItemNotInContainer(_) => 2313,
+            Self::GoldItem(_) => 4296,
+            Self::ObjectItemMinimalInformation(_) => 4416,
+            Self::ObjectItemToSellInNpcShop(_) => 2852,
+            Self::ObjectItemInformationWithQuantity(_) => 6404,
+            Self::ObjectItem(_) => 5598,
+            Self::ObjectItemToSellInHumanVendorShop(_) => 8040,
+            Self::ObjectItemGenericQuantity(_) => 9440,
+            Self::ObjectItemQuantityPriceDateEffects(_) => 6659,
+            Self::ObjectItemQuantity(_) => 9732,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2202 => Ok(Self::Item(Item::deserialize(reader)?)),
+            446 => Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?)),
+            4082 => Ok(Self::ObjectItemToSellInBid(ObjectItemToSellInBid::deserialize(reader)?)),
+            1759 => Ok(Self::SpellItem(SpellItem::deserialize(reader)?)),
+            6454 => Ok(Self::ForgettableSpellItem(ForgettableSpellItem::deserialize(reader)?)),
+            2313 => Ok(Self::ObjectItemNotInContainer(ObjectItemNotInContainer::deserialize(reader)?)),
+            4296 => Ok(Self::GoldItem(GoldItem::deserialize(reader)?)),
+            4416 => Ok(Self::ObjectItemMinimalInformation(ObjectItemMinimalInformation::deserialize(reader)?)),
+            2852 => Ok(Self::ObjectItemToSellInNpcShop(ObjectItemToSellInNpcShop::deserialize(reader)?)),
+            6404 => Ok(Self::ObjectItemInformationWithQuantity(ObjectItemInformationWithQuantity::deserialize(reader)?)),
+            5598 => Ok(Self::ObjectItem(ObjectItem::deserialize(reader)?)),
+            8040 => Ok(Self::ObjectItemToSellInHumanVendorShop(ObjectItemToSellInHumanVendorShop::deserialize(reader)?)),
+            9440 => Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?)),
+            6659 => Ok(Self::ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects::deserialize(reader)?)),
+            9732 => Ok(Self::ObjectItemQuantity(ObjectItemQuantity::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown Item type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ItemVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::Item(v) => v.serialize(writer),
+            Self::ObjectItemToSell(v) => v.serialize(writer),
+            Self::ObjectItemToSellInBid(v) => v.serialize(writer),
+            Self::SpellItem(v) => v.serialize(writer),
+            Self::ForgettableSpellItem(v) => v.serialize(writer),
+            Self::ObjectItemNotInContainer(v) => v.serialize(writer),
+            Self::GoldItem(v) => v.serialize(writer),
+            Self::ObjectItemMinimalInformation(v) => v.serialize(writer),
+            Self::ObjectItemToSellInNpcShop(v) => v.serialize(writer),
+            Self::ObjectItemInformationWithQuantity(v) => v.serialize(writer),
+            Self::ObjectItem(v) => v.serialize(writer),
+            Self::ObjectItemToSellInHumanVendorShop(v) => v.serialize(writer),
+            Self::ObjectItemGenericQuantity(v) => v.serialize(writer),
+            Self::ObjectItemQuantityPriceDateEffects(v) => v.serialize(writer),
+            Self::ObjectItemQuantity(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ItemVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::Item(Item::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectEffectCreature hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectEffectCreatureVariant {
+    ObjectEffectCreature(ObjectEffectCreature),
+    ObjectEffectLadder(ObjectEffectLadder),
+}
+
+impl Default for ObjectEffectCreatureVariant {
+    fn default() -> Self {
+        Self::ObjectEffectCreature(ObjectEffectCreature::default())
+    }
+}
+
+impl ObjectEffectCreatureVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectEffectCreature(_) => 9295,
+            Self::ObjectEffectLadder(_) => 6916,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9295 => Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?)),
+            6916 => Ok(Self::ObjectEffectLadder(ObjectEffectLadder::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectEffectCreature type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectEffectCreatureVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectEffectCreature(v) => v.serialize(writer),
+            Self::ObjectEffectLadder(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectEffectCreatureVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ExtendedBreachBranch hierarchy
+#[derive(Debug, Clone)]
+pub enum ExtendedBreachBranchVariant {
+    ExtendedBreachBranch(ExtendedBreachBranch),
+    ExtendedLockedBreachBranch(ExtendedLockedBreachBranch),
+}
+
+impl Default for ExtendedBreachBranchVariant {
+    fn default() -> Self {
+        Self::ExtendedBreachBranch(ExtendedBreachBranch::default())
+    }
+}
+
+impl ExtendedBreachBranchVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ExtendedBreachBranch(_) => 4962,
+            Self::ExtendedLockedBreachBranch(_) => 3547,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4962 => Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?)),
+            3547 => Ok(Self::ExtendedLockedBreachBranch(ExtendedLockedBreachBranch::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ExtendedBreachBranch type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ExtendedBreachBranchVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ExtendedBreachBranch(v) => v.serialize(writer),
+            Self::ExtendedLockedBreachBranch(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ExtendedBreachBranchVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for EntityDispositionInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum EntityDispositionInformationsVariant {
+    EntityDispositionInformations(EntityDispositionInformations),
+    IdentifiedEntityDispositionInformations(IdentifiedEntityDispositionInformations),
+    FightEntityDispositionInformations(FightEntityDispositionInformations),
+}
+
+impl Default for EntityDispositionInformationsVariant {
+    fn default() -> Self {
+        Self::EntityDispositionInformations(EntityDispositionInformations::default())
+    }
+}
+
+impl EntityDispositionInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::EntityDispositionInformations(_) => 7114,
+            Self::IdentifiedEntityDispositionInformations(_) => 4029,
+            Self::FightEntityDispositionInformations(_) => 4954,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            7114 => Ok(Self::EntityDispositionInformations(EntityDispositionInformations::deserialize(reader)?)),
+            4029 => Ok(Self::IdentifiedEntityDispositionInformations(IdentifiedEntityDispositionInformations::deserialize(reader)?)),
+            4954 => Ok(Self::FightEntityDispositionInformations(FightEntityDispositionInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown EntityDispositionInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for EntityDispositionInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::EntityDispositionInformations(v) => v.serialize(writer),
+            Self::IdentifiedEntityDispositionInformations(v) => v.serialize(writer),
+            Self::FightEntityDispositionInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for EntityDispositionInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::EntityDispositionInformations(EntityDispositionInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for BreachBranch hierarchy
+#[derive(Debug, Clone)]
+pub enum BreachBranchVariant {
+    BreachBranch(BreachBranch),
+    ExtendedBreachBranch(ExtendedBreachBranch),
+    ExtendedLockedBreachBranch(ExtendedLockedBreachBranch),
+}
+
+impl Default for BreachBranchVariant {
+    fn default() -> Self {
+        Self::BreachBranch(BreachBranch::default())
+    }
+}
+
+impl BreachBranchVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::BreachBranch(_) => 4379,
+            Self::ExtendedBreachBranch(_) => 4962,
+            Self::ExtendedLockedBreachBranch(_) => 3547,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4379 => Ok(Self::BreachBranch(BreachBranch::deserialize(reader)?)),
+            4962 => Ok(Self::ExtendedBreachBranch(ExtendedBreachBranch::deserialize(reader)?)),
+            3547 => Ok(Self::ExtendedLockedBreachBranch(ExtendedLockedBreachBranch::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown BreachBranch type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for BreachBranchVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::BreachBranch(v) => v.serialize(writer),
+            Self::ExtendedBreachBranch(v) => v.serialize(writer),
+            Self::ExtendedLockedBreachBranch(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for BreachBranchVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::BreachBranch(BreachBranch::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for SkillActionDescription hierarchy
+#[derive(Debug, Clone)]
+pub enum SkillActionDescriptionVariant {
+    SkillActionDescription(SkillActionDescription),
+    SkillActionDescriptionTimed(SkillActionDescriptionTimed),
+    SkillActionDescriptionCollect(SkillActionDescriptionCollect),
+    SkillActionDescriptionCraft(SkillActionDescriptionCraft),
+}
+
+impl Default for SkillActionDescriptionVariant {
+    fn default() -> Self {
+        Self::SkillActionDescription(SkillActionDescription::default())
+    }
+}
+
+impl SkillActionDescriptionVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::SkillActionDescription(_) => 4405,
+            Self::SkillActionDescriptionTimed(_) => 263,
+            Self::SkillActionDescriptionCollect(_) => 6581,
+            Self::SkillActionDescriptionCraft(_) => 8967,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4405 => Ok(Self::SkillActionDescription(SkillActionDescription::deserialize(reader)?)),
+            263 => Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?)),
+            6581 => Ok(Self::SkillActionDescriptionCollect(SkillActionDescriptionCollect::deserialize(reader)?)),
+            8967 => Ok(Self::SkillActionDescriptionCraft(SkillActionDescriptionCraft::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown SkillActionDescription type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for SkillActionDescriptionVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::SkillActionDescription(v) => v.serialize(writer),
+            Self::SkillActionDescriptionTimed(v) => v.serialize(writer),
+            Self::SkillActionDescriptionCollect(v) => v.serialize(writer),
+            Self::SkillActionDescriptionCraft(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for SkillActionDescriptionVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::SkillActionDescription(SkillActionDescription::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for ObjectItemGenericQuantity hierarchy
+#[derive(Debug, Clone)]
+pub enum ObjectItemGenericQuantityVariant {
+    ObjectItemGenericQuantity(ObjectItemGenericQuantity),
+    ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects),
+}
+
+impl Default for ObjectItemGenericQuantityVariant {
+    fn default() -> Self {
+        Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::default())
+    }
+}
+
+impl ObjectItemGenericQuantityVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::ObjectItemGenericQuantity(_) => 9440,
+            Self::ObjectItemQuantityPriceDateEffects(_) => 6659,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            9440 => Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?)),
+            6659 => Ok(Self::ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown ObjectItemGenericQuantity type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for ObjectItemGenericQuantityVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::ObjectItemGenericQuantity(v) => v.serialize(writer),
+            Self::ObjectItemQuantityPriceDateEffects(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for ObjectItemGenericQuantityVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GuildInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GuildInformationsVariant {
+    GuildInformations(GuildInformations),
+    AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations),
+    GuildFactSheetInformations(GuildFactSheetInformations),
+    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
+    GuildInAllianceInformations(GuildInAllianceInformations),
+}
+
+impl Default for GuildInformationsVariant {
+    fn default() -> Self {
+        Self::GuildInformations(GuildInformations::default())
+    }
+}
+
+impl GuildInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GuildInformations(_) => 6928,
+            Self::AlliancedGuildFactSheetInformations(_) => 920,
+            Self::GuildFactSheetInformations(_) => 5100,
+            Self::GuildInsiderFactSheetInformations(_) => 6301,
+            Self::GuildInAllianceInformations(_) => 8268,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6928 => Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?)),
+            920 => Ok(Self::AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations::deserialize(reader)?)),
+            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
+            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
+            8268 => Ok(Self::GuildInAllianceInformations(GuildInAllianceInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GuildInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GuildInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GuildInformations(v) => v.serialize(writer),
+            Self::AlliancedGuildFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
+            Self::GuildInAllianceInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GuildInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for TaxCollectorComplementaryInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum TaxCollectorComplementaryInformationsVariant {
+    TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations),
+    TaxCollectorGuildInformations(TaxCollectorGuildInformations),
+    TaxCollectorWaitingForHelpInformations(TaxCollectorWaitingForHelpInformations),
+    TaxCollectorLootInformations(TaxCollectorLootInformations),
+}
+
+impl Default for TaxCollectorComplementaryInformationsVariant {
+    fn default() -> Self {
+        Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::default())
+    }
+}
+
+impl TaxCollectorComplementaryInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::TaxCollectorComplementaryInformations(_) => 1561,
+            Self::TaxCollectorGuildInformations(_) => 343,
+            Self::TaxCollectorWaitingForHelpInformations(_) => 3744,
+            Self::TaxCollectorLootInformations(_) => 4070,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            1561 => Ok(Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::deserialize(reader)?)),
+            343 => Ok(Self::TaxCollectorGuildInformations(TaxCollectorGuildInformations::deserialize(reader)?)),
+            3744 => Ok(Self::TaxCollectorWaitingForHelpInformations(TaxCollectorWaitingForHelpInformations::deserialize(reader)?)),
+            4070 => Ok(Self::TaxCollectorLootInformations(TaxCollectorLootInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown TaxCollectorComplementaryInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for TaxCollectorComplementaryInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::TaxCollectorComplementaryInformations(v) => v.serialize(writer),
+            Self::TaxCollectorGuildInformations(v) => v.serialize(writer),
+            Self::TaxCollectorWaitingForHelpInformations(v) => v.serialize(writer),
+            Self::TaxCollectorLootInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for TaxCollectorComplementaryInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::TaxCollectorComplementaryInformations(TaxCollectorComplementaryInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameFightMonsterInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameFightMonsterInformationsVariant {
+    GameFightMonsterInformations(GameFightMonsterInformations),
+    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
+}
+
+impl Default for GameFightMonsterInformationsVariant {
+    fn default() -> Self {
+        Self::GameFightMonsterInformations(GameFightMonsterInformations::default())
+    }
+}
+
+impl GameFightMonsterInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameFightMonsterInformations(_) => 6096,
+            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
+            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameFightMonsterInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameFightMonsterInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameFightMonsterInformations(v) => v.serialize(writer),
+            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightMonsterInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for AbstractCharacterInformation hierarchy
+#[derive(Debug, Clone)]
+pub enum AbstractCharacterInformationVariant {
+    AbstractCharacterInformation(AbstractCharacterInformation),
+    CharacterRemodelingInformation(CharacterRemodelingInformation),
+    CharacterToRemodelInformations(CharacterToRemodelInformations),
+    CharacterBasicMinimalInformations(CharacterBasicMinimalInformations),
+    CharacterMinimalInformations(CharacterMinimalInformations),
+    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
+    CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
+    CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
+    CharacterBaseInformations(CharacterBaseInformations),
+    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
+    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
+    PartyMemberInformations(PartyMemberInformations),
+    PartyMemberArenaInformations(PartyMemberArenaInformations),
+    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
+    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
+    GuildMember(GuildMember),
+}
+
+impl Default for AbstractCharacterInformationVariant {
+    fn default() -> Self {
+        Self::AbstractCharacterInformation(AbstractCharacterInformation::default())
+    }
+}
+
+impl AbstractCharacterInformationVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::AbstractCharacterInformation(_) => 120,
+            Self::CharacterRemodelingInformation(_) => 2924,
+            Self::CharacterToRemodelInformations(_) => 1292,
+            Self::CharacterBasicMinimalInformations(_) => 9273,
+            Self::CharacterMinimalInformations(_) => 8058,
+            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
+            Self::CharacterMinimalPlusLookInformations(_) => 8237,
+            Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
+            Self::CharacterBaseInformations(_) => 6238,
+            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
+            Self::PartyInvitationMemberInformations(_) => 7145,
+            Self::PartyMemberInformations(_) => 8246,
+            Self::PartyMemberArenaInformations(_) => 1101,
+            Self::CharacterMinimalGuildInformations(_) => 6416,
+            Self::CharacterMinimalAllianceInformations(_) => 9412,
+            Self::GuildMember(_) => 8512,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            120 => Ok(Self::AbstractCharacterInformation(AbstractCharacterInformation::deserialize(reader)?)),
+            2924 => Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?)),
+            1292 => Ok(Self::CharacterToRemodelInformations(CharacterToRemodelInformations::deserialize(reader)?)),
+            9273 => Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?)),
+            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
+            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
+            8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
+            651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
+            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
+            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
+            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
+            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
+            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
+            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
+            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
+            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AbstractCharacterInformation type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for AbstractCharacterInformationVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::AbstractCharacterInformation(v) => v.serialize(writer),
+            Self::CharacterRemodelingInformation(v) => v.serialize(writer),
+            Self::CharacterToRemodelInformations(v) => v.serialize(writer),
+            Self::CharacterBasicMinimalInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
+            Self::CharacterBaseInformations(v) => v.serialize(writer),
+            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
+            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberInformations(v) => v.serialize(writer),
+            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
+            Self::GuildMember(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for AbstractCharacterInformationVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::AbstractCharacterInformation(AbstractCharacterInformation::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for MapCoordinates hierarchy
+#[derive(Debug, Clone)]
+pub enum MapCoordinatesVariant {
+    MapCoordinates(MapCoordinates),
+    MapCoordinatesAndId(MapCoordinatesAndId),
+    MapCoordinatesExtended(MapCoordinatesExtended),
+}
+
+impl Default for MapCoordinatesVariant {
+    fn default() -> Self {
+        Self::MapCoordinates(MapCoordinates::default())
+    }
+}
+
+impl MapCoordinatesVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::MapCoordinates(_) => 2571,
+            Self::MapCoordinatesAndId(_) => 5358,
+            Self::MapCoordinatesExtended(_) => 1591,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            2571 => Ok(Self::MapCoordinates(MapCoordinates::deserialize(reader)?)),
+            5358 => Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?)),
+            1591 => Ok(Self::MapCoordinatesExtended(MapCoordinatesExtended::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown MapCoordinates type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for MapCoordinatesVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::MapCoordinates(v) => v.serialize(writer),
+            Self::MapCoordinatesAndId(v) => v.serialize(writer),
+            Self::MapCoordinatesExtended(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for MapCoordinatesVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::MapCoordinates(MapCoordinates::deserialize(reader)?))
     }
 }
 
@@ -3013,578 +4449,6 @@ impl DofusDeserialize for AbstractSocialGroupInfosVariant {
     }
 }
 
-/// Polymorphic enum for PaddockInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum PaddockInformationsVariant {
-    PaddockInformations(PaddockInformations),
-    PaddockInstancesInformations(PaddockInstancesInformations),
-    PaddockContentInformations(PaddockContentInformations),
-}
-
-impl Default for PaddockInformationsVariant {
-    fn default() -> Self {
-        Self::PaddockInformations(PaddockInformations::default())
-    }
-}
-
-impl PaddockInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PaddockInformations(_) => 1824,
-            Self::PaddockInstancesInformations(_) => 4322,
-            Self::PaddockContentInformations(_) => 4735,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1824 => Ok(Self::PaddockInformations(PaddockInformations::deserialize(reader)?)),
-            4322 => Ok(Self::PaddockInstancesInformations(PaddockInstancesInformations::deserialize(reader)?)),
-            4735 => Ok(Self::PaddockContentInformations(PaddockContentInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PaddockInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PaddockInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PaddockInformations(v) => v.serialize(writer),
-            Self::PaddockInstancesInformations(v) => v.serialize(writer),
-            Self::PaddockContentInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PaddockInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PaddockInformations(PaddockInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for UpdateMountCharacteristic hierarchy
-#[derive(Debug, Clone)]
-pub enum UpdateMountCharacteristicVariant {
-    UpdateMountCharacteristic(UpdateMountCharacteristic),
-    UpdateMountIntegerCharacteristic(UpdateMountIntegerCharacteristic),
-    UpdateMountBooleanCharacteristic(UpdateMountBooleanCharacteristic),
-}
-
-impl Default for UpdateMountCharacteristicVariant {
-    fn default() -> Self {
-        Self::UpdateMountCharacteristic(UpdateMountCharacteristic::default())
-    }
-}
-
-impl UpdateMountCharacteristicVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::UpdateMountCharacteristic(_) => 3205,
-            Self::UpdateMountIntegerCharacteristic(_) => 4162,
-            Self::UpdateMountBooleanCharacteristic(_) => 4340,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            3205 => Ok(Self::UpdateMountCharacteristic(UpdateMountCharacteristic::deserialize(reader)?)),
-            4162 => Ok(Self::UpdateMountIntegerCharacteristic(UpdateMountIntegerCharacteristic::deserialize(reader)?)),
-            4340 => Ok(Self::UpdateMountBooleanCharacteristic(UpdateMountBooleanCharacteristic::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown UpdateMountCharacteristic type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for UpdateMountCharacteristicVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::UpdateMountCharacteristic(v) => v.serialize(writer),
-            Self::UpdateMountIntegerCharacteristic(v) => v.serialize(writer),
-            Self::UpdateMountBooleanCharacteristic(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for UpdateMountCharacteristicVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::UpdateMountCharacteristic(UpdateMountCharacteristic::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameFightMonsterInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameFightMonsterInformationsVariant {
-    GameFightMonsterInformations(GameFightMonsterInformations),
-    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
-}
-
-impl Default for GameFightMonsterInformationsVariant {
-    fn default() -> Self {
-        Self::GameFightMonsterInformations(GameFightMonsterInformations::default())
-    }
-}
-
-impl GameFightMonsterInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameFightMonsterInformations(_) => 6096,
-            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
-            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameFightMonsterInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameFightMonsterInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameFightMonsterInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightMonsterInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for MapCoordinatesAndId hierarchy
-#[derive(Debug, Clone)]
-pub enum MapCoordinatesAndIdVariant {
-    MapCoordinatesAndId(MapCoordinatesAndId),
-    MapCoordinatesExtended(MapCoordinatesExtended),
-}
-
-impl Default for MapCoordinatesAndIdVariant {
-    fn default() -> Self {
-        Self::MapCoordinatesAndId(MapCoordinatesAndId::default())
-    }
-}
-
-impl MapCoordinatesAndIdVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::MapCoordinatesAndId(_) => 5358,
-            Self::MapCoordinatesExtended(_) => 1591,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5358 => Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?)),
-            1591 => Ok(Self::MapCoordinatesExtended(MapCoordinatesExtended::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown MapCoordinatesAndId type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for MapCoordinatesAndIdVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::MapCoordinatesAndId(v) => v.serialize(writer),
-            Self::MapCoordinatesExtended(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for MapCoordinatesAndIdVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::MapCoordinatesAndId(MapCoordinatesAndId::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PresetsContainerPreset hierarchy
-#[derive(Debug, Clone)]
-pub enum PresetsContainerPresetVariant {
-    PresetsContainerPreset(PresetsContainerPreset),
-    IconNamedPreset(IconNamedPreset),
-}
-
-impl Default for PresetsContainerPresetVariant {
-    fn default() -> Self {
-        Self::PresetsContainerPreset(PresetsContainerPreset::default())
-    }
-}
-
-impl PresetsContainerPresetVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PresetsContainerPreset(_) => 2645,
-            Self::IconNamedPreset(_) => 3146,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2645 => Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?)),
-            3146 => Ok(Self::IconNamedPreset(IconNamedPreset::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PresetsContainerPreset type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PresetsContainerPresetVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PresetsContainerPreset(v) => v.serialize(writer),
-            Self::IconNamedPreset(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PresetsContainerPresetVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PresetsContainerPreset(PresetsContainerPreset::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for DebtInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum DebtInformationVariant {
-    DebtInformation(DebtInformation),
-    KamaDebtInformation(KamaDebtInformation),
-}
-
-impl Default for DebtInformationVariant {
-    fn default() -> Self {
-        Self::DebtInformation(DebtInformation::default())
-    }
-}
-
-impl DebtInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::DebtInformation(_) => 9957,
-            Self::KamaDebtInformation(_) => 9275,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9957 => Ok(Self::DebtInformation(DebtInformation::deserialize(reader)?)),
-            9275 => Ok(Self::KamaDebtInformation(KamaDebtInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown DebtInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for DebtInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::DebtInformation(v) => v.serialize(writer),
-            Self::KamaDebtInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for DebtInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::DebtInformation(DebtInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for BaseSpawnMonsterInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum BaseSpawnMonsterInformationVariant {
-    BaseSpawnMonsterInformation(BaseSpawnMonsterInformation),
-    SpawnMonsterInformation(SpawnMonsterInformation),
-    SpawnScaledMonsterInformation(SpawnScaledMonsterInformation),
-}
-
-impl Default for BaseSpawnMonsterInformationVariant {
-    fn default() -> Self {
-        Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::default())
-    }
-}
-
-impl BaseSpawnMonsterInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::BaseSpawnMonsterInformation(_) => 1071,
-            Self::SpawnMonsterInformation(_) => 3264,
-            Self::SpawnScaledMonsterInformation(_) => 8617,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            1071 => Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?)),
-            3264 => Ok(Self::SpawnMonsterInformation(SpawnMonsterInformation::deserialize(reader)?)),
-            8617 => Ok(Self::SpawnScaledMonsterInformation(SpawnScaledMonsterInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown BaseSpawnMonsterInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for BaseSpawnMonsterInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::BaseSpawnMonsterInformation(v) => v.serialize(writer),
-            Self::SpawnMonsterInformation(v) => v.serialize(writer),
-            Self::SpawnScaledMonsterInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for BaseSpawnMonsterInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::BaseSpawnMonsterInformation(BaseSpawnMonsterInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightResultAdditionalData hierarchy
-#[derive(Debug, Clone)]
-pub enum FightResultAdditionalDataVariant {
-    FightResultAdditionalData(FightResultAdditionalData),
-    FightResultExperienceData(FightResultExperienceData),
-    FightResultPvpData(FightResultPvpData),
-}
-
-impl Default for FightResultAdditionalDataVariant {
-    fn default() -> Self {
-        Self::FightResultAdditionalData(FightResultAdditionalData::default())
-    }
-}
-
-impl FightResultAdditionalDataVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightResultAdditionalData(_) => 5618,
-            Self::FightResultExperienceData(_) => 2135,
-            Self::FightResultPvpData(_) => 3462,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5618 => Ok(Self::FightResultAdditionalData(FightResultAdditionalData::deserialize(reader)?)),
-            2135 => Ok(Self::FightResultExperienceData(FightResultExperienceData::deserialize(reader)?)),
-            3462 => Ok(Self::FightResultPvpData(FightResultPvpData::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightResultAdditionalData type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightResultAdditionalDataVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightResultAdditionalData(v) => v.serialize(writer),
-            Self::FightResultExperienceData(v) => v.serialize(writer),
-            Self::FightResultPvpData(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightResultAdditionalDataVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightResultAdditionalData(FightResultAdditionalData::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AchievementObjective hierarchy
-#[derive(Debug, Clone)]
-pub enum AchievementObjectiveVariant {
-    AchievementObjective(AchievementObjective),
-    AchievementStartedObjective(AchievementStartedObjective),
-}
-
-impl Default for AchievementObjectiveVariant {
-    fn default() -> Self {
-        Self::AchievementObjective(AchievementObjective::default())
-    }
-}
-
-impl AchievementObjectiveVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AchievementObjective(_) => 8118,
-            Self::AchievementStartedObjective(_) => 3401,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            8118 => Ok(Self::AchievementObjective(AchievementObjective::deserialize(reader)?)),
-            3401 => Ok(Self::AchievementStartedObjective(AchievementStartedObjective::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AchievementObjective type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AchievementObjectiveVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AchievementObjective(v) => v.serialize(writer),
-            Self::AchievementStartedObjective(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AchievementObjectiveVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AchievementObjective(AchievementObjective::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for Idol hierarchy
-#[derive(Debug, Clone)]
-pub enum IdolVariant {
-    Idol(Idol),
-    PartyIdol(PartyIdol),
-}
-
-impl Default for IdolVariant {
-    fn default() -> Self {
-        Self::Idol(Idol::default())
-    }
-}
-
-impl IdolVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::Idol(_) => 5752,
-            Self::PartyIdol(_) => 5714,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5752 => Ok(Self::Idol(Idol::deserialize(reader)?)),
-            5714 => Ok(Self::PartyIdol(PartyIdol::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown Idol type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for IdolVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::Idol(v) => v.serialize(writer),
-            Self::PartyIdol(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for IdolVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::Idol(Idol::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightResultFighterListEntry hierarchy
-#[derive(Debug, Clone)]
-pub enum FightResultFighterListEntryVariant {
-    FightResultFighterListEntry(FightResultFighterListEntry),
-    FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry),
-    FightResultPlayerListEntry(FightResultPlayerListEntry),
-    FightResultMutantListEntry(FightResultMutantListEntry),
-}
-
-impl Default for FightResultFighterListEntryVariant {
-    fn default() -> Self {
-        Self::FightResultFighterListEntry(FightResultFighterListEntry::default())
-    }
-}
-
-impl FightResultFighterListEntryVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightResultFighterListEntry(_) => 7733,
-            Self::FightResultTaxCollectorListEntry(_) => 6240,
-            Self::FightResultPlayerListEntry(_) => 6765,
-            Self::FightResultMutantListEntry(_) => 6988,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            7733 => Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?)),
-            6240 => Ok(Self::FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry::deserialize(reader)?)),
-            6765 => Ok(Self::FightResultPlayerListEntry(FightResultPlayerListEntry::deserialize(reader)?)),
-            6988 => Ok(Self::FightResultMutantListEntry(FightResultMutantListEntry::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightResultFighterListEntry type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightResultFighterListEntryVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightResultFighterListEntry(v) => v.serialize(writer),
-            Self::FightResultTaxCollectorListEntry(v) => v.serialize(writer),
-            Self::FightResultPlayerListEntry(v) => v.serialize(writer),
-            Self::FightResultMutantListEntry(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightResultFighterListEntryVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for AbstractFightTeamInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum AbstractFightTeamInformationsVariant {
-    AbstractFightTeamInformations(AbstractFightTeamInformations),
-    FightTeamInformations(FightTeamInformations),
-    FightAllianceTeamInformations(FightAllianceTeamInformations),
-    FightTeamLightInformations(FightTeamLightInformations),
-}
-
-impl Default for AbstractFightTeamInformationsVariant {
-    fn default() -> Self {
-        Self::AbstractFightTeamInformations(AbstractFightTeamInformations::default())
-    }
-}
-
-impl AbstractFightTeamInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AbstractFightTeamInformations(_) => 5839,
-            Self::FightTeamInformations(_) => 4426,
-            Self::FightAllianceTeamInformations(_) => 5175,
-            Self::FightTeamLightInformations(_) => 6266,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5839 => Ok(Self::AbstractFightTeamInformations(AbstractFightTeamInformations::deserialize(reader)?)),
-            4426 => Ok(Self::FightTeamInformations(FightTeamInformations::deserialize(reader)?)),
-            5175 => Ok(Self::FightAllianceTeamInformations(FightAllianceTeamInformations::deserialize(reader)?)),
-            6266 => Ok(Self::FightTeamLightInformations(FightTeamLightInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AbstractFightTeamInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AbstractFightTeamInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AbstractFightTeamInformations(v) => v.serialize(writer),
-            Self::FightTeamInformations(v) => v.serialize(writer),
-            Self::FightAllianceTeamInformations(v) => v.serialize(writer),
-            Self::FightTeamLightInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AbstractFightTeamInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AbstractFightTeamInformations(AbstractFightTeamInformations::deserialize(reader)?))
-    }
-}
-
 /// Polymorphic enum for GameFightFighterLightInformations hierarchy
 #[derive(Debug, Clone)]
 pub enum GameFightFighterLightInformationsVariant {
@@ -3642,51 +4506,6 @@ impl DofusDeserialize for GameFightFighterLightInformationsVariant {
     }
 }
 
-/// Polymorphic enum for ObjectItemGenericQuantity hierarchy
-#[derive(Debug, Clone)]
-pub enum ObjectItemGenericQuantityVariant {
-    ObjectItemGenericQuantity(ObjectItemGenericQuantity),
-    ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects),
-}
-
-impl Default for ObjectItemGenericQuantityVariant {
-    fn default() -> Self {
-        Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::default())
-    }
-}
-
-impl ObjectItemGenericQuantityVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ObjectItemGenericQuantity(_) => 9440,
-            Self::ObjectItemQuantityPriceDateEffects(_) => 6659,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9440 => Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?)),
-            6659 => Ok(Self::ObjectItemQuantityPriceDateEffects(ObjectItemQuantityPriceDateEffects::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectItemGenericQuantity type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ObjectItemGenericQuantityVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ObjectItemGenericQuantity(v) => v.serialize(writer),
-            Self::ObjectItemQuantityPriceDateEffects(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ObjectItemGenericQuantityVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectItemGenericQuantity(ObjectItemGenericQuantity::deserialize(reader)?))
-    }
-}
-
 /// Polymorphic enum for GameFightFighterNamedInformations hierarchy
 #[derive(Debug, Clone)]
 pub enum GameFightFighterNamedInformationsVariant {
@@ -3736,620 +4555,122 @@ impl DofusDeserialize for GameFightFighterNamedInformationsVariant {
     }
 }
 
-/// Polymorphic enum for AllianceInformations hierarchy
+/// Polymorphic enum for AbstractFightDispellableEffect hierarchy
 #[derive(Debug, Clone)]
-pub enum AllianceInformationsVariant {
-    AllianceInformations(AllianceInformations),
-    AllianceFactSheetInformations(AllianceFactSheetInformations),
+pub enum AbstractFightDispellableEffectVariant {
+    AbstractFightDispellableEffect(AbstractFightDispellableEffect),
+    FightTemporaryBoostEffect(FightTemporaryBoostEffect),
+    FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect),
+    FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect),
+    FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect),
+    FightTriggeredEffect(FightTriggeredEffect),
+    FightTemporarySpellImmunityEffect(FightTemporarySpellImmunityEffect),
 }
 
-impl Default for AllianceInformationsVariant {
+impl Default for AbstractFightDispellableEffectVariant {
     fn default() -> Self {
-        Self::AllianceInformations(AllianceInformations::default())
+        Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::default())
     }
 }
 
-impl AllianceInformationsVariant {
+impl AbstractFightDispellableEffectVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
-            Self::AllianceInformations(_) => 2484,
-            Self::AllianceFactSheetInformations(_) => 6853,
+            Self::AbstractFightDispellableEffect(_) => 9836,
+            Self::FightTemporaryBoostEffect(_) => 2668,
+            Self::FightTemporaryBoostWeaponDamagesEffect(_) => 4451,
+            Self::FightTemporarySpellBoostEffect(_) => 5674,
+            Self::FightTemporaryBoostStateEffect(_) => 7115,
+            Self::FightTriggeredEffect(_) => 3040,
+            Self::FightTemporarySpellImmunityEffect(_) => 8464,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
-            2484 => Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?)),
-            6853 => Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AllianceInformations type_id: {}", type_id)),
+            9836 => Ok(Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::deserialize(reader)?)),
+            2668 => Ok(Self::FightTemporaryBoostEffect(FightTemporaryBoostEffect::deserialize(reader)?)),
+            4451 => Ok(Self::FightTemporaryBoostWeaponDamagesEffect(FightTemporaryBoostWeaponDamagesEffect::deserialize(reader)?)),
+            5674 => Ok(Self::FightTemporarySpellBoostEffect(FightTemporarySpellBoostEffect::deserialize(reader)?)),
+            7115 => Ok(Self::FightTemporaryBoostStateEffect(FightTemporaryBoostStateEffect::deserialize(reader)?)),
+            3040 => Ok(Self::FightTriggeredEffect(FightTriggeredEffect::deserialize(reader)?)),
+            8464 => Ok(Self::FightTemporarySpellImmunityEffect(FightTemporarySpellImmunityEffect::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AbstractFightDispellableEffect type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for AllianceInformationsVariant {
+impl DofusSerialize for AbstractFightDispellableEffectVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
-            Self::AllianceInformations(v) => v.serialize(writer),
-            Self::AllianceFactSheetInformations(v) => v.serialize(writer),
+            Self::AbstractFightDispellableEffect(v) => v.serialize(writer),
+            Self::FightTemporaryBoostEffect(v) => v.serialize(writer),
+            Self::FightTemporaryBoostWeaponDamagesEffect(v) => v.serialize(writer),
+            Self::FightTemporarySpellBoostEffect(v) => v.serialize(writer),
+            Self::FightTemporaryBoostStateEffect(v) => v.serialize(writer),
+            Self::FightTriggeredEffect(v) => v.serialize(writer),
+            Self::FightTemporarySpellImmunityEffect(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for AllianceInformationsVariant {
+impl DofusDeserialize for AbstractFightDispellableEffectVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AllianceInformations(AllianceInformations::deserialize(reader)?))
+        Ok(Self::AbstractFightDispellableEffect(AbstractFightDispellableEffect::deserialize(reader)?))
     }
 }
 
-/// Polymorphic enum for IgnoredInformations hierarchy
+/// Polymorphic enum for PrismSubareaEmptyInfo hierarchy
 #[derive(Debug, Clone)]
-pub enum IgnoredInformationsVariant {
-    IgnoredInformations(IgnoredInformations),
-    IgnoredOnlineInformations(IgnoredOnlineInformations),
+pub enum PrismSubareaEmptyInfoVariant {
+    PrismSubareaEmptyInfo(PrismSubareaEmptyInfo),
+    PrismGeolocalizedInformation(PrismGeolocalizedInformation),
 }
 
-impl Default for IgnoredInformationsVariant {
+impl Default for PrismSubareaEmptyInfoVariant {
     fn default() -> Self {
-        Self::IgnoredInformations(IgnoredInformations::default())
+        Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::default())
     }
 }
 
-impl IgnoredInformationsVariant {
+impl PrismSubareaEmptyInfoVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
-            Self::IgnoredInformations(_) => 4160,
-            Self::IgnoredOnlineInformations(_) => 5101,
+            Self::PrismSubareaEmptyInfo(_) => 9305,
+            Self::PrismGeolocalizedInformation(_) => 8192,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
-            4160 => Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?)),
-            5101 => Ok(Self::IgnoredOnlineInformations(IgnoredOnlineInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown IgnoredInformations type_id: {}", type_id)),
+            9305 => Ok(Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::deserialize(reader)?)),
+            8192 => Ok(Self::PrismGeolocalizedInformation(PrismGeolocalizedInformation::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PrismSubareaEmptyInfo type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for IgnoredInformationsVariant {
+impl DofusSerialize for PrismSubareaEmptyInfoVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
-            Self::IgnoredInformations(v) => v.serialize(writer),
-            Self::IgnoredOnlineInformations(v) => v.serialize(writer),
+            Self::PrismSubareaEmptyInfo(v) => v.serialize(writer),
+            Self::PrismGeolocalizedInformation(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for IgnoredInformationsVariant {
+impl DofusDeserialize for PrismSubareaEmptyInfoVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::IgnoredInformations(IgnoredInformations::deserialize(reader)?))
+        Ok(Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::deserialize(reader)?))
     }
 }
 
-/// Polymorphic enum for AchievementAchieved hierarchy
+/// Polymorphic enum for CharacterBasicMinimalInformations hierarchy
 #[derive(Debug, Clone)]
-pub enum AchievementAchievedVariant {
-    AchievementAchieved(AchievementAchieved),
-    AchievementAchievedRewardable(AchievementAchievedRewardable),
-}
-
-impl Default for AchievementAchievedVariant {
-    fn default() -> Self {
-        Self::AchievementAchieved(AchievementAchieved::default())
-    }
-}
-
-impl AchievementAchievedVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::AchievementAchieved(_) => 9231,
-            Self::AchievementAchievedRewardable(_) => 2164,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9231 => Ok(Self::AchievementAchieved(AchievementAchieved::deserialize(reader)?)),
-            2164 => Ok(Self::AchievementAchievedRewardable(AchievementAchievedRewardable::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown AchievementAchieved type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for AchievementAchievedVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::AchievementAchieved(v) => v.serialize(writer),
-            Self::AchievementAchievedRewardable(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for AchievementAchievedVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::AchievementAchieved(AchievementAchieved::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for TreasureHuntStep hierarchy
-#[derive(Debug, Clone)]
-pub enum TreasureHuntStepVariant {
-    TreasureHuntStep(TreasureHuntStep),
-    TreasureHuntStepFollowDirection(TreasureHuntStepFollowDirection),
-    TreasureHuntStepDig(TreasureHuntStepDig),
-    TreasureHuntStepFollowDirectionToHint(TreasureHuntStepFollowDirectionToHint),
-    TreasureHuntStepFight(TreasureHuntStepFight),
-    TreasureHuntStepFollowDirectionToPOI(TreasureHuntStepFollowDirectionToPOI),
-}
-
-impl Default for TreasureHuntStepVariant {
-    fn default() -> Self {
-        Self::TreasureHuntStep(TreasureHuntStep::default())
-    }
-}
-
-impl TreasureHuntStepVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::TreasureHuntStep(_) => 5041,
-            Self::TreasureHuntStepFollowDirection(_) => 1881,
-            Self::TreasureHuntStepDig(_) => 3298,
-            Self::TreasureHuntStepFollowDirectionToHint(_) => 5721,
-            Self::TreasureHuntStepFight(_) => 6367,
-            Self::TreasureHuntStepFollowDirectionToPOI(_) => 7951,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5041 => Ok(Self::TreasureHuntStep(TreasureHuntStep::deserialize(reader)?)),
-            1881 => Ok(Self::TreasureHuntStepFollowDirection(TreasureHuntStepFollowDirection::deserialize(reader)?)),
-            3298 => Ok(Self::TreasureHuntStepDig(TreasureHuntStepDig::deserialize(reader)?)),
-            5721 => Ok(Self::TreasureHuntStepFollowDirectionToHint(TreasureHuntStepFollowDirectionToHint::deserialize(reader)?)),
-            6367 => Ok(Self::TreasureHuntStepFight(TreasureHuntStepFight::deserialize(reader)?)),
-            7951 => Ok(Self::TreasureHuntStepFollowDirectionToPOI(TreasureHuntStepFollowDirectionToPOI::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown TreasureHuntStep type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for TreasureHuntStepVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::TreasureHuntStep(v) => v.serialize(writer),
-            Self::TreasureHuntStepFollowDirection(v) => v.serialize(writer),
-            Self::TreasureHuntStepDig(v) => v.serialize(writer),
-            Self::TreasureHuntStepFollowDirectionToHint(v) => v.serialize(writer),
-            Self::TreasureHuntStepFight(v) => v.serialize(writer),
-            Self::TreasureHuntStepFollowDirectionToPOI(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for TreasureHuntStepVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::TreasureHuntStep(TreasureHuntStep::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ObjectEffect hierarchy
-#[derive(Debug, Clone)]
-pub enum ObjectEffectVariant {
-    ObjectEffect(ObjectEffect),
-    ObjectEffectDate(ObjectEffectDate),
-    ObjectEffectString(ObjectEffectString),
-    ObjectEffectDuration(ObjectEffectDuration),
-    ObjectEffectMount(ObjectEffectMount),
-    ObjectEffectMinMax(ObjectEffectMinMax),
-    ObjectEffectCreature(ObjectEffectCreature),
-    ObjectEffectLadder(ObjectEffectLadder),
-    ObjectEffectInteger(ObjectEffectInteger),
-    ObjectEffectDice(ObjectEffectDice),
-}
-
-impl Default for ObjectEffectVariant {
-    fn default() -> Self {
-        Self::ObjectEffect(ObjectEffect::default())
-    }
-}
-
-impl ObjectEffectVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ObjectEffect(_) => 6577,
-            Self::ObjectEffectDate(_) => 2036,
-            Self::ObjectEffectString(_) => 2216,
-            Self::ObjectEffectDuration(_) => 7748,
-            Self::ObjectEffectMount(_) => 8688,
-            Self::ObjectEffectMinMax(_) => 9076,
-            Self::ObjectEffectCreature(_) => 9295,
-            Self::ObjectEffectLadder(_) => 6916,
-            Self::ObjectEffectInteger(_) => 9369,
-            Self::ObjectEffectDice(_) => 9512,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6577 => Ok(Self::ObjectEffect(ObjectEffect::deserialize(reader)?)),
-            2036 => Ok(Self::ObjectEffectDate(ObjectEffectDate::deserialize(reader)?)),
-            2216 => Ok(Self::ObjectEffectString(ObjectEffectString::deserialize(reader)?)),
-            7748 => Ok(Self::ObjectEffectDuration(ObjectEffectDuration::deserialize(reader)?)),
-            8688 => Ok(Self::ObjectEffectMount(ObjectEffectMount::deserialize(reader)?)),
-            9076 => Ok(Self::ObjectEffectMinMax(ObjectEffectMinMax::deserialize(reader)?)),
-            9295 => Ok(Self::ObjectEffectCreature(ObjectEffectCreature::deserialize(reader)?)),
-            6916 => Ok(Self::ObjectEffectLadder(ObjectEffectLadder::deserialize(reader)?)),
-            9369 => Ok(Self::ObjectEffectInteger(ObjectEffectInteger::deserialize(reader)?)),
-            9512 => Ok(Self::ObjectEffectDice(ObjectEffectDice::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectEffect type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ObjectEffectVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ObjectEffect(v) => v.serialize(writer),
-            Self::ObjectEffectDate(v) => v.serialize(writer),
-            Self::ObjectEffectString(v) => v.serialize(writer),
-            Self::ObjectEffectDuration(v) => v.serialize(writer),
-            Self::ObjectEffectMount(v) => v.serialize(writer),
-            Self::ObjectEffectMinMax(v) => v.serialize(writer),
-            Self::ObjectEffectCreature(v) => v.serialize(writer),
-            Self::ObjectEffectLadder(v) => v.serialize(writer),
-            Self::ObjectEffectInteger(v) => v.serialize(writer),
-            Self::ObjectEffectDice(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ObjectEffectVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectEffect(ObjectEffect::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for StatisticData hierarchy
-#[derive(Debug, Clone)]
-pub enum StatisticDataVariant {
-    StatisticData(StatisticData),
-    StatisticDataByte(StatisticDataByte),
-    StatisticDataBoolean(StatisticDataBoolean),
-    StatisticDataInt(StatisticDataInt),
-    StatisticDataShort(StatisticDataShort),
-    StatisticDataString(StatisticDataString),
-}
-
-impl Default for StatisticDataVariant {
-    fn default() -> Self {
-        Self::StatisticData(StatisticData::default())
-    }
-}
-
-impl StatisticDataVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::StatisticData(_) => 7795,
-            Self::StatisticDataByte(_) => 3536,
-            Self::StatisticDataBoolean(_) => 3779,
-            Self::StatisticDataInt(_) => 4640,
-            Self::StatisticDataShort(_) => 4749,
-            Self::StatisticDataString(_) => 9818,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            7795 => Ok(Self::StatisticData(StatisticData::deserialize(reader)?)),
-            3536 => Ok(Self::StatisticDataByte(StatisticDataByte::deserialize(reader)?)),
-            3779 => Ok(Self::StatisticDataBoolean(StatisticDataBoolean::deserialize(reader)?)),
-            4640 => Ok(Self::StatisticDataInt(StatisticDataInt::deserialize(reader)?)),
-            4749 => Ok(Self::StatisticDataShort(StatisticDataShort::deserialize(reader)?)),
-            9818 => Ok(Self::StatisticDataString(StatisticDataString::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown StatisticData type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for StatisticDataVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::StatisticData(v) => v.serialize(writer),
-            Self::StatisticDataByte(v) => v.serialize(writer),
-            Self::StatisticDataBoolean(v) => v.serialize(writer),
-            Self::StatisticDataInt(v) => v.serialize(writer),
-            Self::StatisticDataShort(v) => v.serialize(writer),
-            Self::StatisticDataString(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for StatisticDataVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::StatisticData(StatisticData::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for EntityDispositionInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum EntityDispositionInformationsVariant {
-    EntityDispositionInformations(EntityDispositionInformations),
-    IdentifiedEntityDispositionInformations(IdentifiedEntityDispositionInformations),
-    FightEntityDispositionInformations(FightEntityDispositionInformations),
-}
-
-impl Default for EntityDispositionInformationsVariant {
-    fn default() -> Self {
-        Self::EntityDispositionInformations(EntityDispositionInformations::default())
-    }
-}
-
-impl EntityDispositionInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::EntityDispositionInformations(_) => 7114,
-            Self::IdentifiedEntityDispositionInformations(_) => 4029,
-            Self::FightEntityDispositionInformations(_) => 4954,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            7114 => Ok(Self::EntityDispositionInformations(EntityDispositionInformations::deserialize(reader)?)),
-            4029 => Ok(Self::IdentifiedEntityDispositionInformations(IdentifiedEntityDispositionInformations::deserialize(reader)?)),
-            4954 => Ok(Self::FightEntityDispositionInformations(FightEntityDispositionInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown EntityDispositionInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for EntityDispositionInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::EntityDispositionInformations(v) => v.serialize(writer),
-            Self::IdentifiedEntityDispositionInformations(v) => v.serialize(writer),
-            Self::FightEntityDispositionInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for EntityDispositionInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::EntityDispositionInformations(EntityDispositionInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for GameFightAIInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum GameFightAIInformationsVariant {
-    GameFightAIInformations(GameFightAIInformations),
-    GameFightMonsterInformations(GameFightMonsterInformations),
-    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
-    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
-}
-
-impl Default for GameFightAIInformationsVariant {
-    fn default() -> Self {
-        Self::GameFightAIInformations(GameFightAIInformations::default())
-    }
-}
-
-impl GameFightAIInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::GameFightAIInformations(_) => 950,
-            Self::GameFightMonsterInformations(_) => 6096,
-            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
-            Self::GameFightTaxCollectorInformations(_) => 6975,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
-            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
-            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
-            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameFightAIInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for GameFightAIInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::GameFightAIInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
-            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightAIInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterBaseInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterBaseInformationsVariant {
-    CharacterBaseInformations(CharacterBaseInformations),
-    CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations),
-    PartyInvitationMemberInformations(PartyInvitationMemberInformations),
-    PartyMemberInformations(PartyMemberInformations),
-    PartyMemberArenaInformations(PartyMemberArenaInformations),
-}
-
-impl Default for CharacterBaseInformationsVariant {
-    fn default() -> Self {
-        Self::CharacterBaseInformations(CharacterBaseInformations::default())
-    }
-}
-
-impl CharacterBaseInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::CharacterBaseInformations(_) => 6238,
-            Self::CharacterHardcoreOrEpicInformations(_) => 3059,
-            Self::PartyInvitationMemberInformations(_) => 7145,
-            Self::PartyMemberInformations(_) => 8246,
-            Self::PartyMemberArenaInformations(_) => 1101,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
-            3059 => Ok(Self::CharacterHardcoreOrEpicInformations(CharacterHardcoreOrEpicInformations::deserialize(reader)?)),
-            7145 => Ok(Self::PartyInvitationMemberInformations(PartyInvitationMemberInformations::deserialize(reader)?)),
-            8246 => Ok(Self::PartyMemberInformations(PartyMemberInformations::deserialize(reader)?)),
-            1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterBaseInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for CharacterBaseInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::CharacterBaseInformations(v) => v.serialize(writer),
-            Self::CharacterHardcoreOrEpicInformations(v) => v.serialize(writer),
-            Self::PartyInvitationMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberInformations(v) => v.serialize(writer),
-            Self::PartyMemberArenaInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for CharacterBaseInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightTeamMemberCharacterInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum FightTeamMemberCharacterInformationsVariant {
-    FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations),
-    FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations),
-}
-
-impl Default for FightTeamMemberCharacterInformationsVariant {
-    fn default() -> Self {
-        Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::default())
-    }
-}
-
-impl FightTeamMemberCharacterInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightTeamMemberCharacterInformations(_) => 9851,
-            Self::FightTeamMemberWithAllianceCharacterInformations(_) => 8004,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9851 => Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?)),
-            8004 => Ok(Self::FightTeamMemberWithAllianceCharacterInformations(FightTeamMemberWithAllianceCharacterInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightTeamMemberCharacterInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightTeamMemberCharacterInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightTeamMemberCharacterInformations(v) => v.serialize(writer),
-            Self::FightTeamMemberWithAllianceCharacterInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightTeamMemberCharacterInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightTeamMemberCharacterInformations(FightTeamMemberCharacterInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for HumanOption hierarchy
-#[derive(Debug, Clone)]
-pub enum HumanOptionVariant {
-    HumanOption(HumanOption),
-    HumanOptionAlliance(HumanOptionAlliance),
-    HumanOptionObjectUse(HumanOptionObjectUse),
-    HumanOptionFollowers(HumanOptionFollowers),
-    HumanOptionSkillUse(HumanOptionSkillUse),
-    HumanOptionOrnament(HumanOptionOrnament),
-    HumanOptionTitle(HumanOptionTitle),
-    HumanOptionGuild(HumanOptionGuild),
-    HumanOptionEmote(HumanOptionEmote),
-}
-
-impl Default for HumanOptionVariant {
-    fn default() -> Self {
-        Self::HumanOption(HumanOption::default())
-    }
-}
-
-impl HumanOptionVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::HumanOption(_) => 6272,
-            Self::HumanOptionAlliance(_) => 374,
-            Self::HumanOptionObjectUse(_) => 2440,
-            Self::HumanOptionFollowers(_) => 2856,
-            Self::HumanOptionSkillUse(_) => 4888,
-            Self::HumanOptionOrnament(_) => 5651,
-            Self::HumanOptionTitle(_) => 6451,
-            Self::HumanOptionGuild(_) => 7229,
-            Self::HumanOptionEmote(_) => 7370,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            6272 => Ok(Self::HumanOption(HumanOption::deserialize(reader)?)),
-            374 => Ok(Self::HumanOptionAlliance(HumanOptionAlliance::deserialize(reader)?)),
-            2440 => Ok(Self::HumanOptionObjectUse(HumanOptionObjectUse::deserialize(reader)?)),
-            2856 => Ok(Self::HumanOptionFollowers(HumanOptionFollowers::deserialize(reader)?)),
-            4888 => Ok(Self::HumanOptionSkillUse(HumanOptionSkillUse::deserialize(reader)?)),
-            5651 => Ok(Self::HumanOptionOrnament(HumanOptionOrnament::deserialize(reader)?)),
-            6451 => Ok(Self::HumanOptionTitle(HumanOptionTitle::deserialize(reader)?)),
-            7229 => Ok(Self::HumanOptionGuild(HumanOptionGuild::deserialize(reader)?)),
-            7370 => Ok(Self::HumanOptionEmote(HumanOptionEmote::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown HumanOption type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for HumanOptionVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::HumanOption(v) => v.serialize(writer),
-            Self::HumanOptionAlliance(v) => v.serialize(writer),
-            Self::HumanOptionObjectUse(v) => v.serialize(writer),
-            Self::HumanOptionFollowers(v) => v.serialize(writer),
-            Self::HumanOptionSkillUse(v) => v.serialize(writer),
-            Self::HumanOptionOrnament(v) => v.serialize(writer),
-            Self::HumanOptionTitle(v) => v.serialize(writer),
-            Self::HumanOptionGuild(v) => v.serialize(writer),
-            Self::HumanOptionEmote(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for HumanOptionVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::HumanOption(HumanOption::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterMinimalPlusLookInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterMinimalPlusLookInformationsVariant {
+pub enum CharacterBasicMinimalInformationsVariant {
+    CharacterBasicMinimalInformations(CharacterBasicMinimalInformations),
+    CharacterMinimalInformations(CharacterMinimalInformations),
+    CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations),
     CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations),
     CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations),
     CharacterBaseInformations(CharacterBaseInformations),
@@ -4359,17 +4680,21 @@ pub enum CharacterMinimalPlusLookInformationsVariant {
     PartyMemberArenaInformations(PartyMemberArenaInformations),
     CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
     CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
+    GuildMember(GuildMember),
 }
 
-impl Default for CharacterMinimalPlusLookInformationsVariant {
+impl Default for CharacterBasicMinimalInformationsVariant {
     fn default() -> Self {
-        Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::default())
+        Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::default())
     }
 }
 
-impl CharacterMinimalPlusLookInformationsVariant {
+impl CharacterBasicMinimalInformationsVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
+            Self::CharacterBasicMinimalInformations(_) => 9273,
+            Self::CharacterMinimalInformations(_) => 8058,
+            Self::CharacterMinimalGuildPublicInformations(_) => 2887,
             Self::CharacterMinimalPlusLookInformations(_) => 8237,
             Self::CharacterMinimalPlusLookAndGradeInformations(_) => 651,
             Self::CharacterBaseInformations(_) => 6238,
@@ -4379,11 +4704,15 @@ impl CharacterMinimalPlusLookInformationsVariant {
             Self::PartyMemberArenaInformations(_) => 1101,
             Self::CharacterMinimalGuildInformations(_) => 6416,
             Self::CharacterMinimalAllianceInformations(_) => 9412,
+            Self::GuildMember(_) => 8512,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
+            9273 => Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?)),
+            8058 => Ok(Self::CharacterMinimalInformations(CharacterMinimalInformations::deserialize(reader)?)),
+            2887 => Ok(Self::CharacterMinimalGuildPublicInformations(CharacterMinimalGuildPublicInformations::deserialize(reader)?)),
             8237 => Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?)),
             651 => Ok(Self::CharacterMinimalPlusLookAndGradeInformations(CharacterMinimalPlusLookAndGradeInformations::deserialize(reader)?)),
             6238 => Ok(Self::CharacterBaseInformations(CharacterBaseInformations::deserialize(reader)?)),
@@ -4393,14 +4722,18 @@ impl CharacterMinimalPlusLookInformationsVariant {
             1101 => Ok(Self::PartyMemberArenaInformations(PartyMemberArenaInformations::deserialize(reader)?)),
             6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
             9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalPlusLookInformations type_id: {}", type_id)),
+            8512 => Ok(Self::GuildMember(GuildMember::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterBasicMinimalInformations type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for CharacterMinimalPlusLookInformationsVariant {
+impl DofusSerialize for CharacterBasicMinimalInformationsVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
+            Self::CharacterBasicMinimalInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildPublicInformations(v) => v.serialize(writer),
             Self::CharacterMinimalPlusLookInformations(v) => v.serialize(writer),
             Self::CharacterMinimalPlusLookAndGradeInformations(v) => v.serialize(writer),
             Self::CharacterBaseInformations(v) => v.serialize(writer),
@@ -4410,58 +4743,157 @@ impl DofusSerialize for CharacterMinimalPlusLookInformationsVariant {
             Self::PartyMemberArenaInformations(v) => v.serialize(writer),
             Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
             Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
+            Self::GuildMember(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for CharacterMinimalPlusLookInformationsVariant {
+impl DofusDeserialize for CharacterBasicMinimalInformationsVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterMinimalPlusLookInformations(CharacterMinimalPlusLookInformations::deserialize(reader)?))
+        Ok(Self::CharacterBasicMinimalInformations(CharacterBasicMinimalInformations::deserialize(reader)?))
     }
 }
 
-/// Polymorphic enum for ObjectItemToSell hierarchy
+/// Polymorphic enum for CharacterMinimalGuildInformations hierarchy
 #[derive(Debug, Clone)]
-pub enum ObjectItemToSellVariant {
-    ObjectItemToSell(ObjectItemToSell),
-    ObjectItemToSellInBid(ObjectItemToSellInBid),
+pub enum CharacterMinimalGuildInformationsVariant {
+    CharacterMinimalGuildInformations(CharacterMinimalGuildInformations),
+    CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations),
 }
 
-impl Default for ObjectItemToSellVariant {
+impl Default for CharacterMinimalGuildInformationsVariant {
     fn default() -> Self {
-        Self::ObjectItemToSell(ObjectItemToSell::default())
+        Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::default())
     }
 }
 
-impl ObjectItemToSellVariant {
+impl CharacterMinimalGuildInformationsVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
-            Self::ObjectItemToSell(_) => 446,
-            Self::ObjectItemToSellInBid(_) => 4082,
+            Self::CharacterMinimalGuildInformations(_) => 6416,
+            Self::CharacterMinimalAllianceInformations(_) => 9412,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
-            446 => Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?)),
-            4082 => Ok(Self::ObjectItemToSellInBid(ObjectItemToSellInBid::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ObjectItemToSell type_id: {}", type_id)),
+            6416 => Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?)),
+            9412 => Ok(Self::CharacterMinimalAllianceInformations(CharacterMinimalAllianceInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown CharacterMinimalGuildInformations type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for ObjectItemToSellVariant {
+impl DofusSerialize for CharacterMinimalGuildInformationsVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
-            Self::ObjectItemToSell(v) => v.serialize(writer),
-            Self::ObjectItemToSellInBid(v) => v.serialize(writer),
+            Self::CharacterMinimalGuildInformations(v) => v.serialize(writer),
+            Self::CharacterMinimalAllianceInformations(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for ObjectItemToSellVariant {
+impl DofusDeserialize for CharacterMinimalGuildInformationsVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ObjectItemToSell(ObjectItemToSell::deserialize(reader)?))
+        Ok(Self::CharacterMinimalGuildInformations(CharacterMinimalGuildInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for GameRolePlayGroupMonsterInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum GameRolePlayGroupMonsterInformationsVariant {
+    GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations),
+    GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations),
+}
+
+impl Default for GameRolePlayGroupMonsterInformationsVariant {
+    fn default() -> Self {
+        Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::default())
+    }
+}
+
+impl GameRolePlayGroupMonsterInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::GameRolePlayGroupMonsterInformations(_) => 4648,
+            Self::GameRolePlayGroupMonsterWaveInformations(_) => 7041,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            4648 => Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?)),
+            7041 => Ok(Self::GameRolePlayGroupMonsterWaveInformations(GameRolePlayGroupMonsterWaveInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown GameRolePlayGroupMonsterInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for GameRolePlayGroupMonsterInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::GameRolePlayGroupMonsterInformations(v) => v.serialize(writer),
+            Self::GameRolePlayGroupMonsterWaveInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for GameRolePlayGroupMonsterInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::GameRolePlayGroupMonsterInformations(GameRolePlayGroupMonsterInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for FightResultFighterListEntry hierarchy
+#[derive(Debug, Clone)]
+pub enum FightResultFighterListEntryVariant {
+    FightResultFighterListEntry(FightResultFighterListEntry),
+    FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry),
+    FightResultPlayerListEntry(FightResultPlayerListEntry),
+    FightResultMutantListEntry(FightResultMutantListEntry),
+}
+
+impl Default for FightResultFighterListEntryVariant {
+    fn default() -> Self {
+        Self::FightResultFighterListEntry(FightResultFighterListEntry::default())
+    }
+}
+
+impl FightResultFighterListEntryVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::FightResultFighterListEntry(_) => 7733,
+            Self::FightResultTaxCollectorListEntry(_) => 6240,
+            Self::FightResultPlayerListEntry(_) => 6765,
+            Self::FightResultMutantListEntry(_) => 6988,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            7733 => Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?)),
+            6240 => Ok(Self::FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry::deserialize(reader)?)),
+            6765 => Ok(Self::FightResultPlayerListEntry(FightResultPlayerListEntry::deserialize(reader)?)),
+            6988 => Ok(Self::FightResultMutantListEntry(FightResultMutantListEntry::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown FightResultFighterListEntry type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for FightResultFighterListEntryVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::FightResultFighterListEntry(v) => v.serialize(writer),
+            Self::FightResultTaxCollectorListEntry(v) => v.serialize(writer),
+            Self::FightResultPlayerListEntry(v) => v.serialize(writer),
+            Self::FightResultMutantListEntry(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for FightResultFighterListEntryVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?))
     }
 }
 
@@ -4538,611 +4970,97 @@ impl DofusDeserialize for ShortcutVariant {
     }
 }
 
-/// Polymorphic enum for GameFightFighterInformations hierarchy
+/// Polymorphic enum for PaddockInformations hierarchy
 #[derive(Debug, Clone)]
-pub enum GameFightFighterInformationsVariant {
-    GameFightFighterInformations(GameFightFighterInformations),
-    GameFightAIInformations(GameFightAIInformations),
-    GameFightMonsterInformations(GameFightMonsterInformations),
-    GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations),
-    GameFightTaxCollectorInformations(GameFightTaxCollectorInformations),
-    GameFightFighterNamedInformations(GameFightFighterNamedInformations),
-    GameFightMutantInformations(GameFightMutantInformations),
-    GameFightCharacterInformations(GameFightCharacterInformations),
-    GameFightEntityInformation(GameFightEntityInformation),
+pub enum PaddockInformationsVariant {
+    PaddockInformations(PaddockInformations),
+    PaddockInstancesInformations(PaddockInstancesInformations),
+    PaddockContentInformations(PaddockContentInformations),
 }
 
-impl Default for GameFightFighterInformationsVariant {
+impl Default for PaddockInformationsVariant {
     fn default() -> Self {
-        Self::GameFightFighterInformations(GameFightFighterInformations::default())
+        Self::PaddockInformations(PaddockInformations::default())
     }
 }
 
-impl GameFightFighterInformationsVariant {
+impl PaddockInformationsVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
-            Self::GameFightFighterInformations(_) => 8400,
-            Self::GameFightAIInformations(_) => 950,
-            Self::GameFightMonsterInformations(_) => 6096,
-            Self::GameFightMonsterWithAlignmentInformations(_) => 1318,
-            Self::GameFightTaxCollectorInformations(_) => 6975,
-            Self::GameFightFighterNamedInformations(_) => 6665,
-            Self::GameFightMutantInformations(_) => 4633,
-            Self::GameFightCharacterInformations(_) => 7807,
-            Self::GameFightEntityInformation(_) => 9631,
+            Self::PaddockInformations(_) => 1824,
+            Self::PaddockInstancesInformations(_) => 4322,
+            Self::PaddockContentInformations(_) => 4735,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
-            8400 => Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?)),
-            950 => Ok(Self::GameFightAIInformations(GameFightAIInformations::deserialize(reader)?)),
-            6096 => Ok(Self::GameFightMonsterInformations(GameFightMonsterInformations::deserialize(reader)?)),
-            1318 => Ok(Self::GameFightMonsterWithAlignmentInformations(GameFightMonsterWithAlignmentInformations::deserialize(reader)?)),
-            6975 => Ok(Self::GameFightTaxCollectorInformations(GameFightTaxCollectorInformations::deserialize(reader)?)),
-            6665 => Ok(Self::GameFightFighterNamedInformations(GameFightFighterNamedInformations::deserialize(reader)?)),
-            4633 => Ok(Self::GameFightMutantInformations(GameFightMutantInformations::deserialize(reader)?)),
-            7807 => Ok(Self::GameFightCharacterInformations(GameFightCharacterInformations::deserialize(reader)?)),
-            9631 => Ok(Self::GameFightEntityInformation(GameFightEntityInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameFightFighterInformations type_id: {}", type_id)),
+            1824 => Ok(Self::PaddockInformations(PaddockInformations::deserialize(reader)?)),
+            4322 => Ok(Self::PaddockInstancesInformations(PaddockInstancesInformations::deserialize(reader)?)),
+            4735 => Ok(Self::PaddockContentInformations(PaddockContentInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown PaddockInformations type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for GameFightFighterInformationsVariant {
+impl DofusSerialize for PaddockInformationsVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
-            Self::GameFightFighterInformations(v) => v.serialize(writer),
-            Self::GameFightAIInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterInformations(v) => v.serialize(writer),
-            Self::GameFightMonsterWithAlignmentInformations(v) => v.serialize(writer),
-            Self::GameFightTaxCollectorInformations(v) => v.serialize(writer),
-            Self::GameFightFighterNamedInformations(v) => v.serialize(writer),
-            Self::GameFightMutantInformations(v) => v.serialize(writer),
-            Self::GameFightCharacterInformations(v) => v.serialize(writer),
-            Self::GameFightEntityInformation(v) => v.serialize(writer),
+            Self::PaddockInformations(v) => v.serialize(writer),
+            Self::PaddockInstancesInformations(v) => v.serialize(writer),
+            Self::PaddockContentInformations(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for GameFightFighterInformationsVariant {
+impl DofusDeserialize for PaddockInformationsVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameFightFighterInformations(GameFightFighterInformations::deserialize(reader)?))
+        Ok(Self::PaddockInformations(PaddockInformations::deserialize(reader)?))
     }
 }
 
-/// Polymorphic enum for GameRolePlayNpcInformations hierarchy
+/// Polymorphic enum for AchievementObjective hierarchy
 #[derive(Debug, Clone)]
-pub enum GameRolePlayNpcInformationsVariant {
-    GameRolePlayNpcInformations(GameRolePlayNpcInformations),
-    GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations),
+pub enum AchievementObjectiveVariant {
+    AchievementObjective(AchievementObjective),
+    AchievementStartedObjective(AchievementStartedObjective),
 }
 
-impl Default for GameRolePlayNpcInformationsVariant {
+impl Default for AchievementObjectiveVariant {
     fn default() -> Self {
-        Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::default())
+        Self::AchievementObjective(AchievementObjective::default())
     }
 }
 
-impl GameRolePlayNpcInformationsVariant {
+impl AchievementObjectiveVariant {
     pub fn get_type_id(&self) -> u16 {
         match self {
-            Self::GameRolePlayNpcInformations(_) => 8307,
-            Self::GameRolePlayNpcWithQuestInformations(_) => 5968,
+            Self::AchievementObjective(_) => 8118,
+            Self::AchievementStartedObjective(_) => 3401,
         }
     }
 
     pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
         match type_id {
-            8307 => Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?)),
-            5968 => Ok(Self::GameRolePlayNpcWithQuestInformations(GameRolePlayNpcWithQuestInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown GameRolePlayNpcInformations type_id: {}", type_id)),
+            8118 => Ok(Self::AchievementObjective(AchievementObjective::deserialize(reader)?)),
+            3401 => Ok(Self::AchievementStartedObjective(AchievementStartedObjective::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown AchievementObjective type_id: {}", type_id)),
         }
     }
 }
 
-impl DofusSerialize for GameRolePlayNpcInformationsVariant {
+impl DofusSerialize for AchievementObjectiveVariant {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         match self {
-            Self::GameRolePlayNpcInformations(v) => v.serialize(writer),
-            Self::GameRolePlayNpcWithQuestInformations(v) => v.serialize(writer),
+            Self::AchievementObjective(v) => v.serialize(writer),
+            Self::AchievementStartedObjective(v) => v.serialize(writer),
         }
     }
 }
 
-impl DofusDeserialize for GameRolePlayNpcInformationsVariant {
+impl DofusDeserialize for AchievementObjectiveVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::GameRolePlayNpcInformations(GameRolePlayNpcInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PrismInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum PrismInformationVariant {
-    PrismInformation(PrismInformation),
-    AlliancePrismInformation(AlliancePrismInformation),
-    AllianceInsiderPrismInformation(AllianceInsiderPrismInformation),
-}
-
-impl Default for PrismInformationVariant {
-    fn default() -> Self {
-        Self::PrismInformation(PrismInformation::default())
-    }
-}
-
-impl PrismInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PrismInformation(_) => 5963,
-            Self::AlliancePrismInformation(_) => 5996,
-            Self::AllianceInsiderPrismInformation(_) => 6982,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5963 => Ok(Self::PrismInformation(PrismInformation::deserialize(reader)?)),
-            5996 => Ok(Self::AlliancePrismInformation(AlliancePrismInformation::deserialize(reader)?)),
-            6982 => Ok(Self::AllianceInsiderPrismInformation(AllianceInsiderPrismInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PrismInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PrismInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PrismInformation(v) => v.serialize(writer),
-            Self::AlliancePrismInformation(v) => v.serialize(writer),
-            Self::AllianceInsiderPrismInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PrismInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PrismInformation(PrismInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for FightResultListEntry hierarchy
-#[derive(Debug, Clone)]
-pub enum FightResultListEntryVariant {
-    FightResultListEntry(FightResultListEntry),
-    FightResultFighterListEntry(FightResultFighterListEntry),
-    FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry),
-    FightResultPlayerListEntry(FightResultPlayerListEntry),
-    FightResultMutantListEntry(FightResultMutantListEntry),
-}
-
-impl Default for FightResultListEntryVariant {
-    fn default() -> Self {
-        Self::FightResultListEntry(FightResultListEntry::default())
-    }
-}
-
-impl FightResultListEntryVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::FightResultListEntry(_) => 5766,
-            Self::FightResultFighterListEntry(_) => 7733,
-            Self::FightResultTaxCollectorListEntry(_) => 6240,
-            Self::FightResultPlayerListEntry(_) => 6765,
-            Self::FightResultMutantListEntry(_) => 6988,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5766 => Ok(Self::FightResultListEntry(FightResultListEntry::deserialize(reader)?)),
-            7733 => Ok(Self::FightResultFighterListEntry(FightResultFighterListEntry::deserialize(reader)?)),
-            6240 => Ok(Self::FightResultTaxCollectorListEntry(FightResultTaxCollectorListEntry::deserialize(reader)?)),
-            6765 => Ok(Self::FightResultPlayerListEntry(FightResultPlayerListEntry::deserialize(reader)?)),
-            6988 => Ok(Self::FightResultMutantListEntry(FightResultMutantListEntry::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown FightResultListEntry type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for FightResultListEntryVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::FightResultListEntry(v) => v.serialize(writer),
-            Self::FightResultFighterListEntry(v) => v.serialize(writer),
-            Self::FightResultTaxCollectorListEntry(v) => v.serialize(writer),
-            Self::FightResultPlayerListEntry(v) => v.serialize(writer),
-            Self::FightResultMutantListEntry(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for FightResultListEntryVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::FightResultListEntry(FightResultListEntry::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PaddockBuyableInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum PaddockBuyableInformationsVariant {
-    PaddockBuyableInformations(PaddockBuyableInformations),
-    PaddockGuildedInformations(PaddockGuildedInformations),
-}
-
-impl Default for PaddockBuyableInformationsVariant {
-    fn default() -> Self {
-        Self::PaddockBuyableInformations(PaddockBuyableInformations::default())
-    }
-}
-
-impl PaddockBuyableInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PaddockBuyableInformations(_) => 4662,
-            Self::PaddockGuildedInformations(_) => 5112,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4662 => Ok(Self::PaddockBuyableInformations(PaddockBuyableInformations::deserialize(reader)?)),
-            5112 => Ok(Self::PaddockGuildedInformations(PaddockGuildedInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PaddockBuyableInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PaddockBuyableInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PaddockBuyableInformations(v) => v.serialize(writer),
-            Self::PaddockGuildedInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PaddockBuyableInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PaddockBuyableInformations(PaddockBuyableInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for ServerSessionConstant hierarchy
-#[derive(Debug, Clone)]
-pub enum ServerSessionConstantVariant {
-    ServerSessionConstant(ServerSessionConstant),
-    ServerSessionConstantString(ServerSessionConstantString),
-    ServerSessionConstantInteger(ServerSessionConstantInteger),
-    ServerSessionConstantLong(ServerSessionConstantLong),
-}
-
-impl Default for ServerSessionConstantVariant {
-    fn default() -> Self {
-        Self::ServerSessionConstant(ServerSessionConstant::default())
-    }
-}
-
-impl ServerSessionConstantVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::ServerSessionConstant(_) => 9452,
-            Self::ServerSessionConstantString(_) => 133,
-            Self::ServerSessionConstantInteger(_) => 292,
-            Self::ServerSessionConstantLong(_) => 2488,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9452 => Ok(Self::ServerSessionConstant(ServerSessionConstant::deserialize(reader)?)),
-            133 => Ok(Self::ServerSessionConstantString(ServerSessionConstantString::deserialize(reader)?)),
-            292 => Ok(Self::ServerSessionConstantInteger(ServerSessionConstantInteger::deserialize(reader)?)),
-            2488 => Ok(Self::ServerSessionConstantLong(ServerSessionConstantLong::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown ServerSessionConstant type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for ServerSessionConstantVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::ServerSessionConstant(v) => v.serialize(writer),
-            Self::ServerSessionConstantString(v) => v.serialize(writer),
-            Self::ServerSessionConstantInteger(v) => v.serialize(writer),
-            Self::ServerSessionConstantLong(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for ServerSessionConstantVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::ServerSessionConstant(ServerSessionConstant::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for PrismSubareaEmptyInfo hierarchy
-#[derive(Debug, Clone)]
-pub enum PrismSubareaEmptyInfoVariant {
-    PrismSubareaEmptyInfo(PrismSubareaEmptyInfo),
-    PrismGeolocalizedInformation(PrismGeolocalizedInformation),
-}
-
-impl Default for PrismSubareaEmptyInfoVariant {
-    fn default() -> Self {
-        Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::default())
-    }
-}
-
-impl PrismSubareaEmptyInfoVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::PrismSubareaEmptyInfo(_) => 9305,
-            Self::PrismGeolocalizedInformation(_) => 8192,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            9305 => Ok(Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::deserialize(reader)?)),
-            8192 => Ok(Self::PrismGeolocalizedInformation(PrismGeolocalizedInformation::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown PrismSubareaEmptyInfo type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for PrismSubareaEmptyInfoVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::PrismSubareaEmptyInfo(v) => v.serialize(writer),
-            Self::PrismGeolocalizedInformation(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for PrismSubareaEmptyInfoVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::PrismSubareaEmptyInfo(PrismSubareaEmptyInfo::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for CharacterRemodelingInformation hierarchy
-#[derive(Debug, Clone)]
-pub enum CharacterRemodelingInformationVariant {
-    CharacterRemodelingInformation(CharacterRemodelingInformation),
-    CharacterToRemodelInformations(CharacterToRemodelInformations),
-}
-
-impl Default for CharacterRemodelingInformationVariant {
-    fn default() -> Self {
-        Self::CharacterRemodelingInformation(CharacterRemodelingInformation::default())
-    }
-}
-
-impl CharacterRemodelingInformationVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::CharacterRemodelingInformation(_) => 2924,
-            Self::CharacterToRemodelInformations(_) => 1292,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            2924 => Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?)),
-            1292 => Ok(Self::CharacterToRemodelInformations(CharacterToRemodelInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown CharacterRemodelingInformation type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for CharacterRemodelingInformationVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::CharacterRemodelingInformation(v) => v.serialize(writer),
-            Self::CharacterToRemodelInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for CharacterRemodelingInformationVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::CharacterRemodelingInformation(CharacterRemodelingInformation::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for BasicGuildInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum BasicGuildInformationsVariant {
-    BasicGuildInformations(BasicGuildInformations),
-    GuildInformations(GuildInformations),
-    AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations),
-    GuildFactSheetInformations(GuildFactSheetInformations),
-    GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations),
-    GuildInAllianceInformations(GuildInAllianceInformations),
-}
-
-impl Default for BasicGuildInformationsVariant {
-    fn default() -> Self {
-        Self::BasicGuildInformations(BasicGuildInformations::default())
-    }
-}
-
-impl BasicGuildInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::BasicGuildInformations(_) => 492,
-            Self::GuildInformations(_) => 6928,
-            Self::AlliancedGuildFactSheetInformations(_) => 920,
-            Self::GuildFactSheetInformations(_) => 5100,
-            Self::GuildInsiderFactSheetInformations(_) => 6301,
-            Self::GuildInAllianceInformations(_) => 8268,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            492 => Ok(Self::BasicGuildInformations(BasicGuildInformations::deserialize(reader)?)),
-            6928 => Ok(Self::GuildInformations(GuildInformations::deserialize(reader)?)),
-            920 => Ok(Self::AlliancedGuildFactSheetInformations(AlliancedGuildFactSheetInformations::deserialize(reader)?)),
-            5100 => Ok(Self::GuildFactSheetInformations(GuildFactSheetInformations::deserialize(reader)?)),
-            6301 => Ok(Self::GuildInsiderFactSheetInformations(GuildInsiderFactSheetInformations::deserialize(reader)?)),
-            8268 => Ok(Self::GuildInAllianceInformations(GuildInAllianceInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown BasicGuildInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for BasicGuildInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::BasicGuildInformations(v) => v.serialize(writer),
-            Self::GuildInformations(v) => v.serialize(writer),
-            Self::AlliancedGuildFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildInsiderFactSheetInformations(v) => v.serialize(writer),
-            Self::GuildInAllianceInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for BasicGuildInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::BasicGuildInformations(BasicGuildInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for SkillActionDescription hierarchy
-#[derive(Debug, Clone)]
-pub enum SkillActionDescriptionVariant {
-    SkillActionDescription(SkillActionDescription),
-    SkillActionDescriptionTimed(SkillActionDescriptionTimed),
-    SkillActionDescriptionCollect(SkillActionDescriptionCollect),
-    SkillActionDescriptionCraft(SkillActionDescriptionCraft),
-}
-
-impl Default for SkillActionDescriptionVariant {
-    fn default() -> Self {
-        Self::SkillActionDescription(SkillActionDescription::default())
-    }
-}
-
-impl SkillActionDescriptionVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::SkillActionDescription(_) => 4405,
-            Self::SkillActionDescriptionTimed(_) => 263,
-            Self::SkillActionDescriptionCollect(_) => 6581,
-            Self::SkillActionDescriptionCraft(_) => 8967,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            4405 => Ok(Self::SkillActionDescription(SkillActionDescription::deserialize(reader)?)),
-            263 => Ok(Self::SkillActionDescriptionTimed(SkillActionDescriptionTimed::deserialize(reader)?)),
-            6581 => Ok(Self::SkillActionDescriptionCollect(SkillActionDescriptionCollect::deserialize(reader)?)),
-            8967 => Ok(Self::SkillActionDescriptionCraft(SkillActionDescriptionCraft::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown SkillActionDescription type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for SkillActionDescriptionVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::SkillActionDescription(v) => v.serialize(writer),
-            Self::SkillActionDescriptionTimed(v) => v.serialize(writer),
-            Self::SkillActionDescriptionCollect(v) => v.serialize(writer),
-            Self::SkillActionDescriptionCraft(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for SkillActionDescriptionVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::SkillActionDescription(SkillActionDescription::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for HumanInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum HumanInformationsVariant {
-    HumanInformations(HumanInformations),
-}
-
-impl Default for HumanInformationsVariant {
-    fn default() -> Self {
-        Self::HumanInformations(HumanInformations::default())
-    }
-}
-
-impl HumanInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::HumanInformations(_) => 5831,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5831 => Ok(Self::HumanInformations(HumanInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown HumanInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for HumanInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::HumanInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for HumanInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::HumanInformations(HumanInformations::deserialize(reader)?))
-    }
-}
-
-/// Polymorphic enum for TaxCollectorInformations hierarchy
-#[derive(Debug, Clone)]
-pub enum TaxCollectorInformationsVariant {
-    TaxCollectorInformations(TaxCollectorInformations),
-}
-
-impl Default for TaxCollectorInformationsVariant {
-    fn default() -> Self {
-        Self::TaxCollectorInformations(TaxCollectorInformations::default())
-    }
-}
-
-impl TaxCollectorInformationsVariant {
-    pub fn get_type_id(&self) -> u16 {
-        match self {
-            Self::TaxCollectorInformations(_) => 5151,
-        }
-    }
-
-    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
-        match type_id {
-            5151 => Ok(Self::TaxCollectorInformations(TaxCollectorInformations::deserialize(reader)?)),
-            _ => Err(anyhow::anyhow!("Unknown TaxCollectorInformations type_id: {}", type_id)),
-        }
-    }
-}
-
-impl DofusSerialize for TaxCollectorInformationsVariant {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        match self {
-            Self::TaxCollectorInformations(v) => v.serialize(writer),
-        }
-    }
-}
-
-impl DofusDeserialize for TaxCollectorInformationsVariant {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self::TaxCollectorInformations(TaxCollectorInformations::deserialize(reader)?))
+        Ok(Self::AchievementObjective(AchievementObjective::deserialize(reader)?))
     }
 }
 
@@ -5187,6 +5105,47 @@ impl DofusDeserialize for PortalInformationVariant {
     }
 }
 
+/// Polymorphic enum for TaxCollectorInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum TaxCollectorInformationsVariant {
+    TaxCollectorInformations(TaxCollectorInformations),
+}
+
+impl Default for TaxCollectorInformationsVariant {
+    fn default() -> Self {
+        Self::TaxCollectorInformations(TaxCollectorInformations::default())
+    }
+}
+
+impl TaxCollectorInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::TaxCollectorInformations(_) => 5151,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5151 => Ok(Self::TaxCollectorInformations(TaxCollectorInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown TaxCollectorInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for TaxCollectorInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::TaxCollectorInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for TaxCollectorInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::TaxCollectorInformations(TaxCollectorInformations::deserialize(reader)?))
+    }
+}
+
 /// Polymorphic enum for AllianceFactSheetInformations hierarchy
 #[derive(Debug, Clone)]
 pub enum AllianceFactSheetInformationsVariant {
@@ -5225,6 +5184,47 @@ impl DofusSerialize for AllianceFactSheetInformationsVariant {
 impl DofusDeserialize for AllianceFactSheetInformationsVariant {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self::AllianceFactSheetInformations(AllianceFactSheetInformations::deserialize(reader)?))
+    }
+}
+
+/// Polymorphic enum for HumanInformations hierarchy
+#[derive(Debug, Clone)]
+pub enum HumanInformationsVariant {
+    HumanInformations(HumanInformations),
+}
+
+impl Default for HumanInformationsVariant {
+    fn default() -> Self {
+        Self::HumanInformations(HumanInformations::default())
+    }
+}
+
+impl HumanInformationsVariant {
+    pub fn get_type_id(&self) -> u16 {
+        match self {
+            Self::HumanInformations(_) => 5831,
+        }
+    }
+
+    pub fn deserialize_with_id(type_id: u16, reader: &mut BigEndianReader) -> Result<Self> {
+        match type_id {
+            5831 => Ok(Self::HumanInformations(HumanInformations::deserialize(reader)?)),
+            _ => Err(anyhow::anyhow!("Unknown HumanInformations type_id: {}", type_id)),
+        }
+    }
+}
+
+impl DofusSerialize for HumanInformationsVariant {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        match self {
+            Self::HumanInformations(v) => v.serialize(writer),
+        }
+    }
+}
+
+impl DofusDeserialize for HumanInformationsVariant {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self::HumanInformations(HumanInformations::deserialize(reader)?))
     }
 }
 

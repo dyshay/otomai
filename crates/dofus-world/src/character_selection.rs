@@ -106,6 +106,11 @@ pub async fn handle_characters_list_request(
     tracing::debug!(account_id, count = base_infos.len(), "Sending characters list");
 
     let payload = build_characters_list_payload(&base_infos, false);
+    tracing::debug!(
+        payload_len = payload.len(),
+        first_bytes = ?&payload[..payload.len().min(40)],
+        "CharactersListMessage payload"
+    );
     session
         .send_raw(RawMessage {
             message_id: CharactersListMessage::MESSAGE_ID,

@@ -3,3 +3,5 @@ port = 5556
 server_id = 1
 server_name = "Jiva"
 database_url = "postgresql://dofus:dofus@localhost:5433/otomai"
+protocol_version = "1.0.1-ad7c4fd"
+maps_dir = "/Users/dys/Projects/DofusClient/original-client/dofus/5.0_2.57.1.1/darwin/main/Dofus.app/Contents/Resources/content/maps"

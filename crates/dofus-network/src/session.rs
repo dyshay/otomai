@@ -56,6 +56,11 @@ impl Session {
 
     /// Send a raw message directly.
     pub async fn send_raw(&mut self, raw: RawMessage) -> anyhow::Result<()> {
+        tracing::debug!(
+            message_id = raw.message_id,
+            payload_len = raw.payload.len(),
+            "Sending raw message"
+        );
         self.framed.send(raw).await?;
         Ok(())
     }

@@ -34,7 +34,6 @@ pub struct ActorRestrictionsInformations {
 
 impl DofusSerialize for ActorRestrictionsInformations {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        // Byte 0: bits 0-7
         let mut _flag0: u8 = 0;
         _flag0 = boolean_byte_wrapper::set_flag(_flag0, 0, self.cant_be_aggressed).unwrap();
         _flag0 = boolean_byte_wrapper::set_flag(_flag0, 1, self.cant_be_challenged).unwrap();
@@ -45,7 +44,6 @@ impl DofusSerialize for ActorRestrictionsInformations {
         _flag0 = boolean_byte_wrapper::set_flag(_flag0, 6, self.cant_minimize).unwrap();
         _flag0 = boolean_byte_wrapper::set_flag(_flag0, 7, self.cant_move).unwrap();
         writer.write_byte(_flag0);
-        // Byte 1: bits 8-15
         let mut _flag1: u8 = 0;
         _flag1 = boolean_byte_wrapper::set_flag(_flag1, 0, self.cant_aggress).unwrap();
         _flag1 = boolean_byte_wrapper::set_flag(_flag1, 1, self.cant_challenge).unwrap();
@@ -56,7 +54,6 @@ impl DofusSerialize for ActorRestrictionsInformations {
         _flag1 = boolean_byte_wrapper::set_flag(_flag1, 6, self.cant_use_object).unwrap();
         _flag1 = boolean_byte_wrapper::set_flag(_flag1, 7, self.cant_use_tax_collector).unwrap();
         writer.write_byte(_flag1);
-        // Byte 2: bits 16-20
         let mut _flag2: u8 = 0;
         _flag2 = boolean_byte_wrapper::set_flag(_flag2, 0, self.cant_use_interactive).unwrap();
         _flag2 = boolean_byte_wrapper::set_flag(_flag2, 1, self.cant_speak_to_n_p_c).unwrap();

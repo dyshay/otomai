@@ -7,6 +7,7 @@ pub struct AuthConfig {
     pub port: u16,
     pub database_url: String,
     pub rsa_private_key_path: String,
+    #[serde(default = "default_protocol_version")]
     pub protocol_version: String,
 }
 

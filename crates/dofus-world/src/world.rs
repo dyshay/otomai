@@ -152,6 +152,10 @@ impl World {
 /// Build a GameRolePlayShowActorMessage (ID 3267) as raw bytes.
 /// The message contains a polymorphic actor — we write the TYPE_ID prefix
 /// for GameRolePlayCharacterInformations (5268).
+pub fn build_show_actor_raw_msg(player: &MapPlayer) -> RawMessage {
+    build_show_actor_raw(player)
+}
+
 fn build_show_actor_raw(player: &MapPlayer) -> RawMessage {
     let info = build_character_informations(player);
     let mut w = BigEndianWriter::new();

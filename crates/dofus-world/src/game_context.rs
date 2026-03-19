@@ -157,7 +157,7 @@ pub async fn handle_game_context_create(
     session
         .send(&CurrentMapMessage {
             map_id: map_id_f64,
-            map_key: String::new(),
+            map_key: "649ae451ca33ec53bbcbcc33becf15f4".to_string(),
         })
         .await?;
 
@@ -190,8 +190,9 @@ pub async fn handle_game_context_create(
     // Load NPC actors for this map
     let npc_actors = build_npc_actors_for_map(state, character.id, map_id).await;
 
-    // 3. MapComplementaryInformationsDataMessage — unblocks loading screen
-    let payload = build_map_complementary_payload(sub_area_id, map_id_f64, &players, &npc_actors);
+    // 3. MapComplementaryInformationsDataMessage — send with empty actors
+    //    then add player via ShowActorMessage (more reliable serialization)
+    let payload = build_map_complementary_payload(sub_area_id, map_id_f64, &[], &npc_actors);
     session
         .send_raw(RawMessage {
             message_id: MAP_COMPLEMENTARY_MSG_ID,
@@ -232,6 +233,15 @@ pub async fn handle_game_context_create(
             experience_percent: 100,
         })
         .await?;
+
+    // 11. Send the player's own actor via GameRolePlayShowActorMessage
+    //     This uses the auto-generated serialization which is more reliable
+    //     than embedding actors in MapComplementary
+    let player_on_map = players.iter().find(|p| p.character_id == character.id);
+    if let Some(player) = player_on_map {
+        let show_raw = world::build_show_actor_raw_msg(player);
+        session.send_raw(show_raw).await?;
+    }
 
     tracing::info!(
         character_id = character.id,
