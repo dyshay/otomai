@@ -6,8 +6,14 @@ use dofus_protocol::generated::types::{
 };
 use dofus_protocol::messages::game::*;
 
-/// Base HP by breed at level 1.
+/// Base HP at level 1.
 const BASE_HP: i32 = 50;
+
+/// Calculate max HP for a character.
+pub fn base_hp(c: &Character) -> i32 {
+    let vitality = c.stats.get("vitality").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+    BASE_HP + (c.level as i32 - 1) * 5 + vitality
+}
 
 /// XP thresholds for levels 1 and 2 (level floor / next floor).
 const LEVEL_1_XP: i64 = 0;

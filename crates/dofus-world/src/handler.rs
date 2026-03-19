@@ -1,4 +1,4 @@
-use crate::{character_selection, chat, emotes, game_context, movement, npc, quests, social, ticket, WorldState};
+use crate::{character_selection, chat, emotes, fight, game_context, movement, npc, quests, social, ticket, WorldState};
 use dofus_database::repository;
 use dofus_io::DofusMessage as _;
 use dofus_protocol::messages::auth::ProtocolRequired;
@@ -47,6 +47,7 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     let mut current_map_id: Option<i64> = None;
     let mut current_movement: Option<movement::MovementState> = None;
     let mut current_dialog: Option<npc::NpcDialogState> = None;
+    let mut current_fight: Option<fight::state::Fight> = None;
 
     let (broadcast_tx, mut broadcast_rx) = crate::world::new_broadcast_channel();
 
@@ -228,6 +229,90 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                         if current_dialog.is_some() {
                             session.send(&LeaveDialogMessage { dialog_type: 2 }).await?;
                             current_dialog = None;
+                        }
+                    }
+
+                    // Combat
+                    Ok(ProtocolMessage::GameRolePlayAttackMonsterRequestMessage(msg)) => {
+                        if let Some(char_id) = current_character_id {
+                            if let Some(map_id) = current_map_id {
+                                if let Some(character) = repository::get_character(&state.pool, char_id).await? {
+                                    current_fight = fight::start_pve_fight(
+                                        &mut session, &state, &character,
+                                        map_id, msg.monster_group_id, &broadcast_tx,
+                                    ).await?;
+                                }
+                            }
+                        }
+                    }
+                    Ok(ProtocolMessage::GameFightReadyMessage(_)) => {
+                        if let Some(ref mut f) = current_fight {
+                            if let Some(char_id) = current_character_id {
+                                fight::handle_fight_ready(&mut session, f, char_id as f64).await?;
+                            }
+                        }
+                    }
+                    Ok(ProtocolMessage::GameFightTurnFinishMessage(_)) => {
+                        if let Some(ref mut f) = current_fight {
+                            fight::turns::handle_turn_finish(&mut session, f).await?;
+
+                            // Check if fight ended
+                            if f.phase == fight::state::FightPhase::Ended {
+                                let won = f.challengers_won();
+                                let map_id = f.map_id;
+                                let duration = 0i32; // simplified
+
+                                // Send fight end
+                                session.send(&GameFightEndMessage {
+                                    duration,
+                                    reward_rate: 100,
+                                    loot_share_limit_malus: 0,
+                                    results: vec![],
+                                    named_party_teams_outcomes: vec![],
+                                }).await?;
+
+                                // Return to roleplay context
+                                session.send(&GameContextDestroyMessage {}).await?;
+                                session.send(&GameContextCreateMessage { context: 1 }).await?;
+
+                                // Re-join map
+                                if let Some(char_id) = current_character_id {
+                                    if let Some(character) = repository::get_character(&state.pool, char_id).await? {
+                                        game_context::handle_game_context_create(
+                                            &mut session, &state, &character, &broadcast_tx,
+                                        ).await?;
+                                        current_map_id = Some(map_id);
+
+                                        if won {
+                                            // Award XP
+                                            let xp_gained = 50 * character.level as i64;
+                                            let new_xp = character.experience + xp_gained;
+                                            let _ = sqlx::query("UPDATE characters SET experience = $2 WHERE id = $1")
+                                                .bind(char_id)
+                                                .bind(new_xp)
+                                                .execute(&state.pool)
+                                                .await;
+                                            session.send(&CharacterExperienceGainMessage {
+                                                experience_character: xp_gained,
+                                                experience_mount: 0,
+                                                experience_guild: 0,
+                                                experience_incarnation: 0,
+                                            }).await?;
+                                        }
+                                    }
+                                }
+                                current_fight = None;
+                            }
+                        }
+                    }
+                    Ok(ProtocolMessage::GameActionFightSpellCastMessage(msg)) => {
+                        if let Some(ref mut f) = current_fight {
+                            if let Some(char_id) = current_character_id {
+                                fight::spells::handle_spell_cast(
+                                    &mut session, f, char_id as f64,
+                                    msg.spell_id, msg.destination_cell_id,
+                                ).await?;
+                            }
                         }
                     }
 

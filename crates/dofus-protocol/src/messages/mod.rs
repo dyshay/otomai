@@ -17,6 +17,10 @@ pub mod game {
     pub use crate::generated::messages::game_context_roleplay_npc::*;
     pub use crate::generated::messages::game_context_roleplay_quest::*;
     pub use crate::generated::messages::game_dialog::*;
+    pub use crate::generated::messages::game_actions_fight::*;
+    pub use crate::generated::messages::game_actions_sequence::*;
+    pub use crate::generated::messages::game_context_fight::*;
+    pub use crate::generated::messages::game_context_roleplay_fight::*;
     pub use crate::generated::messages::game_friend::*;
     pub use crate::generated::messages::game_initialization::*;
     pub use crate::generated::messages::game_inventory_items::*;

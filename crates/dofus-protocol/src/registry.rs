@@ -108,6 +108,27 @@ protocol_registry! {
     QuestObjectiveValidatedMessage(game::QuestObjectiveValidatedMessage),
     QuestStepValidatedMessage(game::QuestStepValidatedMessage),
     QuestValidatedMessage(game::QuestValidatedMessage),
+    // Phase 5 — Combat PvE
+    GameRolePlayAttackMonsterRequestMessage(game::GameRolePlayAttackMonsterRequestMessage),
+    GameFightStartingMessage(game::GameFightStartingMessage),
+    GameFightJoinMessage(game::GameFightJoinMessage),
+    GameFightStartMessage(game::GameFightStartMessage),
+    GameFightEndMessage(game::GameFightEndMessage),
+    GameFightReadyMessage(game::GameFightReadyMessage),
+    GameFightPlacementPossiblePositionsMessage(game::GameFightPlacementPossiblePositionsMessage),
+    GameFightPlacementPositionRequestMessage(game::GameFightPlacementPositionRequestMessage),
+    GameFightTurnStartMessage(game::GameFightTurnStartMessage),
+    GameFightTurnEndMessage(game::GameFightTurnEndMessage),
+    GameFightTurnReadyMessage(game::GameFightTurnReadyMessage),
+    GameFightTurnFinishMessage(game::GameFightTurnFinishMessage),
+    GameFightNewRoundMessage(game::GameFightNewRoundMessage),
+    GameFightLeaveMessage(game::GameFightLeaveMessage),
+    GameActionFightSpellCastMessage(game::GameActionFightSpellCastMessage),
+    GameActionFightDeathMessage(game::GameActionFightDeathMessage),
+    GameActionFightLifePointsLostMessage(game::GameActionFightLifePointsLostMessage),
+    GameActionFightPointsVariationMessage(game::GameActionFightPointsVariationMessage),
+    SequenceStartMessage(game::SequenceStartMessage),
+    SequenceEndMessage(game::SequenceEndMessage),
 }
 
 #[cfg(test)]

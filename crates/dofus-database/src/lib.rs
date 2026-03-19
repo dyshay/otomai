@@ -174,6 +174,21 @@ pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     .execute(pool)
     .await?;
 
+    // --- Monster tables ---
+
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS monster_spawns (
+            id SERIAL PRIMARY KEY,
+            map_id BIGINT NOT NULL,
+            monster_group JSONB NOT NULL DEFAULT '[]',
+            cell_id INT NOT NULL DEFAULT 0
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
     // --- Game data tables ---
 
     // D2O objects (Items, Spells, Monsters, etc.)
