@@ -9,8 +9,33 @@ use dofus_protocol::generated::types::EntityLook;
 use dofus_protocol::messages::game::*;
 use std::sync::Arc;
 
+/// Breed skin IDs — maps (breed_id, sex) to the base skin.
+/// From the Breed D2O data (maleLook/femaleLook fields).
+/// Format: BREED_SKINS[breed_id - 1] = (male_skin, female_skin)
+const BREED_SKINS: [(i16, i16); 18] = [
+    (10, 20),   // 1  Feca
+    (30, 40),   // 2  Osamodas
+    (50, 60),   // 3  Enutrof
+    (70, 80),   // 4  Sram
+    (90, 100),  // 5  Xelor
+    (110, 120), // 6  Ecaflip
+    (130, 140), // 7  Eniripsa
+    (150, 160), // 8  Iop
+    (170, 180), // 9  Cra
+    (190, 200), // 10 Sadida
+    (210, 220), // 11 Sacrieur
+    (230, 240), // 12 Pandawa
+    (250, 260), // 13 Roublard
+    (270, 280), // 14 Zobal
+    (290, 300), // 15 Steamer (Foggernauts)
+    (310, 320), // 16 Eliotrope
+    (330, 340), // 17 Huppermage
+    (350, 360), // 18 Ouginak
+];
+
 /// Build a CharacterBaseInformations from a DB Character.
 fn character_to_base_info(c: &Character) -> CharacterBaseInformations {
+    // Encode colors as indexed_colors: (colorIndex << 24) | (rgb & 0xFFFFFF)
     let indexed_colors: Vec<i32> = c
         .colors
         .as_array()
@@ -26,8 +51,16 @@ fn character_to_base_info(c: &Character) -> CharacterBaseInformations {
         })
         .unwrap_or_default();
 
-    let bones_id: i16 = 1;
-    let skin_id: i16 = (c.breed_id * 10 + c.sex + 1) as i16;
+    // bonesId: 1 = male, 2 = female
+    let bones_id: i16 = if c.sex == 0 { 1 } else { 2 };
+
+    // Breed-specific skin
+    let breed_idx = (c.breed_id as usize).saturating_sub(1).min(BREED_SKINS.len() - 1);
+    let skin_id = if c.sex == 0 {
+        BREED_SKINS[breed_idx].0
+    } else {
+        BREED_SKINS[breed_idx].1
+    };
 
     CharacterBaseInformations {
         id: c.id,
@@ -37,7 +70,7 @@ fn character_to_base_info(c: &Character) -> CharacterBaseInformations {
             bones_id,
             skins: vec![skin_id],
             indexed_colors,
-            scales: vec![125],
+            scales: vec![100], // 100 = 1.0x scale
             subentities: vec![],
         },
         breed: c.breed_id as u8,
