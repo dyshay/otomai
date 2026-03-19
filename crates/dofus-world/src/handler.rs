@@ -1,4 +1,4 @@
-use crate::{character_selection, chat, emotes, game_context, movement, social, ticket, WorldState};
+use crate::{character_selection, chat, emotes, game_context, movement, npc, quests, social, ticket, WorldState};
 use dofus_database::repository;
 use dofus_io::DofusMessage as _;
 use dofus_protocol::messages::auth::ProtocolRequired;
@@ -46,6 +46,7 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     let mut current_character_name: Option<String> = None;
     let mut current_map_id: Option<i64> = None;
     let mut current_movement: Option<movement::MovementState> = None;
+    let mut current_dialog: Option<npc::NpcDialogState> = None;
 
     let (broadcast_tx, mut broadcast_rx) = crate::world::new_broadcast_channel();
 
@@ -131,6 +132,9 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                                         map_id, msg.map_id as i64, &broadcast_tx,
                                     ).await? {
                                         current_map_id = Some(new_map_id);
+                                        quests::check_map_objectives(
+                                            &mut session, &state, char_id, new_map_id,
+                                        ).await?;
                                     }
                                 }
                             }
@@ -195,6 +199,43 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                     }
                     Ok(ProtocolMessage::IgnoredDeleteRequestMessage(msg)) => {
                         social::handle_ignored_delete(&mut session, &state, account_id, msg.account_id).await?;
+                    }
+
+                    // NPCs + Dialogues
+                    Ok(ProtocolMessage::NpcGenericActionRequestMessage(msg)) => {
+                        if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
+                            current_dialog = npc::handle_npc_action(
+                                &mut session, &state, char_id, map_id, &msg,
+                            ).await?;
+                        }
+                    }
+                    Ok(ProtocolMessage::NpcDialogReplyMessage(msg)) => {
+                        if let (Some(char_id), Some(ref mut dialog)) = (current_character_id, &mut current_dialog) {
+                            let continues = npc::handle_npc_dialog_reply(
+                                &mut session, &state, char_id, dialog, msg.reply_id,
+                            ).await?;
+                            if !continues {
+                                // Dialogue ended — check quest objectives
+                                let npc_id = dialog.npc_id;
+                                current_dialog = None;
+                                quests::check_talk_to_npc_objective(
+                                    &mut session, &state, char_id, npc_id,
+                                ).await?;
+                            }
+                        }
+                    }
+                    Ok(ProtocolMessage::LeaveDialogRequestMessage(_)) => {
+                        if current_dialog.is_some() {
+                            session.send(&LeaveDialogMessage { dialog_type: 2 }).await?;
+                            current_dialog = None;
+                        }
+                    }
+
+                    // Quests
+                    Ok(ProtocolMessage::QuestListRequestMessage(_)) => {
+                        if let Some(char_id) = current_character_id {
+                            quests::handle_quest_list(&mut session, &state, char_id).await?;
+                        }
                     }
 
                     Ok(msg) => {

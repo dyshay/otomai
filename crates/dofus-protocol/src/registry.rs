@@ -94,6 +94,20 @@ protocol_registry! {
     IgnoredGetListMessage(game::IgnoredGetListMessage),
     IgnoredAddRequestMessage(game::IgnoredAddRequestMessage),
     IgnoredDeleteRequestMessage(game::IgnoredDeleteRequestMessage),
+    // Phase 4 — NPCs + Dialogues + Quests
+    NpcGenericActionRequestMessage(game::NpcGenericActionRequestMessage),
+    NpcDialogCreationMessage(game::NpcDialogCreationMessage),
+    NpcDialogQuestionMessage(game::NpcDialogQuestionMessage),
+    NpcDialogReplyMessage(game::NpcDialogReplyMessage),
+    LeaveDialogRequestMessage(game::LeaveDialogRequestMessage),
+    LeaveDialogMessage(game::LeaveDialogMessage),
+    QuestListRequestMessage(game::QuestListRequestMessage),
+    QuestListMessage(game::QuestListMessage),
+    QuestStartedMessage(game::QuestStartedMessage),
+    QuestStepStartedMessage(game::QuestStepStartedMessage),
+    QuestObjectiveValidatedMessage(game::QuestObjectiveValidatedMessage),
+    QuestStepValidatedMessage(game::QuestStepValidatedMessage),
+    QuestValidatedMessage(game::QuestValidatedMessage),
 }
 
 #[cfg(test)]

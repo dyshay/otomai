@@ -1,7 +1,8 @@
+use crate::npc;
 use crate::world::{self, MapPlayer, World};
-use crate::{inventory, spells, stats, WorldState};
+use crate::{inventory, quests, spells, stats, WorldState};
 use dofus_database::models::Character;
-use dofus_io::{BigEndianWriter, DofusMessage};
+use dofus_io::{BigEndianWriter, DofusMessage, DofusSerialize, DofusType};
 use dofus_network::codec::RawMessage;
 use dofus_network::session::Session;
 use dofus_protocol::generated::types::ActorRestrictionsInformations;
@@ -72,15 +73,53 @@ pub fn build_entity_look(c: &Character) -> EntityLook {
     }
 }
 
+use dofus_database::repository;
+use dofus_protocol::generated::types::GameRolePlayNpcWithQuestInformations;
+
+/// Load and build NPC actors for a map, computing quest flags per player.
+pub async fn build_npc_actors_for_map(
+    state: &Arc<WorldState>,
+    character_id: i64,
+    map_id: i64,
+) -> Vec<GameRolePlayNpcWithQuestInformations> {
+    let spawns = match repository::list_npc_spawns_for_map(&state.pool, map_id).await {
+        Ok(s) => s,
+        Err(_) => return vec![],
+    };
+
+    let mut actors = Vec::with_capacity(spawns.len());
+    for spawn in &spawns {
+        let look = npc::get_npc_look(state, spawn.npc_id, &spawn.look).await;
+        let (to_start, to_valid) =
+            quests::compute_npc_quest_flags(state, character_id, spawn.npc_id).await;
+        actors.push(npc::build_npc_actor(spawn, &look, to_start, to_valid));
+    }
+    actors
+}
+
 /// Build MapComplementaryInformationsDataMessage payload with actors.
-pub fn build_map_complementary_payload(sub_area_id: i16, map_id: f64, players: &[MapPlayer]) -> Vec<u8> {
+pub fn build_map_complementary_payload(
+    sub_area_id: i16,
+    map_id: f64,
+    players: &[MapPlayer],
+    npcs: &[GameRolePlayNpcWithQuestInformations],
+) -> Vec<u8> {
     let mut w = BigEndianWriter::new();
     w.write_var_short(sub_area_id);
     w.write_double(map_id);
     w.write_short(0); // houses (count=0)
 
-    // actors — polymorphic vector with player informations
-    world::write_actors(&mut w, players);
+    // actors — total count includes players + NPCs
+    let total_actors = players.len() + npcs.len();
+    w.write_short(total_actors as i16);
+    // Write player actors
+    for player in players {
+        let info = world::build_character_informations(player);
+        w.write_ushort(dofus_protocol::generated::types::GameRolePlayCharacterInformations::TYPE_ID);
+        info.serialize(&mut w);
+    }
+    // Write NPC actors
+    npc::write_npc_actors(&mut w, npcs);
 
     w.write_short(0); // interactiveElements (count=0)
     w.write_short(0); // statedElements (count=0)
@@ -148,8 +187,11 @@ pub async fn handle_game_context_create(
         .map(|m| m.sub_area_id as i16)
         .unwrap_or(DEFAULT_SUB_AREA_ID);
 
+    // Load NPC actors for this map
+    let npc_actors = build_npc_actors_for_map(state, character.id, map_id).await;
+
     // 3. MapComplementaryInformationsDataMessage — unblocks loading screen
-    let payload = build_map_complementary_payload(sub_area_id, map_id_f64, &players);
+    let payload = build_map_complementary_payload(sub_area_id, map_id_f64, &players, &npc_actors);
     session
         .send_raw(RawMessage {
             message_id: MAP_COMPLEMENTARY_MSG_ID,
@@ -264,7 +306,7 @@ mod tests {
 
     #[test]
     fn map_complementary_empty_is_valid() {
-        let data = build_map_complementary_payload(449, 154010883.0, &[]);
+        let data = build_map_complementary_payload(449, 154010883.0, &[], &[]);
         let mut r = BigEndianReader::new(data);
 
         let sub_area = r.read_var_short().unwrap();
@@ -317,7 +359,7 @@ mod tests {
             tx,
         };
 
-        let data = build_map_complementary_payload(449, 154010883.0, &[player]);
+        let data = build_map_complementary_payload(449, 154010883.0, &[player], &[]);
         let mut r = BigEndianReader::new(data);
 
         let _sub_area = r.read_var_short().unwrap();

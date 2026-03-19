@@ -6,6 +6,8 @@ mod handler;
 mod inventory;
 pub mod map_cache;
 mod movement;
+mod npc;
+mod quests;
 mod social;
 mod spells;
 mod stats;

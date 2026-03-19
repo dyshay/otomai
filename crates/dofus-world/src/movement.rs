@@ -315,10 +315,14 @@ pub async fn handle_change_map(
         .map(|m| m.sub_area_id as i16)
         .unwrap_or(449);
 
+    let npc_actors = crate::game_context::build_npc_actors_for_map(
+        state, character.id, target_map_id,
+    ).await;
     let payload = crate::game_context::build_map_complementary_payload(
         sub_area_id,
         target_map_id as f64,
         &players,
+        &npc_actors,
     );
     session
         .send_raw(RawMessage {

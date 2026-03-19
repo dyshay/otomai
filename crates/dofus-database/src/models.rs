@@ -62,6 +62,27 @@ pub struct Spell {
     pub position: i32,
 }
 
+#[derive(Debug, Clone, FromRow)]
+pub struct NpcSpawn {
+    pub id: i32,
+    pub npc_id: i32,
+    pub map_id: i64,
+    pub cell_id: i32,
+    pub direction: i32,
+    pub look: String,
+}
+
+#[derive(Debug, Clone, FromRow)]
+pub struct CharacterQuest {
+    pub character_id: i64,
+    pub quest_id: i32,
+    pub step_id: i32,
+    pub status: i32, // 0=active, 1=completed
+    pub objectives: JsonValue,
+    pub started_at: DateTime<Utc>,
+    pub completed_at: Option<DateTime<Utc>>,
+}
+
 #[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
 pub struct GameData {
     pub file_name: String,

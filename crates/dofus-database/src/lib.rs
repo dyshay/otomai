@@ -140,6 +140,40 @@ pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     .execute(pool)
     .await?;
 
+    // --- NPC + Quest tables ---
+
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS npc_spawns (
+            id SERIAL PRIMARY KEY,
+            npc_id INT NOT NULL,
+            map_id BIGINT NOT NULL,
+            cell_id INT NOT NULL,
+            direction INT NOT NULL DEFAULT 3,
+            look TEXT NOT NULL DEFAULT ''
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS character_quests (
+            character_id BIGINT NOT NULL REFERENCES characters(id),
+            quest_id INT NOT NULL,
+            step_id INT NOT NULL,
+            status INT NOT NULL DEFAULT 0,
+            objectives JSONB NOT NULL DEFAULT '[]',
+            started_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMPTZ,
+            PRIMARY KEY (character_id, quest_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
     // --- Game data tables ---
 
     // D2O objects (Items, Spells, Monsters, etc.)

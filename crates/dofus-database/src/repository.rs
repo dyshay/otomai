@@ -1,4 +1,4 @@
-use crate::models::{Account, Character, GameData, Server, Spell, Ticket};
+use crate::models::{Account, Character, CharacterQuest, GameData, NpcSpawn, Server, Spell, Ticket};
 use sqlx::PgPool;
 
 // --- Accounts ---
@@ -525,6 +525,119 @@ pub async fn remove_ignored(
     )
     .bind(account_id)
     .bind(ignored_account_id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+// --- NPC Spawns ---
+
+pub async fn list_npc_spawns_for_map(
+    pool: &PgPool,
+    map_id: i64,
+) -> anyhow::Result<Vec<NpcSpawn>> {
+    let spawns = sqlx::query_as::<_, NpcSpawn>(
+        "SELECT * FROM npc_spawns WHERE map_id = $1",
+    )
+    .bind(map_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(spawns)
+}
+
+// --- Character Quests ---
+
+pub async fn get_character_quests(
+    pool: &PgPool,
+    character_id: i64,
+) -> anyhow::Result<Vec<CharacterQuest>> {
+    let quests = sqlx::query_as::<_, CharacterQuest>(
+        "SELECT * FROM character_quests WHERE character_id = $1 ORDER BY quest_id",
+    )
+    .bind(character_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(quests)
+}
+
+pub async fn get_active_quests(
+    pool: &PgPool,
+    character_id: i64,
+) -> anyhow::Result<Vec<CharacterQuest>> {
+    let quests = sqlx::query_as::<_, CharacterQuest>(
+        "SELECT * FROM character_quests WHERE character_id = $1 AND status = 0",
+    )
+    .bind(character_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(quests)
+}
+
+pub async fn get_completed_quest_ids(
+    pool: &PgPool,
+    character_id: i64,
+) -> anyhow::Result<Vec<i32>> {
+    let rows: Vec<(i32,)> = sqlx::query_as(
+        "SELECT quest_id FROM character_quests WHERE character_id = $1 AND status = 1",
+    )
+    .bind(character_id)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().map(|r| r.0).collect())
+}
+
+pub async fn start_quest(
+    pool: &PgPool,
+    character_id: i64,
+    quest_id: i32,
+    step_id: i32,
+    objectives: &serde_json::Value,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO character_quests (character_id, quest_id, step_id, objectives)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (character_id, quest_id) DO NOTHING",
+    )
+    .bind(character_id)
+    .bind(quest_id)
+    .bind(step_id)
+    .bind(objectives)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn update_quest_step(
+    pool: &PgPool,
+    character_id: i64,
+    quest_id: i32,
+    step_id: i32,
+    objectives: &serde_json::Value,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "UPDATE character_quests SET step_id = $3, objectives = $4
+         WHERE character_id = $1 AND quest_id = $2",
+    )
+    .bind(character_id)
+    .bind(quest_id)
+    .bind(step_id)
+    .bind(objectives)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn complete_quest(
+    pool: &PgPool,
+    character_id: i64,
+    quest_id: i32,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "UPDATE character_quests SET status = 1, completed_at = CURRENT_TIMESTAMP
+         WHERE character_id = $1 AND quest_id = $2",
+    )
+    .bind(character_id)
+    .bind(quest_id)
     .execute(pool)
     .await?;
     Ok(())
