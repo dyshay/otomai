@@ -54,6 +54,7 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     // Player session state
     let mut current_character_id: Option<i64> = None;
     let mut current_map_id: Option<i64> = None;
+    let mut current_movement: Option<movement::MovementState> = None;
 
     // Broadcast channel
     let (broadcast_tx, mut broadcast_rx) = crate::world::new_broadcast_channel();
@@ -106,19 +107,23 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                     // Phase 2 — Movement
                     Ok(ProtocolMessage::GameMapMovementRequestMessage(msg)) => {
                         if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
-                            movement::handle_movement_request(
+                            current_movement = movement::handle_movement_request(
                                 &mut session, &state, char_id, map_id, &msg,
                             ).await?;
                         }
                     }
                     Ok(ProtocolMessage::GameMapMovementConfirmMessage(_)) => {
                         if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
-                            movement::handle_movement_confirm(&state, char_id, map_id).await?;
+                            movement::handle_movement_confirm(
+                                &state, char_id, map_id, current_movement.as_ref(),
+                            ).await?;
+                            current_movement = None;
                         }
                     }
                     Ok(ProtocolMessage::GameMapMovementCancelMessage(msg)) => {
                         if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
                             movement::handle_movement_cancel(&state, char_id, map_id, msg.cell_id).await?;
+                            current_movement = None;
                         }
                     }
                     Ok(ProtocolMessage::ChangeMapMessage(msg)) => {

@@ -760,4 +760,34 @@ mod dlm_tests {
         // Allow some failures for exotic/encrypted maps
         assert!(failed <= 5, "Too many failures: {}/{}", failed, success + failed);
     }
+
+    #[test]
+    fn pathfinding_on_real_map() {
+        let Some(data) = load_dlm(MAPS_D2P, INCARNAM_DLM) else { return; };
+        let map = dlm::parse_dlm(&data).expect("Failed to parse DLM");
+
+        use dofus_common::pathfinding;
+
+        // Find two walkable cells
+        let walkable: Vec<u16> = (0..dlm::MAP_CELLS_COUNT as u16)
+            .filter(|&c| map.cells[c as usize].is_walkable())
+            .collect();
+        assert!(walkable.len() > 10, "Not enough walkable cells");
+
+        let start = walkable[0];
+        let end = walkable[walkable.len() / 2];
+
+        let path = pathfinding::find_path(&map, start, end, None);
+        assert!(path.is_some(), "Should find path on real Incarnam map from {} to {}", start, end);
+
+        let path = path.unwrap();
+        assert_eq!(*path.first().unwrap(), start);
+        assert_eq!(*path.last().unwrap(), end);
+        assert!(pathfinding::validate_path(&map, &path), "Path should be valid");
+
+        std::fs::write("/tmp/dlm_pathfind.txt", format!(
+            "Path from {} to {}: {} steps, path: {:?}\n",
+            start, end, path.len() - 1, &path[..path.len().min(20)]
+        )).unwrap();
+    }
 }
