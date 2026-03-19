@@ -10,17 +10,15 @@ use std::sync::Arc;
 /// Quest objective type IDs (from QuestObjectiveTypes.d2o).
 /// Only the types we handle in Phase 4. Others are noted for future phases.
 pub mod objective_types {
-    pub const TALK_TO_NPC: i32 = 0; // parameter0 = npc_id
-    pub const GO_TO_MAP: i32 = 3; // mapId field on objective
-    pub const DISCOVER_SUBAREA: i32 = 5; // parameter0 = subarea_id
-
-    // Future phases:
-    // DEFEAT_MONSTER = 1       // Phase 5: parameter0 = monster_id, parameter1 = count
-    // COLLECT_ITEM = 2         // Phase 6: parameter0 = item_id, parameter1 = count
-    // CRAFT_ITEM = 4           // Phase 6: parameter0 = item_id
-    // HARVEST_RESOURCE = 6     // Phase 6: parameter0 = resource_id
-    // REACH_LEVEL = 7          // Phase 5: parameter0 = level
-    // WIN_FIGHT_ON_MAP = 8     // Phase 5: mapId field
+    pub const TALK_TO_NPC: i32 = 0;
+    pub const DEFEAT_MONSTER: i32 = 1;  // parameter0 = monster_id, parameter1 = count
+    pub const COLLECT_ITEM: i32 = 2;    // parameter0 = item_id, parameter1 = count
+    pub const GO_TO_MAP: i32 = 3;
+    pub const CRAFT_ITEM: i32 = 4;      // parameter0 = item_id
+    pub const DISCOVER_SUBAREA: i32 = 5;
+    pub const HARVEST_RESOURCE: i32 = 6; // parameter0 = resource_id
+    pub const REACH_LEVEL: i32 = 7;     // parameter0 = target_level
+    pub const WIN_FIGHT_ON_MAP: i32 = 8; // mapId field
 }
 
 /// QuestListMessage ID (has polymorphic active_quests vector).
@@ -239,6 +237,242 @@ pub async fn check_map_objectives(
     Ok(())
 }
 
+/// Check DEFEAT_MONSTER objectives after a fight ends.
+/// Called with the list of monster IDs killed in the fight.
+pub async fn check_defeat_monster_objectives(
+    session: &mut Session,
+    state: &Arc<WorldState>,
+    character_id: i64,
+    killed_monster_ids: &[i32],
+    fight_map_id: i64,
+) -> anyhow::Result<()> {
+    let active = repository::get_active_quests(&state.pool, character_id).await?;
+
+    for quest in &active {
+        let objectives = quest.objectives.as_array().cloned().unwrap_or_default();
+        let mut updated = false;
+        let mut updated_objectives = objectives.clone();
+
+        for (i, obj_value) in objectives.iter().enumerate() {
+            let obj_type = obj_value.get("type").and_then(|v| v.as_i64()).unwrap_or(-1) as i32;
+            let param0 = obj_value.get("param0").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+            let obj_id = obj_value.get("id").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+            let obj_map = obj_value.get("mapId").and_then(|v| v.as_i64()).unwrap_or(0);
+            let completed = obj_value.get("completed").and_then(|v| v.as_bool()).unwrap_or(false);
+
+            if completed {
+                continue;
+            }
+
+            let should_complete = match obj_type {
+                objective_types::DEFEAT_MONSTER => killed_monster_ids.contains(&param0),
+                objective_types::WIN_FIGHT_ON_MAP => obj_map == fight_map_id,
+                _ => false,
+            };
+
+            if should_complete {
+                if let Some(obj) = updated_objectives.get_mut(i) {
+                    obj.as_object_mut().map(|o| o.insert("completed".to_string(), serde_json::json!(true)));
+                }
+                updated = true;
+
+                session
+                    .send(&QuestObjectiveValidatedMessage {
+                        quest_id: quest.quest_id as i16,
+                        objective_id: obj_id as i16,
+                    })
+                    .await?;
+            }
+        }
+
+        if updated {
+            let json = serde_json::Value::Array(updated_objectives);
+            complete_step_if_done(session, state, character_id, quest.quest_id, quest.step_id, &json).await?;
+        }
+    }
+    Ok(())
+}
+
+/// Check REACH_LEVEL objectives after a level up.
+pub async fn check_level_objectives(
+    session: &mut Session,
+    state: &Arc<WorldState>,
+    character_id: i64,
+    new_level: i32,
+) -> anyhow::Result<()> {
+    let active = repository::get_active_quests(&state.pool, character_id).await?;
+
+    for quest in &active {
+        let objectives = quest.objectives.as_array().cloned().unwrap_or_default();
+        let mut updated = false;
+        let mut updated_objectives = objectives.clone();
+
+        for (i, obj_value) in objectives.iter().enumerate() {
+            let obj_type = obj_value.get("type").and_then(|v| v.as_i64()).unwrap_or(-1) as i32;
+            let param0 = obj_value.get("param0").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+            let completed = obj_value.get("completed").and_then(|v| v.as_bool()).unwrap_or(false);
+
+            if !completed && obj_type == objective_types::REACH_LEVEL && new_level >= param0 {
+                if let Some(obj) = updated_objectives.get_mut(i) {
+                    obj.as_object_mut().map(|o| o.insert("completed".to_string(), serde_json::json!(true)));
+                }
+                updated = true;
+
+                let obj_id = obj_value.get("id").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+                session
+                    .send(&QuestObjectiveValidatedMessage {
+                        quest_id: quest.quest_id as i16,
+                        objective_id: obj_id as i16,
+                    })
+                    .await?;
+            }
+        }
+
+        if updated {
+            let json = serde_json::Value::Array(updated_objectives);
+            complete_step_if_done(session, state, character_id, quest.quest_id, quest.step_id, &json).await?;
+        }
+    }
+    Ok(())
+}
+
+/// Helper: if all objectives in a step are done, advance or complete the quest.
+async fn complete_step_if_done(
+    session: &mut Session,
+    state: &Arc<WorldState>,
+    character_id: i64,
+    quest_id: i32,
+    step_id: i32,
+    objectives: &serde_json::Value,
+) -> anyhow::Result<()> {
+    let all_done = objectives.as_array()
+        .map(|arr| arr.iter().all(|o| o.get("completed").and_then(|v| v.as_bool()).unwrap_or(false)))
+        .unwrap_or(false);
+
+    if all_done {
+        // Award step rewards
+        award_step_rewards(session, state, character_id, step_id).await?;
+
+        session
+            .send(&QuestStepValidatedMessage {
+                quest_id: quest_id as i16,
+                step_id: step_id as i16,
+            })
+            .await?;
+
+        match get_next_step_id(state, quest_id, step_id).await {
+            Some(next_id) => {
+                let next_objectives = get_step_objectives(state, next_id).await;
+                repository::update_quest_step(&state.pool, character_id, quest_id, next_id, &next_objectives).await?;
+                session.send(&QuestStepStartedMessage {
+                    quest_id: quest_id as i16,
+                    step_id: next_id as i16,
+                }).await?;
+            }
+            None => {
+                repository::complete_quest(&state.pool, character_id, quest_id).await?;
+                session.send(&QuestValidatedMessage {
+                    quest_id: quest_id as i16,
+                }).await?;
+            }
+        }
+    } else {
+        repository::update_quest_step(&state.pool, character_id, quest_id, step_id, objectives).await?;
+    }
+
+    Ok(())
+}
+
+/// Award rewards for completing a quest step (from QuestStepRewards D2O).
+async fn award_step_rewards(
+    session: &mut Session,
+    state: &Arc<WorldState>,
+    character_id: i64,
+    step_id: i32,
+) -> anyhow::Result<()> {
+    // QuestStepRewards are indexed by their own ID, not by stepId.
+    // We need to scan for the right one matching our step.
+    let all_rewards = repository::get_all_game_data(&state.pool, "QuestStepRewards").await?;
+    let reward_data = all_rewards.iter().find(|r| {
+        r.data.get("stepId").and_then(|v| v.as_i64()).unwrap_or(0) as i32 == step_id
+    });
+
+    let reward = match reward_data {
+        Some(r) => r,
+        None => return Ok(()), // No rewards for this step
+    };
+
+    let character = match repository::get_character(&state.pool, character_id).await? {
+        Some(c) => c,
+        None => return Ok(()),
+    };
+
+    // XP reward
+    let xp_ratio = reward.data.get("experienceRatio").and_then(|v| v.as_f64()).unwrap_or(0.0);
+    if xp_ratio > 0.0 {
+        let xp = (xp_ratio * character.level as f64).max(1.0) as i64;
+        let new_xp = character.experience + xp;
+        let _ = sqlx::query("UPDATE characters SET experience = $2 WHERE id = $1")
+            .bind(character_id)
+            .bind(new_xp)
+            .execute(&state.pool)
+            .await;
+
+        session
+            .send(&CharacterExperienceGainMessage {
+                experience_character: xp,
+                experience_mount: 0,
+                experience_guild: 0,
+                experience_incarnation: 0,
+            })
+            .await?;
+    }
+
+    // Kamas reward
+    let kamas_ratio = reward.data.get("kamasRatio").and_then(|v| v.as_f64()).unwrap_or(0.0);
+    if kamas_ratio > 0.0 {
+        let scale_with_level = reward.data.get("kamasScaleWithPlayerLevel")
+            .and_then(|v| v.as_bool()).unwrap_or(false);
+        let kamas = if scale_with_level {
+            (kamas_ratio * character.level as f64).max(1.0) as i64
+        } else {
+            kamas_ratio as i64
+        };
+
+        let new_kamas = character.kamas + kamas;
+        let _ = sqlx::query("UPDATE characters SET kamas = $2 WHERE id = $1")
+            .bind(character_id)
+            .bind(new_kamas)
+            .execute(&state.pool)
+            .await;
+    }
+
+    // Item rewards: [[item_id, quantity], ...]
+    let items = reward.data.get("itemsReward").and_then(|v| v.as_array());
+    if let Some(items) = items {
+        for item_entry in items {
+            if let Some(arr) = item_entry.as_array() {
+                let item_id = arr.first().and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+                let quantity = arr.get(1).and_then(|v| v.as_i64()).unwrap_or(1) as i32;
+                if item_id > 0 && quantity > 0 {
+                    let _ = sqlx::query(
+                        "INSERT INTO inventory_items (character_id, item_template_id, quantity)
+                         VALUES ($1, $2, $3)"
+                    )
+                    .bind(character_id)
+                    .bind(item_id)
+                    .bind(quantity)
+                    .execute(&state.pool)
+                    .await;
+                }
+            }
+        }
+    }
+
+    tracing::info!(character_id, step_id, "Quest step rewards awarded");
+    Ok(())
+}
+
 // ─── D2O helpers ───────────────────────────────────────────────────
 
 /// Get the first step ID of a quest from D2O.
@@ -310,16 +544,114 @@ async fn get_step_objectives(state: &Arc<WorldState>, step_id: i32) -> serde_jso
 
 /// Compute quest flags for a specific NPC and player.
 /// Returns (quests_to_start, quests_to_valid) based on player's quest state.
+///
+/// - quests_to_start: quests the player can accept from this NPC
+/// - quests_to_valid: quests where the player has an active objective involving this NPC
 pub async fn compute_npc_quest_flags(
     state: &Arc<WorldState>,
     character_id: i64,
     npc_id: i32,
 ) -> (Vec<i16>, Vec<i16>) {
-    // This would query D2O to find quests where an objective references this NPC,
-    // then check against the player's completed/active quests.
-    // For now, return empty — quest flags will be populated as quests are added to the DB.
-    let _ = (state, character_id, npc_id);
-    (vec![], vec![])
+    let mut to_start = Vec::new();
+    let mut to_valid = Vec::new();
+
+    // Load player quest state
+    let completed_ids = repository::get_completed_quest_ids(&state.pool, character_id)
+        .await
+        .unwrap_or_default();
+    let active_quests = repository::get_active_quests(&state.pool, character_id)
+        .await
+        .unwrap_or_default();
+    let active_ids: Vec<i32> = active_quests.iter().map(|q| q.quest_id).collect();
+
+    // Get character info for criterion evaluation
+    let character = match repository::get_character(&state.pool, character_id).await {
+        Ok(Some(c)) => c,
+        _ => return (to_start, to_valid),
+    };
+
+    let ctx = dofus_common::criterion::CriterionContext {
+        level: character.level,
+        breed_id: character.breed_id,
+        sex: character.sex,
+        completed_quest_ids: completed_ids.clone(),
+        active_quest_ids: active_ids.clone(),
+    };
+
+    // Check active quests: does any have a TALK_TO_NPC objective for this NPC?
+    for quest in &active_quests {
+        let objectives = quest.objectives.as_array().cloned().unwrap_or_default();
+        for obj in &objectives {
+            let obj_type = obj.get("type").and_then(|v| v.as_i64()).unwrap_or(-1) as i32;
+            let param0 = obj.get("param0").and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+            let completed = obj.get("completed").and_then(|v| v.as_bool()).unwrap_or(false);
+
+            if obj_type == objective_types::TALK_TO_NPC && param0 == npc_id && !completed {
+                to_valid.push(quest.quest_id as i16);
+                break;
+            }
+        }
+    }
+
+    // Scan all quests in D2O to find ones this NPC can start
+    // Look for quests where the first step has a TALK_TO_NPC objective with this NPC
+    let all_quests = repository::get_all_game_data(&state.pool, "Quests")
+        .await
+        .unwrap_or_default();
+
+    for quest_data in &all_quests {
+        let quest_id = quest_data.object_id;
+
+        // Skip already active or completed
+        if active_ids.contains(&quest_id) || completed_ids.contains(&quest_id) {
+            continue;
+        }
+
+        // Check startCriterion
+        let start_criterion = quest_data.data.get("startCriterion")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        if !dofus_common::criterion::evaluate(start_criterion, &ctx) {
+            continue;
+        }
+
+        // Check first step's objectives for TALK_TO_NPC with this NPC
+        let step_ids = quest_data.data.get("stepIds")
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default();
+
+        if let Some(first_step_id) = step_ids.first().and_then(|v| v.as_i64()) {
+            if let Ok(Some(step_data)) = repository::get_game_data(
+                &state.pool, "QuestSteps", first_step_id as i32,
+            ).await {
+                let obj_ids = step_data.data.get("objectiveIds")
+                    .and_then(|v| v.as_array())
+                    .cloned()
+                    .unwrap_or_default();
+
+                for obj_id_val in &obj_ids {
+                    let obj_id = obj_id_val.as_i64().unwrap_or(0) as i32;
+                    if let Ok(Some(obj_data)) = repository::get_game_data(
+                        &state.pool, "QuestObjectives", obj_id,
+                    ).await {
+                        let type_id = obj_data.data.get("typeId")
+                            .and_then(|v| v.as_i64()).unwrap_or(-1) as i32;
+                        let param0 = obj_data.data.get("parameters")
+                            .and_then(|p| p.get("parameter0"))
+                            .and_then(|v| v.as_i64()).unwrap_or(0) as i32;
+
+                        if type_id == objective_types::TALK_TO_NPC && param0 == npc_id {
+                            to_start.push(quest_id as i16);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    (to_start, to_valid)
 }
 
 #[cfg(test)]

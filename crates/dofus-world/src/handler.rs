@@ -27,10 +27,22 @@ async fn check_fight_end(
 
     if let Some(f) = current_fight.take() {
         let map_id = f.map_id;
+        let won = f.challengers_won();
         if let Some(char_id) = current_character_id {
             if let Some(character) = repository::get_character(&state.pool, char_id).await? {
                 fight::handle_fight_end(session, state, &f, &character, broadcast_tx).await?;
                 *current_map_id = Some(map_id);
+
+                // Check quest objectives after fight
+                if won {
+                    let killed_ids: Vec<i32> = f.fighters.iter()
+                        .filter(|fi| !fi.is_player && !fi.is_alive)
+                        .map(|fi| fi.monster_id)
+                        .collect();
+                    quests::check_defeat_monster_objectives(
+                        session, state, char_id, &killed_ids, map_id,
+                    ).await?;
+                }
             }
         }
     }
