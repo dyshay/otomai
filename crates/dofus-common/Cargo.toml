@@ -10,3 +10,5 @@ thiserror = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
 anyhow = { workspace = true }
+byteorder = "1"
+flate2 = "1"

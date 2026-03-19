@@ -616,3 +616,148 @@ mod d2p_tests {
         assert_eq!(reader.read_file("empty.bin").unwrap(), vec![] as Vec<u8>);
     }
 }
+
+mod dlm_tests {
+    use crate::d2p::D2PReader;
+    use dofus_common::dlm;
+    use std::path::Path;
+
+    const MAPS_D2P: &str = "/Users/dys/Projects/DofusClient/original-client/dofus/5.0_2.57.1.1/darwin/main/Dofus.app/Contents/Resources/content/maps/maps0.d2p";
+    const INCARNAM_DLM: &str = "3/154010883.dlm";
+
+    fn load_dlm(d2p_path: &str, dlm_path: &str) -> Option<Vec<u8>> {
+        let path = Path::new(d2p_path);
+        if !path.exists() {
+            return None;
+        }
+        let reader = D2PReader::open(path).ok()?;
+        reader.read_file(dlm_path).ok()
+    }
+
+    #[test]
+    fn debug_dlm_header() {
+        let Some(data) = load_dlm(MAPS_D2P, INCARNAM_DLM) else { return; };
+
+        use byteorder::{BigEndian, ReadBytesExt};
+        use flate2::read::ZlibDecoder;
+        use std::io::{Cursor, Read};
+
+        let mut decoder = ZlibDecoder::new(&data[..]);
+        let mut decompressed = Vec::new();
+        decoder.read_to_end(&mut decompressed).unwrap();
+
+        let mut out = String::new();
+        out.push_str(&format!("Total decompressed: {} bytes\n", decompressed.len()));
+
+        let mut c = Cursor::new(&decompressed[..]);
+        let header = c.read_u8().unwrap();
+        let version = c.read_u8().unwrap();
+        let id = c.read_u32::<BigEndian>().unwrap();
+        out.push_str(&format!("header=0x{:02X} version={} id={}\n", header, version, id));
+
+        // Encryption
+        let encrypted = c.read_u8().unwrap() != 0;
+        let enc_version = c.read_u8().unwrap();
+        let data_len = c.read_i32::<BigEndian>().unwrap();
+        out.push_str(&format!("encrypted={} enc_version={} data_len={}\n", encrypted, enc_version, data_len));
+
+        if encrypted {
+            // Decrypt
+            let key_hex = "649ae451ca33ec53bbcbcc33becf15f4";
+            let key_bytes: Vec<u8> = (0..key_hex.len()).step_by(2)
+                .filter_map(|i| u8::from_str_radix(&key_hex[i..i+2], 16).ok())
+                .collect();
+            out.push_str(&format!("key_bytes ({} bytes): {:02X?}\n", key_bytes.len(), &key_bytes));
+
+            let pos = c.position() as usize;
+            let mut enc_data = decompressed[pos..pos + data_len as usize].to_vec();
+            for (i, byte) in enc_data.iter_mut().enumerate() {
+                *byte ^= key_bytes[i % key_bytes.len()];
+            }
+
+            // Dump first 80 bytes of decrypted data
+            out.push_str("Decrypted data (first 80 bytes):\n");
+            for (i, chunk) in enc_data[..80.min(enc_data.len())].chunks(16).enumerate() {
+                out.push_str(&format!("{:04X}: ", i * 16));
+                for b in chunk {
+                    out.push_str(&format!("{:02X} ", b));
+                }
+                out.push('\n');
+            }
+
+            // Parse from decrypted
+            let mut dc = Cursor::new(&enc_data[..]);
+            let rel_id = dc.read_u32::<BigEndian>().unwrap();
+            let map_type = dc.read_u8().unwrap();
+            let sub_area = dc.read_i32::<BigEndian>().unwrap();
+            let top = dc.read_i32::<BigEndian>().unwrap();
+            let bot = dc.read_i32::<BigEndian>().unwrap();
+            let left = dc.read_i32::<BigEndian>().unwrap();
+            let right = dc.read_i32::<BigEndian>().unwrap();
+            out.push_str(&format!("rel_id={} map_type={} sub_area={}\n", rel_id, map_type, sub_area));
+            out.push_str(&format!("neighbors: T={} B={} L={} R={}\n", top, bot, left, right));
+        }
+
+        std::fs::write("/tmp/dlm_debug.txt", &out).unwrap();
+    }
+
+    #[test]
+    fn parse_incarnam_map() {
+        let Some(data) = load_dlm(MAPS_D2P, INCARNAM_DLM) else {
+            eprintln!("Skipping: client files not found");
+            return;
+        };
+
+        let map = dlm::parse_dlm(&data).expect("Failed to parse Incarnam DLM");
+
+        // Incarnam statue map
+        assert_eq!(map.id, 154010883);
+        assert_eq!(map.cells.len(), dlm::MAP_CELLS_COUNT);
+
+        // Should have some walkable cells
+        let walkable = map.cells.iter().filter(|c| c.is_walkable()).count();
+        assert!(walkable > 0, "No walkable cells found");
+        assert!(walkable < dlm::MAP_CELLS_COUNT, "All cells walkable (suspicious)");
+
+        std::fs::write("/tmp/dlm_incarnam.txt", format!(
+            "Map {} v{}: {} cells, {} walkable, sub_area={}, neighbors: T={} B={} L={} R={}\n",
+            map.id, map.version, map.cells.len(), walkable, map.sub_area_id,
+            map.top_neighbour_id, map.bottom_neighbour_id,
+            map.left_neighbour_id, map.right_neighbour_id,
+        )).unwrap();
+    }
+
+    #[test]
+    fn parse_multiple_maps() {
+        let path = Path::new(MAPS_D2P);
+        if !path.exists() {
+            eprintln!("Skipping: client files not found");
+            return;
+        }
+        let reader = D2PReader::open(path).expect("Failed to open D2P");
+
+        let mut success = 0;
+        let mut failed = 0;
+
+        for name in reader.filenames().iter().take(50) {
+            let data = reader.read_file(name).expect("Failed to read DLM");
+            match dlm::parse_dlm(&data) {
+                Ok(map) => {
+                    assert_eq!(map.cells.len(), dlm::MAP_CELLS_COUNT);
+                    success += 1;
+                }
+                Err(e) => {
+                    eprintln!("Failed to parse {}: {}", name, e);
+                    failed += 1;
+                }
+            }
+        }
+
+        std::fs::write("/tmp/dlm_multi.txt", format!(
+            "Parsed {}/{} maps successfully\n", success, success + failed
+        )).unwrap();
+        assert!(success > 0, "No maps parsed successfully");
+        // Allow some failures for exotic/encrypted maps
+        assert!(failed <= 5, "Too many failures: {}/{}", failed, success + failed);
+    }
+}
