@@ -20,6 +20,7 @@ pub mod game {
     pub use crate::generated::messages::game_actions_fight::*;
     pub use crate::generated::messages::game_actions_sequence::*;
     pub use crate::generated::messages::game_context_fight::*;
+    pub use crate::generated::messages::game_context_fight_character::*;
     pub use crate::generated::messages::game_context_roleplay_fight::*;
     pub use crate::generated::messages::game_friend::*;
     pub use crate::generated::messages::game_initialization::*;

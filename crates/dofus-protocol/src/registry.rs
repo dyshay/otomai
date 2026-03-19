@@ -129,6 +129,14 @@ protocol_registry! {
     GameActionFightPointsVariationMessage(game::GameActionFightPointsVariationMessage),
     SequenceStartMessage(game::SequenceStartMessage),
     SequenceEndMessage(game::SequenceEndMessage),
+    GameActionFightCastRequestMessage(game::GameActionFightCastRequestMessage),
+    GameFightTurnListMessage(game::GameFightTurnListMessage),
+    GameFightTurnReadyRequestMessage(game::GameFightTurnReadyRequestMessage),
+    GameFightShowFighterMessage(game::GameFightShowFighterMessage),
+    GameContextDestroyMessage(game::GameContextDestroyMessage),
+    GameEntityDispositionMessage(game::GameEntityDispositionMessage),
+    CharacterLevelUpMessage(game::CharacterLevelUpMessage),
+    CharacterExperienceGainMessage(game::CharacterExperienceGainMessage),
 }
 
 #[cfg(test)]
