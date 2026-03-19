@@ -12,6 +12,7 @@ pub struct CharacterCreationRequestMessage {
     pub name: String,
     pub breed: u8,
     pub sex: bool,
+    pub colors: [i32; 5],
     pub cosmetic_id: i16,
 }
 
@@ -20,6 +21,9 @@ impl DofusSerialize for CharacterCreationRequestMessage {
         writer.write_utf(&self.name);
         writer.write_byte(self.breed);
         writer.write_boolean(self.sex);
+        for c in &self.colors {
+            writer.write_int(*c);
+        }
         writer.write_var_short(self.cosmetic_id);
     }
 }
@@ -30,6 +34,13 @@ impl DofusDeserialize for CharacterCreationRequestMessage {
             name: reader.read_utf()?,
             breed: reader.read_byte()?,
             sex: reader.read_boolean()?,
+            colors: [
+                reader.read_int()?,
+                reader.read_int()?,
+                reader.read_int()?,
+                reader.read_int()?,
+                reader.read_int()?,
+            ],
             cosmetic_id: reader.read_var_short()?,
         })
     }

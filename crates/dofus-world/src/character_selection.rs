@@ -134,7 +134,7 @@ pub async fn handle_character_creation(
         return Ok(());
     }
 
-    let colors = serde_json::json!([]);
+    let colors = serde_json::json!(msg.colors.to_vec());
     let sex = if msg.sex { 1 } else { 0 };
 
     match repository::create_character(

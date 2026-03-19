@@ -221,6 +221,7 @@ mod tests {
             name: "Xelor".to_string(),
             breed: 11,
             sex: true,
+            colors: [0xFF0000, 0x00FF00, 0x0000FF, 0, 0],
             cosmetic_id: 42,
         };
         let payload = serialize_msg(&msg);
@@ -230,6 +231,7 @@ mod tests {
                 assert_eq!(m.name, "Xelor");
                 assert_eq!(m.breed, 11);
                 assert_eq!(m.sex, true);
+                assert_eq!(m.colors, [0xFF0000, 0x00FF00, 0x0000FF, 0, 0]);
                 assert_eq!(m.cosmetic_id, 42);
             }
             _ => panic!("Wrong variant"),
