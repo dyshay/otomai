@@ -6,12 +6,13 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 147
+/// Protocol type — ID: 2842
 #[derive(Debug, Clone, Default)]
 pub struct TaxCollectorStaticInformations {
     pub first_name_id: i16,
     pub last_name_id: i16,
     pub guild_identity: GuildInformations,
+    pub caller_id: i64,
 }
 
 impl DofusSerialize for TaxCollectorStaticInformations {
@@ -19,6 +20,7 @@ impl DofusSerialize for TaxCollectorStaticInformations {
         writer.write_var_short(self.first_name_id);
         writer.write_var_short(self.last_name_id);
         self.guild_identity.serialize(writer);
+        writer.write_var_long(self.caller_id);
     }
 }
 
@@ -28,11 +30,12 @@ impl DofusDeserialize for TaxCollectorStaticInformations {
             first_name_id: reader.read_var_short()?,
             last_name_id: reader.read_var_short()?,
             guild_identity: GuildInformations::deserialize(reader)?,
+            caller_id: reader.read_var_long()?,
         })
     }
 }
 
 impl DofusType for TaxCollectorStaticInformations {
-    const TYPE_ID: u16 = 147;
+    const TYPE_ID: u16 = 2842;
 }
 

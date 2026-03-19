@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 76
+/// Protocol type — ID: 6577
 #[derive(Debug, Clone, Default)]
 pub struct ObjectEffect {
     pub action_id: i16,
@@ -27,6 +27,6 @@ impl DofusDeserialize for ObjectEffect {
 }
 
 impl DofusType for ObjectEffect {
-    const TYPE_ID: u16 = 76;
+    const TYPE_ID: u16 = 6577;
 }
 

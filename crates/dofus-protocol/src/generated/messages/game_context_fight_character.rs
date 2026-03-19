@@ -6,63 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5864
-#[derive(Debug, Clone, Default)]
-pub struct GameFightShowFighterMessage {
-    pub informations: Box<GameFightFighterInformationsVariant>,
-}
-
-impl DofusSerialize for GameFightShowFighterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.informations.get_type_id());
-        (*self.informations).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameFightShowFighterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            informations: {
-                let type_id = reader.read_ushort()?;
-                Box::new(GameFightFighterInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightShowFighterMessage {
-    const MESSAGE_ID: u16 = 5864;
-}
-
-/// Protocol message — ID: 6218
-#[derive(Debug, Clone, Default)]
-pub struct GameFightShowFighterRandomStaticPoseMessage {
-    pub informations: Box<GameFightFighterInformationsVariant>,
-}
-
-impl DofusSerialize for GameFightShowFighterRandomStaticPoseMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.informations.get_type_id());
-        (*self.informations).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameFightShowFighterRandomStaticPoseMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            informations: {
-                let type_id = reader.read_ushort()?;
-                Box::new(GameFightFighterInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightShowFighterRandomStaticPoseMessage {
-    const MESSAGE_ID: u16 = 6218;
-}
-
-/// Protocol message — ID: 6309
+/// Protocol message — ID: 986
 #[derive(Debug, Clone, Default)]
 pub struct GameFightRefreshFighterMessage {
     pub informations: Box<GameContextActorInformationsVariant>,
@@ -87,6 +31,62 @@ impl DofusDeserialize for GameFightRefreshFighterMessage {
 }
 
 impl DofusMessage for GameFightRefreshFighterMessage {
-    const MESSAGE_ID: u16 = 6309;
+    const MESSAGE_ID: u16 = 986;
+}
+
+/// Protocol message — ID: 3884
+#[derive(Debug, Clone, Default)]
+pub struct GameFightShowFighterMessage {
+    pub informations: Box<GameFightFighterInformationsVariant>,
+}
+
+impl DofusSerialize for GameFightShowFighterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.informations.get_type_id());
+        (*self.informations).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameFightShowFighterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let type_id = reader.read_ushort()?;
+                Box::new(GameFightFighterInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightShowFighterMessage {
+    const MESSAGE_ID: u16 = 3884;
+}
+
+/// Protocol message — ID: 6588
+#[derive(Debug, Clone, Default)]
+pub struct GameFightShowFighterRandomStaticPoseMessage {
+    pub informations: Box<GameFightFighterInformationsVariant>,
+}
+
+impl DofusSerialize for GameFightShowFighterRandomStaticPoseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.informations.get_type_id());
+        (*self.informations).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameFightShowFighterRandomStaticPoseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let type_id = reader.read_ushort()?;
+                Box::new(GameFightFighterInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightShowFighterRandomStaticPoseMessage {
+    const MESSAGE_ID: u16 = 6588;
 }
 

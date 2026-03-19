@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 200
+/// Protocol type — ID: 2651
 #[derive(Debug, Clone, Default)]
 pub struct MapObstacle {
     pub obstacle_cell_id: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for MapObstacle {
 }
 
 impl DofusType for MapObstacle {
-    const TYPE_ID: u16 = 200;
+    const TYPE_ID: u16 = 2651;
 }
 

@@ -6,7 +6,122 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6786
+/// Protocol message — ID: 335
+#[derive(Debug, Clone, Default)]
+pub struct BreachRoomLockedMessage {
+}
+
+impl DofusSerialize for BreachRoomLockedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for BreachRoomLockedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for BreachRoomLockedMessage {
+    const MESSAGE_ID: u16 = 335;
+}
+
+/// Protocol message — ID: 884
+#[derive(Debug, Clone, Default)]
+pub struct BreachRoomUnlockResultMessage {
+    pub room_id: u8,
+    pub result: u8,
+}
+
+impl DofusSerialize for BreachRoomUnlockResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.room_id);
+        writer.write_byte(self.result);
+    }
+}
+
+impl DofusDeserialize for BreachRoomUnlockResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            room_id: reader.read_byte()?,
+            result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachRoomUnlockResultMessage {
+    const MESSAGE_ID: u16 = 884;
+}
+
+/// Protocol message — ID: 1220
+#[derive(Debug, Clone, Default)]
+pub struct BreachStateMessage {
+    pub owner: CharacterMinimalInformations,
+    pub bonuses: Vec<ObjectEffectInteger>,
+    pub bugdet: i32,
+    pub saved: bool,
+}
+
+impl DofusSerialize for BreachStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.owner.serialize(writer);
+        writer.write_short(self.bonuses.len() as _);
+        for item in &self.bonuses {
+            item.serialize(writer);
+        }
+        writer.write_var_int(self.bugdet);
+        writer.write_boolean(self.saved);
+    }
+}
+
+impl DofusDeserialize for BreachStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            owner: CharacterMinimalInformations::deserialize(reader)?,
+            bonuses: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectEffectInteger::deserialize(reader)?);
+                }
+                v
+            },
+            bugdet: reader.read_var_int()?,
+            saved: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachStateMessage {
+    const MESSAGE_ID: u16 = 1220;
+}
+
+/// Protocol message — ID: 1936
+#[derive(Debug, Clone, Default)]
+pub struct BreachTeleportResponseMessage {
+    pub teleported: bool,
+}
+
+impl DofusSerialize for BreachTeleportResponseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.teleported);
+    }
+}
+
+impl DofusDeserialize for BreachTeleportResponseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            teleported: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachTeleportResponseMessage {
+    const MESSAGE_ID: u16 = 1936;
+}
+
+/// Protocol message — ID: 2375
 #[derive(Debug, Clone, Default)]
 pub struct BreachBudgetMessage {
     pub bugdet: i32,
@@ -27,10 +142,10 @@ impl DofusDeserialize for BreachBudgetMessage {
 }
 
 impl DofusMessage for BreachBudgetMessage {
-    const MESSAGE_ID: u16 = 6786;
+    const MESSAGE_ID: u16 = 2375;
 }
 
-/// Protocol message — ID: 6791
+/// Protocol message — ID: 3106
 #[derive(Debug, Clone, Default)]
 pub struct MapComplementaryInformationsBreachMessage {
     pub sub_area_id: i16,
@@ -152,77 +267,34 @@ impl DofusDeserialize for MapComplementaryInformationsBreachMessage {
 }
 
 impl DofusMessage for MapComplementaryInformationsBreachMessage {
-    const MESSAGE_ID: u16 = 6791;
+    const MESSAGE_ID: u16 = 3106;
 }
 
-/// Protocol message — ID: 6798
+/// Protocol message — ID: 3311
 #[derive(Debug, Clone, Default)]
-pub struct BreachSavedMessage {
-    pub saved: bool,
+pub struct BreachExitResponseMessage {
+    pub exited: bool,
 }
 
-impl DofusSerialize for BreachSavedMessage {
+impl DofusSerialize for BreachExitResponseMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.saved);
+        writer.write_boolean(self.exited);
     }
 }
 
-impl DofusDeserialize for BreachSavedMessage {
+impl DofusDeserialize for BreachExitResponseMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            saved: reader.read_boolean()?,
+            exited: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for BreachSavedMessage {
-    const MESSAGE_ID: u16 = 6798;
+impl DofusMessage for BreachExitResponseMessage {
+    const MESSAGE_ID: u16 = 3311;
 }
 
-/// Protocol message — ID: 6799
-#[derive(Debug, Clone, Default)]
-pub struct BreachStateMessage {
-    pub owner: CharacterMinimalInformations,
-    pub bonuses: Vec<ObjectEffectInteger>,
-    pub bugdet: i32,
-    pub saved: bool,
-}
-
-impl DofusSerialize for BreachStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.owner.serialize(writer);
-        writer.write_short(self.bonuses.len() as _);
-        for item in &self.bonuses {
-            item.serialize(writer);
-        }
-        writer.write_var_int(self.bugdet);
-        writer.write_boolean(self.saved);
-    }
-}
-
-impl DofusDeserialize for BreachStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            owner: CharacterMinimalInformations::deserialize(reader)?,
-            bonuses: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectEffectInteger::deserialize(reader)?);
-                }
-                v
-            },
-            bugdet: reader.read_var_int()?,
-            saved: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachStateMessage {
-    const MESSAGE_ID: u16 = 6799;
-}
-
-/// Protocol message — ID: 6800
+/// Protocol message — ID: 3478
 #[derive(Debug, Clone, Default)]
 pub struct BreachBonusMessage {
     pub bonus: ObjectEffectInteger,
@@ -243,34 +315,55 @@ impl DofusDeserialize for BreachBonusMessage {
 }
 
 impl DofusMessage for BreachBonusMessage {
-    const MESSAGE_ID: u16 = 6800;
+    const MESSAGE_ID: u16 = 3478;
 }
 
-/// Protocol message — ID: 6810
+/// Protocol message — ID: 6725
 #[derive(Debug, Clone, Default)]
-pub struct BreachEnterMessage {
-    pub owner: i64,
+pub struct BreachRoomUnlockRequestMessage {
+    pub room_id: u8,
 }
 
-impl DofusSerialize for BreachEnterMessage {
+impl DofusSerialize for BreachRoomUnlockRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.owner);
+        writer.write_byte(self.room_id);
     }
 }
 
-impl DofusDeserialize for BreachEnterMessage {
+impl DofusDeserialize for BreachRoomUnlockRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            owner: reader.read_var_long()?,
+            room_id: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for BreachEnterMessage {
-    const MESSAGE_ID: u16 = 6810;
+impl DofusMessage for BreachRoomUnlockRequestMessage {
+    const MESSAGE_ID: u16 = 6725;
 }
 
-/// Protocol message — ID: 6811
+/// Protocol message — ID: 6772
+#[derive(Debug, Clone, Default)]
+pub struct BreachTeleportRequestMessage {
+}
+
+impl DofusSerialize for BreachTeleportRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for BreachTeleportRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for BreachTeleportRequestMessage {
+    const MESSAGE_ID: u16 = 6772;
+}
+
+/// Protocol message — ID: 6961
 #[derive(Debug, Clone, Default)]
 pub struct BreachCharactersMessage {
     pub characters: Vec<i64>,
@@ -301,34 +394,34 @@ impl DofusDeserialize for BreachCharactersMessage {
 }
 
 impl DofusMessage for BreachCharactersMessage {
-    const MESSAGE_ID: u16 = 6811;
+    const MESSAGE_ID: u16 = 6961;
 }
 
-/// Protocol message — ID: 6814
+/// Protocol message — ID: 8176
 #[derive(Debug, Clone, Default)]
-pub struct BreachExitResponseMessage {
-    pub exited: bool,
+pub struct BreachSavedMessage {
+    pub saved: bool,
 }
 
-impl DofusSerialize for BreachExitResponseMessage {
+impl DofusSerialize for BreachSavedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.exited);
+        writer.write_boolean(self.saved);
     }
 }
 
-impl DofusDeserialize for BreachExitResponseMessage {
+impl DofusDeserialize for BreachSavedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            exited: reader.read_boolean()?,
+            saved: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for BreachExitResponseMessage {
-    const MESSAGE_ID: u16 = 6814;
+impl DofusMessage for BreachSavedMessage {
+    const MESSAGE_ID: u16 = 8176;
 }
 
-/// Protocol message — ID: 6815
+/// Protocol message — ID: 9437
 #[derive(Debug, Clone, Default)]
 pub struct BreachExitRequestMessage {
 }
@@ -346,123 +439,30 @@ impl DofusDeserialize for BreachExitRequestMessage {
 }
 
 impl DofusMessage for BreachExitRequestMessage {
-    const MESSAGE_ID: u16 = 6815;
+    const MESSAGE_ID: u16 = 9437;
 }
 
-/// Protocol message — ID: 6816
+/// Protocol message — ID: 9979
 #[derive(Debug, Clone, Default)]
-pub struct BreachTeleportResponseMessage {
-    pub teleported: bool,
+pub struct BreachEnterMessage {
+    pub owner: i64,
 }
 
-impl DofusSerialize for BreachTeleportResponseMessage {
+impl DofusSerialize for BreachEnterMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.teleported);
+        writer.write_var_long(self.owner);
     }
 }
 
-impl DofusDeserialize for BreachTeleportResponseMessage {
+impl DofusDeserialize for BreachEnterMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            teleported: reader.read_boolean()?,
+            owner: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for BreachTeleportResponseMessage {
-    const MESSAGE_ID: u16 = 6816;
-}
-
-/// Protocol message — ID: 6817
-#[derive(Debug, Clone, Default)]
-pub struct BreachTeleportRequestMessage {
-}
-
-impl DofusSerialize for BreachTeleportRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for BreachTeleportRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for BreachTeleportRequestMessage {
-    const MESSAGE_ID: u16 = 6817;
-}
-
-/// Protocol message — ID: 6862
-#[derive(Debug, Clone, Default)]
-pub struct BreachRoomLockedMessage {
-}
-
-impl DofusSerialize for BreachRoomLockedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for BreachRoomLockedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for BreachRoomLockedMessage {
-    const MESSAGE_ID: u16 = 6862;
-}
-
-/// Protocol message — ID: 6863
-#[derive(Debug, Clone, Default)]
-pub struct BreachRoomUnlockRequestMessage {
-    pub room_id: u8,
-}
-
-impl DofusSerialize for BreachRoomUnlockRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.room_id);
-    }
-}
-
-impl DofusDeserialize for BreachRoomUnlockRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            room_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachRoomUnlockRequestMessage {
-    const MESSAGE_ID: u16 = 6863;
-}
-
-/// Protocol message — ID: 6864
-#[derive(Debug, Clone, Default)]
-pub struct BreachRoomUnlockResultMessage {
-    pub room_id: u8,
-    pub result: u8,
-}
-
-impl DofusSerialize for BreachRoomUnlockResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.room_id);
-        writer.write_byte(self.result);
-    }
-}
-
-impl DofusDeserialize for BreachRoomUnlockResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            room_id: reader.read_byte()?,
-            result: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachRoomUnlockResultMessage {
-    const MESSAGE_ID: u16 = 6864;
+impl DofusMessage for BreachEnterMessage {
+    const MESSAGE_ID: u16 = 9979;
 }
 

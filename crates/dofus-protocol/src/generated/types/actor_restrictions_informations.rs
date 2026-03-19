@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 204
+/// Protocol type — ID: 4964
 #[derive(Debug, Clone, Default)]
 pub struct ActorRestrictionsInformations {
     pub cant_be_aggressed: bool,
@@ -90,6 +90,6 @@ impl DofusDeserialize for ActorRestrictionsInformations {
 }
 
 impl DofusType for ActorRestrictionsInformations {
-    const TYPE_ID: u16 = 204;
+    const TYPE_ID: u16 = 4964;
 }
 

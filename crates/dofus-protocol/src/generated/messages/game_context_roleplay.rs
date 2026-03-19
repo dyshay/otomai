@@ -6,156 +6,23 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 210
+/// Protocol message — ID: 224
 #[derive(Debug, Clone, Default)]
-pub struct MapFightCountMessage {
-    pub fight_count: i16,
+pub struct GameRolePlayShowMultipleActorsMessage {
+    pub informations_list: Vec<Vec<u8>>,
 }
 
-impl DofusSerialize for MapFightCountMessage {
+impl DofusSerialize for GameRolePlayShowMultipleActorsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_count);
-    }
-}
-
-impl DofusDeserialize for MapFightCountMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_count: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MapFightCountMessage {
-    const MESSAGE_ID: u16 = 210;
-}
-
-/// Protocol message — ID: 220
-#[derive(Debug, Clone, Default)]
-pub struct CurrentMapMessage {
-    pub map_id: f64,
-    pub map_key: String,
-}
-
-impl DofusSerialize for CurrentMapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-        writer.write_utf(&self.map_key);
-    }
-}
-
-impl DofusDeserialize for CurrentMapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-            map_key: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for CurrentMapMessage {
-    const MESSAGE_ID: u16 = 220;
-}
-
-/// Protocol message — ID: 221
-#[derive(Debug, Clone, Default)]
-pub struct ChangeMapMessage {
-    pub map_id: f64,
-    pub autopilot: bool,
-}
-
-impl DofusSerialize for ChangeMapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-        writer.write_boolean(self.autopilot);
-    }
-}
-
-impl DofusDeserialize for ChangeMapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-            autopilot: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ChangeMapMessage {
-    const MESSAGE_ID: u16 = 221;
-}
-
-/// Protocol message — ID: 225
-#[derive(Debug, Clone, Default)]
-pub struct MapInformationsRequestMessage {
-    pub map_id: f64,
-}
-
-impl DofusSerialize for MapInformationsRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-    }
-}
-
-impl DofusDeserialize for MapInformationsRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for MapInformationsRequestMessage {
-    const MESSAGE_ID: u16 = 225;
-}
-
-/// Protocol message — ID: 226
-#[derive(Debug, Clone, Default)]
-pub struct MapComplementaryInformationsDataMessage {
-    pub sub_area_id: i16,
-    pub map_id: f64,
-    pub houses: Vec<Vec<u8>>,
-    pub actors: Vec<Vec<u8>>,
-    pub interactive_elements: Vec<Vec<u8>>,
-    pub stated_elements: Vec<StatedElement>,
-    pub obstacles: Vec<MapObstacle>,
-    pub fights: Vec<FightCommonInformations>,
-    pub has_aggressive_monsters: bool,
-    pub fight_start_positions: FightStartingPositions,
-}
-
-impl DofusSerialize for MapComplementaryInformationsDataMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_double(self.map_id);
-        writer.write_short(self.houses.len() as _);
+        writer.write_short(self.informations_list.len() as _);
         // polymorphic vector (unresolved base type)
-        writer.write_short(self.actors.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.interactive_elements.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.stated_elements.len() as _);
-        for item in &self.stated_elements {
-            item.serialize(writer);
-        }
-        writer.write_short(self.obstacles.len() as _);
-        for item in &self.obstacles {
-            item.serialize(writer);
-        }
-        writer.write_short(self.fights.len() as _);
-        for item in &self.fights {
-            item.serialize(writer);
-        }
-        writer.write_boolean(self.has_aggressive_monsters);
-        self.fight_start_positions.serialize(writer);
     }
 }
 
-impl DofusDeserialize for MapComplementaryInformationsDataMessage {
+impl DofusDeserialize for GameRolePlayShowMultipleActorsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            map_id: reader.read_double()?,
-            houses: {
+            informations_list: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -163,106 +30,45 @@ impl DofusDeserialize for MapComplementaryInformationsDataMessage {
                 }
                 v
             },
-            actors: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            interactive_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            stated_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(StatedElement::deserialize(reader)?);
-                }
-                v
-            },
-            obstacles: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MapObstacle::deserialize(reader)?);
-                }
-                v
-            },
-            fights: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(FightCommonInformations::deserialize(reader)?);
-                }
-                v
-            },
-            has_aggressive_monsters: reader.read_boolean()?,
-            fight_start_positions: FightStartingPositions::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for MapComplementaryInformationsDataMessage {
-    const MESSAGE_ID: u16 = 226;
+impl DofusMessage for GameRolePlayShowMultipleActorsMessage {
+    const MESSAGE_ID: u16 = 224;
 }
 
-/// Protocol message — ID: 5632
+/// Protocol message — ID: 2130
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayShowActorMessage {
-    pub informations: Box<GameRolePlayActorInformationsVariant>,
+pub struct MapRewardRateMessage {
+    pub map_rate: i16,
+    pub sub_area_rate: i16,
+    pub total_rate: i16,
 }
 
-impl DofusSerialize for GameRolePlayShowActorMessage {
+impl DofusSerialize for MapRewardRateMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.informations.get_type_id());
-        (*self.informations).serialize(writer);
+        writer.write_var_short(self.map_rate);
+        writer.write_var_short(self.sub_area_rate);
+        writer.write_var_short(self.total_rate);
     }
 }
 
-impl DofusDeserialize for GameRolePlayShowActorMessage {
+impl DofusDeserialize for MapRewardRateMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            informations: {
-                let type_id = reader.read_ushort()?;
-                Box::new(GameRolePlayActorInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
+            map_rate: reader.read_var_short()?,
+            sub_area_rate: reader.read_var_short()?,
+            total_rate: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayShowActorMessage {
-    const MESSAGE_ID: u16 = 5632;
+impl DofusMessage for MapRewardRateMessage {
+    const MESSAGE_ID: u16 = 2130;
 }
 
-/// Protocol message — ID: 5742
-#[derive(Debug, Clone, Default)]
-pub struct MapRunningFightListRequestMessage {
-}
-
-impl DofusSerialize for MapRunningFightListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for MapRunningFightListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for MapRunningFightListRequestMessage {
-    const MESSAGE_ID: u16 = 5742;
-}
-
-/// Protocol message — ID: 5743
+/// Protocol message — ID: 2666
 #[derive(Debug, Clone, Default)]
 pub struct MapRunningFightListMessage {
     pub fights: Vec<FightExternalInformations>,
@@ -293,436 +99,40 @@ impl DofusDeserialize for MapRunningFightListMessage {
 }
 
 impl DofusMessage for MapRunningFightListMessage {
-    const MESSAGE_ID: u16 = 5743;
+    const MESSAGE_ID: u16 = 2666;
 }
 
-/// Protocol message — ID: 5750
+/// Protocol message — ID: 3125
 #[derive(Debug, Clone, Default)]
-pub struct MapRunningFightDetailsRequestMessage {
-    pub fight_id: i16,
-}
-
-impl DofusSerialize for MapRunningFightDetailsRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-    }
-}
-
-impl DofusDeserialize for MapRunningFightDetailsRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MapRunningFightDetailsRequestMessage {
-    const MESSAGE_ID: u16 = 5750;
-}
-
-/// Protocol message — ID: 5751
-#[derive(Debug, Clone, Default)]
-pub struct MapRunningFightDetailsMessage {
-    pub fight_id: i16,
-    pub attackers: Vec<Vec<u8>>,
-    pub defenders: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for MapRunningFightDetailsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        writer.write_short(self.attackers.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.defenders.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for MapRunningFightDetailsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            attackers: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            defenders: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for MapRunningFightDetailsMessage {
-    const MESSAGE_ID: u16 = 5751;
-}
-
-/// Protocol message — ID: 6048
-#[derive(Debug, Clone, Default)]
-pub struct TeleportOnSameMapMessage {
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for TeleportOnSameMapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.target_id);
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for TeleportOnSameMapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            target_id: reader.read_double()?,
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportOnSameMapMessage {
-    const MESSAGE_ID: u16 = 6048;
-}
-
-/// Protocol message — ID: 6051
-#[derive(Debug, Clone, Default)]
-pub struct MapObstacleUpdateMessage {
-    pub obstacles: Vec<MapObstacle>,
-}
-
-impl DofusSerialize for MapObstacleUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.obstacles.len() as _);
-        for item in &self.obstacles {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for MapObstacleUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            obstacles: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MapObstacle::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for MapObstacleUpdateMessage {
-    const MESSAGE_ID: u16 = 6051;
-}
-
-/// Protocol message — ID: 6124
-#[derive(Debug, Clone, Default)]
-pub struct StopToListenRunningFightRequestMessage {
-}
-
-impl DofusSerialize for StopToListenRunningFightRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for StopToListenRunningFightRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for StopToListenRunningFightRequestMessage {
-    const MESSAGE_ID: u16 = 6124;
-}
-
-/// Protocol message — ID: 6130
-#[derive(Debug, Clone, Default)]
-pub struct MapComplementaryInformationsDataInHouseMessage {
-    pub sub_area_id: i16,
+pub struct CurrentMapInstanceMessage {
     pub map_id: f64,
-    pub houses: Vec<Vec<u8>>,
-    pub actors: Vec<Vec<u8>>,
-    pub interactive_elements: Vec<Vec<u8>>,
-    pub stated_elements: Vec<StatedElement>,
-    pub obstacles: Vec<MapObstacle>,
-    pub fights: Vec<FightCommonInformations>,
-    pub has_aggressive_monsters: bool,
-    pub fight_start_positions: FightStartingPositions,
-    pub current_house: HouseInformationsInside,
+    pub map_key: String,
+    pub instantiated_map_id: f64,
 }
 
-impl DofusSerialize for MapComplementaryInformationsDataInHouseMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_double(self.map_id);
-        writer.write_short(self.houses.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.actors.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.interactive_elements.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.stated_elements.len() as _);
-        for item in &self.stated_elements {
-            item.serialize(writer);
-        }
-        writer.write_short(self.obstacles.len() as _);
-        for item in &self.obstacles {
-            item.serialize(writer);
-        }
-        writer.write_short(self.fights.len() as _);
-        for item in &self.fights {
-            item.serialize(writer);
-        }
-        writer.write_boolean(self.has_aggressive_monsters);
-        self.fight_start_positions.serialize(writer);
-        self.current_house.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for MapComplementaryInformationsDataInHouseMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            map_id: reader.read_double()?,
-            houses: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            actors: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            interactive_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            stated_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(StatedElement::deserialize(reader)?);
-                }
-                v
-            },
-            obstacles: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MapObstacle::deserialize(reader)?);
-                }
-                v
-            },
-            fights: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(FightCommonInformations::deserialize(reader)?);
-                }
-                v
-            },
-            has_aggressive_monsters: reader.read_boolean()?,
-            fight_start_positions: FightStartingPositions::deserialize(reader)?,
-            current_house: HouseInformationsInside::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for MapComplementaryInformationsDataInHouseMessage {
-    const MESSAGE_ID: u16 = 6130;
-}
-
-/// Protocol message — ID: 6197
-#[derive(Debug, Clone, Default)]
-pub struct ErrorMapNotFoundMessage {
-    pub map_id: f64,
-}
-
-impl DofusSerialize for ErrorMapNotFoundMessage {
+impl DofusSerialize for CurrentMapInstanceMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_double(self.map_id);
+        writer.write_utf(&self.map_key);
+        writer.write_double(self.instantiated_map_id);
     }
 }
 
-impl DofusDeserialize for ErrorMapNotFoundMessage {
+impl DofusDeserialize for CurrentMapInstanceMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             map_id: reader.read_double()?,
+            map_key: reader.read_utf()?,
+            instantiated_map_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for ErrorMapNotFoundMessage {
-    const MESSAGE_ID: u16 = 6197;
+impl DofusMessage for CurrentMapInstanceMessage {
+    const MESSAGE_ID: u16 = 3125;
 }
 
-/// Protocol message — ID: 6268
-#[derive(Debug, Clone, Default)]
-pub struct MapComplementaryInformationsWithCoordsMessage {
-    pub sub_area_id: i16,
-    pub map_id: f64,
-    pub houses: Vec<Vec<u8>>,
-    pub actors: Vec<Vec<u8>>,
-    pub interactive_elements: Vec<Vec<u8>>,
-    pub stated_elements: Vec<StatedElement>,
-    pub obstacles: Vec<MapObstacle>,
-    pub fights: Vec<FightCommonInformations>,
-    pub has_aggressive_monsters: bool,
-    pub fight_start_positions: FightStartingPositions,
-    pub world_x: i16,
-    pub world_y: i16,
-}
-
-impl DofusSerialize for MapComplementaryInformationsWithCoordsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_double(self.map_id);
-        writer.write_short(self.houses.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.actors.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.interactive_elements.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.stated_elements.len() as _);
-        for item in &self.stated_elements {
-            item.serialize(writer);
-        }
-        writer.write_short(self.obstacles.len() as _);
-        for item in &self.obstacles {
-            item.serialize(writer);
-        }
-        writer.write_short(self.fights.len() as _);
-        for item in &self.fights {
-            item.serialize(writer);
-        }
-        writer.write_boolean(self.has_aggressive_monsters);
-        self.fight_start_positions.serialize(writer);
-        writer.write_short(self.world_x);
-        writer.write_short(self.world_y);
-    }
-}
-
-impl DofusDeserialize for MapComplementaryInformationsWithCoordsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            map_id: reader.read_double()?,
-            houses: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            actors: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            interactive_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            stated_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(StatedElement::deserialize(reader)?);
-                }
-                v
-            },
-            obstacles: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MapObstacle::deserialize(reader)?);
-                }
-                v
-            },
-            fights: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(FightCommonInformations::deserialize(reader)?);
-                }
-                v
-            },
-            has_aggressive_monsters: reader.read_boolean()?,
-            fight_start_positions: FightStartingPositions::deserialize(reader)?,
-            world_x: reader.read_short()?,
-            world_y: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MapComplementaryInformationsWithCoordsMessage {
-    const MESSAGE_ID: u16 = 6268;
-}
-
-/// Protocol message — ID: 6407
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayShowActorWithEventMessage {
-    pub informations: Box<GameRolePlayActorInformationsVariant>,
-    pub actor_event_id: u8,
-}
-
-impl DofusSerialize for GameRolePlayShowActorWithEventMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.informations.get_type_id());
-        (*self.informations).serialize(writer);
-        writer.write_byte(self.actor_event_id);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayShowActorWithEventMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            informations: {
-                let type_id = reader.read_ushort()?;
-                Box::new(GameRolePlayActorInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-            actor_event_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayShowActorWithEventMessage {
-    const MESSAGE_ID: u16 = 6407;
-}
-
-/// Protocol message — ID: 6500
+/// Protocol message — ID: 3172
 #[derive(Debug, Clone, Default)]
 pub struct MapRunningFightDetailsExtendedMessage {
     pub fight_id: i16,
@@ -778,10 +188,89 @@ impl DofusDeserialize for MapRunningFightDetailsExtendedMessage {
 }
 
 impl DofusMessage for MapRunningFightDetailsExtendedMessage {
-    const MESSAGE_ID: u16 = 6500;
+    const MESSAGE_ID: u16 = 3172;
 }
 
-/// Protocol message — ID: 6622
+/// Protocol message — ID: 3266
+#[derive(Debug, Clone, Default)]
+pub struct ChangeMapMessage {
+    pub map_id: f64,
+    pub autopilot: bool,
+}
+
+impl DofusSerialize for ChangeMapMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+        writer.write_boolean(self.autopilot);
+    }
+}
+
+impl DofusDeserialize for ChangeMapMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+            autopilot: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ChangeMapMessage {
+    const MESSAGE_ID: u16 = 3266;
+}
+
+/// Protocol message — ID: 3267
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayShowActorMessage {
+    pub informations: Box<GameRolePlayActorInformationsVariant>,
+}
+
+impl DofusSerialize for GameRolePlayShowActorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.informations.get_type_id());
+        (*self.informations).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayShowActorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let type_id = reader.read_ushort()?;
+                Box::new(GameRolePlayActorInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayShowActorMessage {
+    const MESSAGE_ID: u16 = 3267;
+}
+
+/// Protocol message — ID: 3684
+#[derive(Debug, Clone, Default)]
+pub struct MapFightCountMessage {
+    pub fight_count: i16,
+}
+
+impl DofusSerialize for MapFightCountMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_count);
+    }
+}
+
+impl DofusDeserialize for MapFightCountMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_count: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MapFightCountMessage {
+    const MESSAGE_ID: u16 = 3684;
+}
+
+/// Protocol message — ID: 4332
 #[derive(Debug, Clone, Default)]
 pub struct MapComplementaryInformationsDataInHavenBagMessage {
     pub sub_area_id: i16,
@@ -895,26 +384,78 @@ impl DofusDeserialize for MapComplementaryInformationsDataInHavenBagMessage {
 }
 
 impl DofusMessage for MapComplementaryInformationsDataInHavenBagMessage {
-    const MESSAGE_ID: u16 = 6622;
+    const MESSAGE_ID: u16 = 4332;
 }
 
-/// Protocol message — ID: 6712
+/// Protocol message — ID: 4556
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayShowMultipleActorsMessage {
-    pub informations_list: Vec<Vec<u8>>,
+pub struct MapRunningFightListRequestMessage {
 }
 
-impl DofusSerialize for GameRolePlayShowMultipleActorsMessage {
+impl DofusSerialize for MapRunningFightListRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.informations_list.len() as _);
-        // polymorphic vector (unresolved base type)
     }
 }
 
-impl DofusDeserialize for GameRolePlayShowMultipleActorsMessage {
+impl DofusDeserialize for MapRunningFightListRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            informations_list: {
+        })
+    }
+}
+
+impl DofusMessage for MapRunningFightListRequestMessage {
+    const MESSAGE_ID: u16 = 4556;
+}
+
+/// Protocol message — ID: 5176
+#[derive(Debug, Clone, Default)]
+pub struct MapComplementaryInformationsDataMessage {
+    pub sub_area_id: i16,
+    pub map_id: f64,
+    pub houses: Vec<Vec<u8>>,
+    pub actors: Vec<Vec<u8>>,
+    pub interactive_elements: Vec<Vec<u8>>,
+    pub stated_elements: Vec<StatedElement>,
+    pub obstacles: Vec<MapObstacle>,
+    pub fights: Vec<FightCommonInformations>,
+    pub has_aggressive_monsters: bool,
+    pub fight_start_positions: FightStartingPositions,
+}
+
+impl DofusSerialize for MapComplementaryInformationsDataMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_double(self.map_id);
+        writer.write_short(self.houses.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.actors.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.interactive_elements.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.stated_elements.len() as _);
+        for item in &self.stated_elements {
+            item.serialize(writer);
+        }
+        writer.write_short(self.obstacles.len() as _);
+        for item in &self.obstacles {
+            item.serialize(writer);
+        }
+        writer.write_short(self.fights.len() as _);
+        for item in &self.fights {
+            item.serialize(writer);
+        }
+        writer.write_boolean(self.has_aggressive_monsters);
+        self.fight_start_positions.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for MapComplementaryInformationsDataMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            map_id: reader.read_double()?,
+            houses: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -922,15 +463,278 @@ impl DofusDeserialize for GameRolePlayShowMultipleActorsMessage {
                 }
                 v
             },
+            actors: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            interactive_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            stated_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(StatedElement::deserialize(reader)?);
+                }
+                v
+            },
+            obstacles: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MapObstacle::deserialize(reader)?);
+                }
+                v
+            },
+            fights: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(FightCommonInformations::deserialize(reader)?);
+                }
+                v
+            },
+            has_aggressive_monsters: reader.read_boolean()?,
+            fight_start_positions: FightStartingPositions::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayShowMultipleActorsMessage {
-    const MESSAGE_ID: u16 = 6712;
+impl DofusMessage for MapComplementaryInformationsDataMessage {
+    const MESSAGE_ID: u16 = 5176;
 }
 
-/// Protocol message — ID: 6716
+/// Protocol message — ID: 5308
+#[derive(Debug, Clone, Default)]
+pub struct MapComplementaryInformationsWithCoordsMessage {
+    pub sub_area_id: i16,
+    pub map_id: f64,
+    pub houses: Vec<Vec<u8>>,
+    pub actors: Vec<Vec<u8>>,
+    pub interactive_elements: Vec<Vec<u8>>,
+    pub stated_elements: Vec<StatedElement>,
+    pub obstacles: Vec<MapObstacle>,
+    pub fights: Vec<FightCommonInformations>,
+    pub has_aggressive_monsters: bool,
+    pub fight_start_positions: FightStartingPositions,
+    pub world_x: i16,
+    pub world_y: i16,
+}
+
+impl DofusSerialize for MapComplementaryInformationsWithCoordsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_double(self.map_id);
+        writer.write_short(self.houses.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.actors.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.interactive_elements.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.stated_elements.len() as _);
+        for item in &self.stated_elements {
+            item.serialize(writer);
+        }
+        writer.write_short(self.obstacles.len() as _);
+        for item in &self.obstacles {
+            item.serialize(writer);
+        }
+        writer.write_short(self.fights.len() as _);
+        for item in &self.fights {
+            item.serialize(writer);
+        }
+        writer.write_boolean(self.has_aggressive_monsters);
+        self.fight_start_positions.serialize(writer);
+        writer.write_short(self.world_x);
+        writer.write_short(self.world_y);
+    }
+}
+
+impl DofusDeserialize for MapComplementaryInformationsWithCoordsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            map_id: reader.read_double()?,
+            houses: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            actors: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            interactive_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            stated_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(StatedElement::deserialize(reader)?);
+                }
+                v
+            },
+            obstacles: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MapObstacle::deserialize(reader)?);
+                }
+                v
+            },
+            fights: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(FightCommonInformations::deserialize(reader)?);
+                }
+                v
+            },
+            has_aggressive_monsters: reader.read_boolean()?,
+            fight_start_positions: FightStartingPositions::deserialize(reader)?,
+            world_x: reader.read_short()?,
+            world_y: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MapComplementaryInformationsWithCoordsMessage {
+    const MESSAGE_ID: u16 = 5308;
+}
+
+/// Protocol message — ID: 5450
+#[derive(Debug, Clone, Default)]
+pub struct AnomalySubareaInformationRequestMessage {
+}
+
+impl DofusSerialize for AnomalySubareaInformationRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AnomalySubareaInformationRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AnomalySubareaInformationRequestMessage {
+    const MESSAGE_ID: u16 = 5450;
+}
+
+/// Protocol message — ID: 6086
+#[derive(Debug, Clone, Default)]
+pub struct ErrorMapNotFoundMessage {
+    pub map_id: f64,
+}
+
+impl DofusSerialize for ErrorMapNotFoundMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for ErrorMapNotFoundMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for ErrorMapNotFoundMessage {
+    const MESSAGE_ID: u16 = 6086;
+}
+
+/// Protocol message — ID: 6726
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayShowActorWithEventMessage {
+    pub informations: Box<GameRolePlayActorInformationsVariant>,
+    pub actor_event_id: u8,
+}
+
+impl DofusSerialize for GameRolePlayShowActorWithEventMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.informations.get_type_id());
+        (*self.informations).serialize(writer);
+        writer.write_byte(self.actor_event_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayShowActorWithEventMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let type_id = reader.read_ushort()?;
+                Box::new(GameRolePlayActorInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+            actor_event_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayShowActorWithEventMessage {
+    const MESSAGE_ID: u16 = 6726;
+}
+
+/// Protocol message — ID: 6903
+#[derive(Debug, Clone, Default)]
+pub struct MapObstacleUpdateMessage {
+    pub obstacles: Vec<MapObstacle>,
+}
+
+impl DofusSerialize for MapObstacleUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.obstacles.len() as _);
+        for item in &self.obstacles {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for MapObstacleUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            obstacles: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MapObstacle::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for MapObstacleUpdateMessage {
+    const MESSAGE_ID: u16 = 6903;
+}
+
+/// Protocol message — ID: 7089
 #[derive(Debug, Clone, Default)]
 pub struct MapFightStartPositionsUpdateMessage {
     pub map_id: f64,
@@ -954,91 +758,263 @@ impl DofusDeserialize for MapFightStartPositionsUpdateMessage {
 }
 
 impl DofusMessage for MapFightStartPositionsUpdateMessage {
-    const MESSAGE_ID: u16 = 6716;
+    const MESSAGE_ID: u16 = 7089;
 }
 
-/// Protocol message — ID: 6738
+/// Protocol message — ID: 7557
 #[derive(Debug, Clone, Default)]
-pub struct CurrentMapInstanceMessage {
-    pub map_id: f64,
-    pub map_key: String,
-    pub instantiated_map_id: f64,
+pub struct StopToListenRunningFightRequestMessage {
 }
 
-impl DofusSerialize for CurrentMapInstanceMessage {
+impl DofusSerialize for StopToListenRunningFightRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-        writer.write_utf(&self.map_key);
-        writer.write_double(self.instantiated_map_id);
     }
 }
 
-impl DofusDeserialize for CurrentMapInstanceMessage {
+impl DofusDeserialize for StopToListenRunningFightRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for StopToListenRunningFightRequestMessage {
+    const MESSAGE_ID: u16 = 7557;
+}
+
+/// Protocol message — ID: 7796
+#[derive(Debug, Clone, Default)]
+pub struct CurrentMapMessage {
+    pub map_id: f64,
+    pub map_key: String,
+}
+
+impl DofusSerialize for CurrentMapMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+        writer.write_utf(&self.map_key);
+    }
+}
+
+impl DofusDeserialize for CurrentMapMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             map_id: reader.read_double()?,
             map_key: reader.read_utf()?,
-            instantiated_map_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for CurrentMapInstanceMessage {
-    const MESSAGE_ID: u16 = 6738;
+impl DofusMessage for CurrentMapMessage {
+    const MESSAGE_ID: u16 = 7796;
 }
 
-/// Protocol message — ID: 6827
+/// Protocol message — ID: 8222
 #[derive(Debug, Clone, Default)]
-pub struct MapRewardRateMessage {
-    pub map_rate: i16,
-    pub sub_area_rate: i16,
-    pub total_rate: i16,
+pub struct MapRunningFightDetailsMessage {
+    pub fight_id: i16,
+    pub attackers: Vec<Vec<u8>>,
+    pub defenders: Vec<Vec<u8>>,
 }
 
-impl DofusSerialize for MapRewardRateMessage {
+impl DofusSerialize for MapRunningFightDetailsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.map_rate);
-        writer.write_var_short(self.sub_area_rate);
-        writer.write_var_short(self.total_rate);
+        writer.write_var_short(self.fight_id);
+        writer.write_short(self.attackers.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.defenders.len() as _);
+        // polymorphic vector (unresolved base type)
     }
 }
 
-impl DofusDeserialize for MapRewardRateMessage {
+impl DofusDeserialize for MapRunningFightDetailsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            map_rate: reader.read_var_short()?,
-            sub_area_rate: reader.read_var_short()?,
-            total_rate: reader.read_var_short()?,
+            fight_id: reader.read_var_short()?,
+            attackers: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            defenders: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for MapRewardRateMessage {
-    const MESSAGE_ID: u16 = 6827;
+impl DofusMessage for MapRunningFightDetailsMessage {
+    const MESSAGE_ID: u16 = 8222;
 }
 
-/// Protocol message — ID: 6835
+/// Protocol message — ID: 8234
 #[derive(Debug, Clone, Default)]
-pub struct AnomalySubareaInformationRequestMessage {
+pub struct TeleportOnSameMapMessage {
+    pub target_id: f64,
+    pub cell_id: i16,
 }
 
-impl DofusSerialize for AnomalySubareaInformationRequestMessage {
+impl DofusSerialize for TeleportOnSameMapMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.target_id);
+        writer.write_var_short(self.cell_id);
     }
 }
 
-impl DofusDeserialize for AnomalySubareaInformationRequestMessage {
+impl DofusDeserialize for TeleportOnSameMapMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            target_id: reader.read_double()?,
+            cell_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for AnomalySubareaInformationRequestMessage {
-    const MESSAGE_ID: u16 = 6835;
+impl DofusMessage for TeleportOnSameMapMessage {
+    const MESSAGE_ID: u16 = 8234;
 }
 
-/// Protocol message — ID: 6836
+/// Protocol message — ID: 8879
+#[derive(Debug, Clone, Default)]
+pub struct MapRunningFightDetailsRequestMessage {
+    pub fight_id: i16,
+}
+
+impl DofusSerialize for MapRunningFightDetailsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+    }
+}
+
+impl DofusDeserialize for MapRunningFightDetailsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MapRunningFightDetailsRequestMessage {
+    const MESSAGE_ID: u16 = 8879;
+}
+
+/// Protocol message — ID: 9214
+#[derive(Debug, Clone, Default)]
+pub struct MapComplementaryInformationsDataInHouseMessage {
+    pub sub_area_id: i16,
+    pub map_id: f64,
+    pub houses: Vec<Vec<u8>>,
+    pub actors: Vec<Vec<u8>>,
+    pub interactive_elements: Vec<Vec<u8>>,
+    pub stated_elements: Vec<StatedElement>,
+    pub obstacles: Vec<MapObstacle>,
+    pub fights: Vec<FightCommonInformations>,
+    pub has_aggressive_monsters: bool,
+    pub fight_start_positions: FightStartingPositions,
+    pub current_house: HouseInformationsInside,
+}
+
+impl DofusSerialize for MapComplementaryInformationsDataInHouseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_double(self.map_id);
+        writer.write_short(self.houses.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.actors.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.interactive_elements.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.stated_elements.len() as _);
+        for item in &self.stated_elements {
+            item.serialize(writer);
+        }
+        writer.write_short(self.obstacles.len() as _);
+        for item in &self.obstacles {
+            item.serialize(writer);
+        }
+        writer.write_short(self.fights.len() as _);
+        for item in &self.fights {
+            item.serialize(writer);
+        }
+        writer.write_boolean(self.has_aggressive_monsters);
+        self.fight_start_positions.serialize(writer);
+        self.current_house.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for MapComplementaryInformationsDataInHouseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            map_id: reader.read_double()?,
+            houses: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            actors: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            interactive_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            stated_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(StatedElement::deserialize(reader)?);
+                }
+                v
+            },
+            obstacles: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MapObstacle::deserialize(reader)?);
+                }
+                v
+            },
+            fights: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(FightCommonInformations::deserialize(reader)?);
+                }
+                v
+            },
+            has_aggressive_monsters: reader.read_boolean()?,
+            fight_start_positions: FightStartingPositions::deserialize(reader)?,
+            current_house: HouseInformationsInside::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for MapComplementaryInformationsDataInHouseMessage {
+    const MESSAGE_ID: u16 = 9214;
+}
+
+/// Protocol message — ID: 9391
 #[derive(Debug, Clone, Default)]
 pub struct AnomalySubareaInformationResponseMessage {
     pub subareas: Vec<AnomalySubareaInformation>,
@@ -1069,6 +1045,30 @@ impl DofusDeserialize for AnomalySubareaInformationResponseMessage {
 }
 
 impl DofusMessage for AnomalySubareaInformationResponseMessage {
-    const MESSAGE_ID: u16 = 6836;
+    const MESSAGE_ID: u16 = 9391;
+}
+
+/// Protocol message — ID: 9780
+#[derive(Debug, Clone, Default)]
+pub struct MapInformationsRequestMessage {
+    pub map_id: f64,
+}
+
+impl DofusSerialize for MapInformationsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for MapInformationsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for MapInformationsRequestMessage {
+    const MESSAGE_ID: u16 = 9780;
 }
 

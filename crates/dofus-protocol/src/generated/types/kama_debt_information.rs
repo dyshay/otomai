@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 580
+/// Protocol type — ID: 9275
 #[derive(Debug, Clone, Default)]
 pub struct KamaDebtInformation {
     pub id: f64,
@@ -33,6 +33,6 @@ impl DofusDeserialize for KamaDebtInformation {
 }
 
 impl DofusType for KamaDebtInformation {
-    const TYPE_ID: u16 = 580;
+    const TYPE_ID: u16 = 9275;
 }
 

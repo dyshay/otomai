@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6726
+/// Protocol message — ID: 2580
 #[derive(Debug, Clone, Default)]
 pub struct HouseTeleportRequestMessage {
     pub house_id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for HouseTeleportRequestMessage {
 }
 
 impl DofusMessage for HouseTeleportRequestMessage {
-    const MESSAGE_ID: u16 = 6726;
+    const MESSAGE_ID: u16 = 2580;
 }
 

@@ -6,28 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 150
-#[derive(Debug, Clone, Default)]
-pub struct CharactersListRequestMessage {
-}
-
-impl DofusSerialize for CharactersListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharactersListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharactersListRequestMessage {
-    const MESSAGE_ID: u16 = 150;
-}
-
-/// Protocol message — ID: 151
+/// Protocol message — ID: 434
 #[derive(Debug, Clone, Default)]
 pub struct CharactersListMessage {
     pub characters: Vec<Vec<u8>>,
@@ -59,234 +38,10 @@ impl DofusDeserialize for CharactersListMessage {
 }
 
 impl DofusMessage for CharactersListMessage {
-    const MESSAGE_ID: u16 = 151;
+    const MESSAGE_ID: u16 = 434;
 }
 
-/// Protocol message — ID: 152
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectionMessage {
-    pub id: i64,
-}
-
-impl DofusSerialize for CharacterSelectionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.id);
-    }
-}
-
-impl DofusDeserialize for CharacterSelectionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectionMessage {
-    const MESSAGE_ID: u16 = 152;
-}
-
-/// Protocol message — ID: 153
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectedSuccessMessage {
-    pub infos: CharacterBaseInformations,
-    pub is_collecting_stats: bool,
-}
-
-impl DofusSerialize for CharacterSelectedSuccessMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.infos.serialize(writer);
-        writer.write_boolean(self.is_collecting_stats);
-    }
-}
-
-impl DofusDeserialize for CharacterSelectedSuccessMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            infos: CharacterBaseInformations::deserialize(reader)?,
-            is_collecting_stats: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectedSuccessMessage {
-    const MESSAGE_ID: u16 = 153;
-}
-
-/// Protocol message — ID: 5545
-#[derive(Debug, Clone, Default)]
-pub struct CharactersListErrorMessage {
-}
-
-impl DofusSerialize for CharactersListErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharactersListErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharactersListErrorMessage {
-    const MESSAGE_ID: u16 = 5545;
-}
-
-/// Protocol message — ID: 5836
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectedErrorMessage {
-}
-
-impl DofusSerialize for CharacterSelectedErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharacterSelectedErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectedErrorMessage {
-    const MESSAGE_ID: u16 = 5836;
-}
-
-/// Protocol message — ID: 6068
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectedForceMessage {
-    pub id: i32,
-}
-
-impl DofusSerialize for CharacterSelectedForceMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.id);
-    }
-}
-
-impl DofusDeserialize for CharacterSelectedForceMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectedForceMessage {
-    const MESSAGE_ID: u16 = 6068;
-}
-
-/// Protocol message — ID: 6072
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectedForceReadyMessage {
-}
-
-impl DofusSerialize for CharacterSelectedForceReadyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharacterSelectedForceReadyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectedForceReadyMessage {
-    const MESSAGE_ID: u16 = 6072;
-}
-
-/// Protocol message — ID: 6084
-#[derive(Debug, Clone, Default)]
-pub struct CharacterFirstSelectionMessage {
-    pub id: i64,
-    pub do_tutorial: bool,
-}
-
-impl DofusSerialize for CharacterFirstSelectionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.id);
-        writer.write_boolean(self.do_tutorial);
-    }
-}
-
-impl DofusDeserialize for CharacterFirstSelectionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_long()?,
-            do_tutorial: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterFirstSelectionMessage {
-    const MESSAGE_ID: u16 = 6084;
-}
-
-/// Protocol message — ID: 6475
-#[derive(Debug, Clone, Default)]
-pub struct BasicCharactersListMessage {
-    pub characters: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for BasicCharactersListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.characters.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for BasicCharactersListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            characters: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for BasicCharactersListMessage {
-    const MESSAGE_ID: u16 = 6475;
-}
-
-/// Protocol message — ID: 6549
-#[derive(Debug, Clone, Default)]
-pub struct CharacterSelectionWithRemodelMessage {
-    pub id: i64,
-    pub remodel: RemodelingInformation,
-}
-
-impl DofusSerialize for CharacterSelectionWithRemodelMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.id);
-        self.remodel.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for CharacterSelectionWithRemodelMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_long()?,
-            remodel: RemodelingInformation::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterSelectionWithRemodelMessage {
-    const MESSAGE_ID: u16 = 6549;
-}
-
-/// Protocol message — ID: 6550
+/// Protocol message — ID: 1171
 #[derive(Debug, Clone, Default)]
 pub struct CharactersListWithRemodelingMessage {
     pub characters: Vec<Vec<u8>>,
@@ -331,10 +86,234 @@ impl DofusDeserialize for CharactersListWithRemodelingMessage {
 }
 
 impl DofusMessage for CharactersListWithRemodelingMessage {
-    const MESSAGE_ID: u16 = 6550;
+    const MESSAGE_ID: u16 = 1171;
 }
 
-/// Protocol message — ID: 6551
+/// Protocol message — ID: 2068
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectedForceMessage {
+    pub id: i32,
+}
+
+impl DofusSerialize for CharacterSelectedForceMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.id);
+    }
+}
+
+impl DofusDeserialize for CharacterSelectedForceMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectedForceMessage {
+    const MESSAGE_ID: u16 = 2068;
+}
+
+/// Protocol message — ID: 2566
+#[derive(Debug, Clone, Default)]
+pub struct CharactersListRequestMessage {
+}
+
+impl DofusSerialize for CharactersListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharactersListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharactersListRequestMessage {
+    const MESSAGE_ID: u16 = 2566;
+}
+
+/// Protocol message — ID: 3592
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectionWithRemodelMessage {
+    pub id: i64,
+    pub remodel: RemodelingInformation,
+}
+
+impl DofusSerialize for CharacterSelectionWithRemodelMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
+        self.remodel.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for CharacterSelectionWithRemodelMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_long()?,
+            remodel: RemodelingInformation::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectionWithRemodelMessage {
+    const MESSAGE_ID: u16 = 3592;
+}
+
+/// Protocol message — ID: 5754
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectedForceReadyMessage {
+}
+
+impl DofusSerialize for CharacterSelectedForceReadyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharacterSelectedForceReadyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectedForceReadyMessage {
+    const MESSAGE_ID: u16 = 5754;
+}
+
+/// Protocol message — ID: 6200
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectionMessage {
+    pub id: i64,
+}
+
+impl DofusSerialize for CharacterSelectionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
+    }
+}
+
+impl DofusDeserialize for CharacterSelectionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectionMessage {
+    const MESSAGE_ID: u16 = 6200;
+}
+
+/// Protocol message — ID: 6801
+#[derive(Debug, Clone, Default)]
+pub struct CharactersListErrorMessage {
+}
+
+impl DofusSerialize for CharactersListErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharactersListErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharactersListErrorMessage {
+    const MESSAGE_ID: u16 = 6801;
+}
+
+/// Protocol message — ID: 7120
+#[derive(Debug, Clone, Default)]
+pub struct CharacterFirstSelectionMessage {
+    pub id: i64,
+    pub do_tutorial: bool,
+}
+
+impl DofusSerialize for CharacterFirstSelectionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
+        writer.write_boolean(self.do_tutorial);
+    }
+}
+
+impl DofusDeserialize for CharacterFirstSelectionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_long()?,
+            do_tutorial: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterFirstSelectionMessage {
+    const MESSAGE_ID: u16 = 7120;
+}
+
+/// Protocol message — ID: 7584
+#[derive(Debug, Clone, Default)]
+pub struct BasicCharactersListMessage {
+    pub characters: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for BasicCharactersListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.characters.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for BasicCharactersListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            characters: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for BasicCharactersListMessage {
+    const MESSAGE_ID: u16 = 7584;
+}
+
+/// Protocol message — ID: 8424
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectedSuccessMessage {
+    pub infos: CharacterBaseInformations,
+    pub is_collecting_stats: bool,
+}
+
+impl DofusSerialize for CharacterSelectedSuccessMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.infos.serialize(writer);
+        writer.write_boolean(self.is_collecting_stats);
+    }
+}
+
+impl DofusDeserialize for CharacterSelectedSuccessMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            infos: CharacterBaseInformations::deserialize(reader)?,
+            is_collecting_stats: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectedSuccessMessage {
+    const MESSAGE_ID: u16 = 8424;
+}
+
+/// Protocol message — ID: 8678
 #[derive(Debug, Clone, Default)]
 pub struct CharacterReplayWithRemodelRequestMessage {
     pub character_id: i64,
@@ -358,6 +337,27 @@ impl DofusDeserialize for CharacterReplayWithRemodelRequestMessage {
 }
 
 impl DofusMessage for CharacterReplayWithRemodelRequestMessage {
-    const MESSAGE_ID: u16 = 6551;
+    const MESSAGE_ID: u16 = 8678;
+}
+
+/// Protocol message — ID: 8844
+#[derive(Debug, Clone, Default)]
+pub struct CharacterSelectedErrorMessage {
+}
+
+impl DofusSerialize for CharacterSelectedErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharacterSelectedErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharacterSelectedErrorMessage {
+    const MESSAGE_ID: u16 = 8844;
 }
 

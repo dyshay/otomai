@@ -71,7 +71,6 @@ pub mod game_context_roleplay_spell;
 pub mod game_context_roleplay_stats;
 pub mod game_context_roleplay_treasureHunt;
 pub mod game_context_roleplay_visual;
-pub mod game_dare;
 pub mod game_dialog;
 pub mod game_entity;
 pub mod game_feed;

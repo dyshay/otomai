@@ -6,196 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5932
-#[derive(Debug, Clone, Default)]
-pub struct ContactLookRequestMessage {
-    pub request_id: u8,
-    pub contact_type: u8,
-}
-
-impl DofusSerialize for ContactLookRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.request_id);
-        writer.write_byte(self.contact_type);
-    }
-}
-
-impl DofusDeserialize for ContactLookRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_byte()?,
-            contact_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ContactLookRequestMessage {
-    const MESSAGE_ID: u16 = 5932;
-}
-
-/// Protocol message — ID: 5933
-#[derive(Debug, Clone, Default)]
-pub struct ContactLookRequestByNameMessage {
-    pub request_id: u8,
-    pub contact_type: u8,
-    pub player_name: String,
-}
-
-impl DofusSerialize for ContactLookRequestByNameMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.request_id);
-        writer.write_byte(self.contact_type);
-        writer.write_utf(&self.player_name);
-    }
-}
-
-impl DofusDeserialize for ContactLookRequestByNameMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_byte()?,
-            contact_type: reader.read_byte()?,
-            player_name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for ContactLookRequestByNameMessage {
-    const MESSAGE_ID: u16 = 5933;
-}
-
-/// Protocol message — ID: 5934
-#[derive(Debug, Clone, Default)]
-pub struct ContactLookMessage {
-    pub request_id: i32,
-    pub player_name: String,
-    pub player_id: i64,
-    pub look: EntityLook,
-}
-
-impl DofusSerialize for ContactLookMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.request_id);
-        writer.write_utf(&self.player_name);
-        writer.write_var_long(self.player_id);
-        self.look.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ContactLookMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_var_int()?,
-            player_name: reader.read_utf()?,
-            player_id: reader.read_var_long()?,
-            look: EntityLook::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ContactLookMessage {
-    const MESSAGE_ID: u16 = 5934;
-}
-
-/// Protocol message — ID: 5935
-#[derive(Debug, Clone, Default)]
-pub struct ContactLookRequestByIdMessage {
-    pub request_id: u8,
-    pub contact_type: u8,
-    pub player_id: i64,
-}
-
-impl DofusSerialize for ContactLookRequestByIdMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.request_id);
-        writer.write_byte(self.contact_type);
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for ContactLookRequestByIdMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_byte()?,
-            contact_type: reader.read_byte()?,
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ContactLookRequestByIdMessage {
-    const MESSAGE_ID: u16 = 5935;
-}
-
-/// Protocol message — ID: 6045
-#[derive(Debug, Clone, Default)]
-pub struct ContactLookErrorMessage {
-    pub request_id: i32,
-}
-
-impl DofusSerialize for ContactLookErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.request_id);
-    }
-}
-
-impl DofusDeserialize for ContactLookErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ContactLookErrorMessage {
-    const MESSAGE_ID: u16 = 6045;
-}
-
-/// Protocol message — ID: 6684
-#[derive(Debug, Clone, Default)]
-pub struct SocialNoticeSetErrorMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for SocialNoticeSetErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for SocialNoticeSetErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for SocialNoticeSetErrorMessage {
-    const MESSAGE_ID: u16 = 6684;
-}
-
-/// Protocol message — ID: 6686
-#[derive(Debug, Clone, Default)]
-pub struct SocialNoticeSetRequestMessage {
-}
-
-impl DofusSerialize for SocialNoticeSetRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for SocialNoticeSetRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for SocialNoticeSetRequestMessage {
-    const MESSAGE_ID: u16 = 6686;
-}
-
-/// Protocol message — ID: 6688
+/// Protocol message — ID: 1883
 #[derive(Debug, Clone, Default)]
 pub struct SocialNoticeMessage {
     pub content: String,
@@ -225,10 +36,103 @@ impl DofusDeserialize for SocialNoticeMessage {
 }
 
 impl DofusMessage for SocialNoticeMessage {
-    const MESSAGE_ID: u16 = 6688;
+    const MESSAGE_ID: u16 = 1883;
 }
 
-/// Protocol message — ID: 6695
+/// Protocol message — ID: 3633
+#[derive(Debug, Clone, Default)]
+pub struct ContactLookRequestByIdMessage {
+    pub request_id: u8,
+    pub contact_type: u8,
+    pub player_id: i64,
+}
+
+impl DofusSerialize for ContactLookRequestByIdMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.request_id);
+        writer.write_byte(self.contact_type);
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for ContactLookRequestByIdMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_byte()?,
+            contact_type: reader.read_byte()?,
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ContactLookRequestByIdMessage {
+    const MESSAGE_ID: u16 = 3633;
+}
+
+/// Protocol message — ID: 4430
+#[derive(Debug, Clone, Default)]
+pub struct ContactLookRequestByNameMessage {
+    pub request_id: u8,
+    pub contact_type: u8,
+    pub player_name: String,
+}
+
+impl DofusSerialize for ContactLookRequestByNameMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.request_id);
+        writer.write_byte(self.contact_type);
+        writer.write_utf(&self.player_name);
+    }
+}
+
+impl DofusDeserialize for ContactLookRequestByNameMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_byte()?,
+            contact_type: reader.read_byte()?,
+            player_name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for ContactLookRequestByNameMessage {
+    const MESSAGE_ID: u16 = 4430;
+}
+
+/// Protocol message — ID: 4440
+#[derive(Debug, Clone, Default)]
+pub struct ContactLookMessage {
+    pub request_id: i32,
+    pub player_name: String,
+    pub player_id: i64,
+    pub look: EntityLook,
+}
+
+impl DofusSerialize for ContactLookMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.request_id);
+        writer.write_utf(&self.player_name);
+        writer.write_var_long(self.player_id);
+        self.look.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ContactLookMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_var_int()?,
+            player_name: reader.read_utf()?,
+            player_id: reader.read_var_long()?,
+            look: EntityLook::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ContactLookMessage {
+    const MESSAGE_ID: u16 = 4440;
+}
+
+/// Protocol message — ID: 6070
 #[derive(Debug, Clone, Default)]
 pub struct BulletinMessage {
     pub content: String,
@@ -261,6 +165,102 @@ impl DofusDeserialize for BulletinMessage {
 }
 
 impl DofusMessage for BulletinMessage {
-    const MESSAGE_ID: u16 = 6695;
+    const MESSAGE_ID: u16 = 6070;
+}
+
+/// Protocol message — ID: 6653
+#[derive(Debug, Clone, Default)]
+pub struct ContactLookRequestMessage {
+    pub request_id: u8,
+    pub contact_type: u8,
+}
+
+impl DofusSerialize for ContactLookRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.request_id);
+        writer.write_byte(self.contact_type);
+    }
+}
+
+impl DofusDeserialize for ContactLookRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_byte()?,
+            contact_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ContactLookRequestMessage {
+    const MESSAGE_ID: u16 = 6653;
+}
+
+/// Protocol message — ID: 7031
+#[derive(Debug, Clone, Default)]
+pub struct ContactLookErrorMessage {
+    pub request_id: i32,
+}
+
+impl DofusSerialize for ContactLookErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.request_id);
+    }
+}
+
+impl DofusDeserialize for ContactLookErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ContactLookErrorMessage {
+    const MESSAGE_ID: u16 = 7031;
+}
+
+/// Protocol message — ID: 7244
+#[derive(Debug, Clone, Default)]
+pub struct SocialNoticeSetRequestMessage {
+}
+
+impl DofusSerialize for SocialNoticeSetRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for SocialNoticeSetRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for SocialNoticeSetRequestMessage {
+    const MESSAGE_ID: u16 = 7244;
+}
+
+/// Protocol message — ID: 9965
+#[derive(Debug, Clone, Default)]
+pub struct SocialNoticeSetErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for SocialNoticeSetErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for SocialNoticeSetErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for SocialNoticeSetErrorMessage {
+    const MESSAGE_ID: u16 = 9965;
 }
 

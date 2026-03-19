@@ -6,58 +6,41 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 3014
+/// Protocol message — ID: 420
 #[derive(Debug, Clone, Default)]
-pub struct ObjectGroundRemovedMessage {
-    pub cell: i16,
+pub struct ObjectGroundRemovedMultipleMessage {
+    pub cells: Vec<i16>,
 }
 
-impl DofusSerialize for ObjectGroundRemovedMessage {
+impl DofusSerialize for ObjectGroundRemovedMultipleMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell);
+        writer.write_short(self.cells.len() as _);
+        for item in &self.cells {
+            writer.write_var_short(*item);
+        }
     }
 }
 
-impl DofusDeserialize for ObjectGroundRemovedMessage {
+impl DofusDeserialize for ObjectGroundRemovedMultipleMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            cell: reader.read_var_short()?,
+            cells: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for ObjectGroundRemovedMessage {
-    const MESSAGE_ID: u16 = 3014;
+impl DofusMessage for ObjectGroundRemovedMultipleMessage {
+    const MESSAGE_ID: u16 = 420;
 }
 
-/// Protocol message — ID: 3017
-#[derive(Debug, Clone, Default)]
-pub struct ObjectGroundAddedMessage {
-    pub cell_id: i16,
-    pub object_g_i_d: i16,
-}
-
-impl DofusSerialize for ObjectGroundAddedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
-        writer.write_var_short(self.object_g_i_d);
-    }
-}
-
-impl DofusDeserialize for ObjectGroundAddedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_id: reader.read_var_short()?,
-            object_g_i_d: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ObjectGroundAddedMessage {
-    const MESSAGE_ID: u16 = 3017;
-}
-
-/// Protocol message — ID: 5925
+/// Protocol message — ID: 2797
 #[derive(Debug, Clone, Default)]
 pub struct ObjectGroundListAddedMessage {
     pub cells: Vec<i16>,
@@ -101,40 +84,57 @@ impl DofusDeserialize for ObjectGroundListAddedMessage {
 }
 
 impl DofusMessage for ObjectGroundListAddedMessage {
-    const MESSAGE_ID: u16 = 5925;
+    const MESSAGE_ID: u16 = 2797;
 }
 
-/// Protocol message — ID: 5944
+/// Protocol message — ID: 3539
 #[derive(Debug, Clone, Default)]
-pub struct ObjectGroundRemovedMultipleMessage {
-    pub cells: Vec<i16>,
+pub struct ObjectGroundAddedMessage {
+    pub cell_id: i16,
+    pub object_g_i_d: i16,
 }
 
-impl DofusSerialize for ObjectGroundRemovedMultipleMessage {
+impl DofusSerialize for ObjectGroundAddedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.cells.len() as _);
-        for item in &self.cells {
-            writer.write_var_short(*item);
-        }
+        writer.write_var_short(self.cell_id);
+        writer.write_var_short(self.object_g_i_d);
     }
 }
 
-impl DofusDeserialize for ObjectGroundRemovedMultipleMessage {
+impl DofusDeserialize for ObjectGroundAddedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            cells: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
+            cell_id: reader.read_var_short()?,
+            object_g_i_d: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for ObjectGroundRemovedMultipleMessage {
-    const MESSAGE_ID: u16 = 5944;
+impl DofusMessage for ObjectGroundAddedMessage {
+    const MESSAGE_ID: u16 = 3539;
+}
+
+/// Protocol message — ID: 5737
+#[derive(Debug, Clone, Default)]
+pub struct ObjectGroundRemovedMessage {
+    pub cell: i16,
+}
+
+impl DofusSerialize for ObjectGroundRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell);
+    }
+}
+
+impl DofusDeserialize for ObjectGroundRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ObjectGroundRemovedMessage {
+    const MESSAGE_ID: u16 = 5737;
 }
 

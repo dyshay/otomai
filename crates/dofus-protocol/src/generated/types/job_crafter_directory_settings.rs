@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 97
+/// Protocol type — ID: 6554
 #[derive(Debug, Clone, Default)]
 pub struct JobCrafterDirectorySettings {
     pub job_id: u8,
@@ -33,6 +33,6 @@ impl DofusDeserialize for JobCrafterDirectorySettings {
 }
 
 impl DofusType for JobCrafterDirectorySettings {
-    const TYPE_ID: u16 = 97;
+    const TYPE_ID: u16 = 6554;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6594
+/// Protocol message — ID: 1921
 #[derive(Debug, Clone, Default)]
 pub struct ClientYouAreDrunkMessage {
     pub level: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ClientYouAreDrunkMessage {
 }
 
 impl DofusMessage for ClientYouAreDrunkMessage {
-    const MESSAGE_ID: u16 = 6594;
+    const MESSAGE_ID: u16 = 1921;
 }
 

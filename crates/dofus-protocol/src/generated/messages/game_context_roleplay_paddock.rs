@@ -6,7 +6,43 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5824
+/// Protocol message — ID: 1885
+#[derive(Debug, Clone, Default)]
+pub struct PaddockToSellFilterMessage {
+    pub area_id: i32,
+    pub at_least_nb_mount: u8,
+    pub at_least_nb_machine: u8,
+    pub max_price: i64,
+    pub order_by: u8,
+}
+
+impl DofusSerialize for PaddockToSellFilterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.area_id);
+        writer.write_byte(self.at_least_nb_mount);
+        writer.write_byte(self.at_least_nb_machine);
+        writer.write_var_long(self.max_price);
+        writer.write_byte(self.order_by);
+    }
+}
+
+impl DofusDeserialize for PaddockToSellFilterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            area_id: reader.read_int()?,
+            at_least_nb_mount: reader.read_byte()?,
+            at_least_nb_machine: reader.read_byte()?,
+            max_price: reader.read_var_long()?,
+            order_by: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PaddockToSellFilterMessage {
+    const MESSAGE_ID: u16 = 1885;
+}
+
+/// Protocol message — ID: 2259
 #[derive(Debug, Clone, Default)]
 pub struct PaddockPropertiesMessage {
     pub properties: PaddockInstancesInformations,
@@ -27,74 +63,10 @@ impl DofusDeserialize for PaddockPropertiesMessage {
 }
 
 impl DofusMessage for PaddockPropertiesMessage {
-    const MESSAGE_ID: u16 = 5824;
+    const MESSAGE_ID: u16 = 2259;
 }
 
-/// Protocol message — ID: 6018
-#[derive(Debug, Clone, Default)]
-pub struct PaddockSellBuyDialogMessage {
-    pub bsell: bool,
-    pub owner_id: i32,
-    pub price: i64,
-}
-
-impl DofusSerialize for PaddockSellBuyDialogMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.bsell);
-        writer.write_var_int(self.owner_id);
-        writer.write_var_long(self.price);
-    }
-}
-
-impl DofusDeserialize for PaddockSellBuyDialogMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bsell: reader.read_boolean()?,
-            owner_id: reader.read_var_int()?,
-            price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for PaddockSellBuyDialogMessage {
-    const MESSAGE_ID: u16 = 6018;
-}
-
-/// Protocol message — ID: 6026
-#[derive(Debug, Clone, Default)]
-pub struct GameDataPlayFarmObjectAnimationMessage {
-    pub cell_id: Vec<i16>,
-}
-
-impl DofusSerialize for GameDataPlayFarmObjectAnimationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.cell_id.len() as _);
-        for item in &self.cell_id {
-            writer.write_var_short(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for GameDataPlayFarmObjectAnimationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_id: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameDataPlayFarmObjectAnimationMessage {
-    const MESSAGE_ID: u16 = 6026;
-}
-
-/// Protocol message — ID: 6138
+/// Protocol message — ID: 2971
 #[derive(Debug, Clone, Default)]
 pub struct PaddockToSellListMessage {
     pub page_index: i16,
@@ -131,10 +103,10 @@ impl DofusDeserialize for PaddockToSellListMessage {
 }
 
 impl DofusMessage for PaddockToSellListMessage {
-    const MESSAGE_ID: u16 = 6138;
+    const MESSAGE_ID: u16 = 2971;
 }
 
-/// Protocol message — ID: 6141
+/// Protocol message — ID: 6059
 #[derive(Debug, Clone, Default)]
 pub struct PaddockToSellListRequestMessage {
     pub page_index: i16,
@@ -155,42 +127,70 @@ impl DofusDeserialize for PaddockToSellListRequestMessage {
 }
 
 impl DofusMessage for PaddockToSellListRequestMessage {
-    const MESSAGE_ID: u16 = 6141;
+    const MESSAGE_ID: u16 = 6059;
 }
 
-/// Protocol message — ID: 6161
+/// Protocol message — ID: 8137
 #[derive(Debug, Clone, Default)]
-pub struct PaddockToSellFilterMessage {
-    pub area_id: i32,
-    pub at_least_nb_mount: u8,
-    pub at_least_nb_machine: u8,
-    pub max_price: i64,
-    pub order_by: u8,
+pub struct PaddockSellBuyDialogMessage {
+    pub bsell: bool,
+    pub owner_id: i32,
+    pub price: i64,
 }
 
-impl DofusSerialize for PaddockToSellFilterMessage {
+impl DofusSerialize for PaddockSellBuyDialogMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.area_id);
-        writer.write_byte(self.at_least_nb_mount);
-        writer.write_byte(self.at_least_nb_machine);
-        writer.write_var_long(self.max_price);
-        writer.write_byte(self.order_by);
+        writer.write_boolean(self.bsell);
+        writer.write_var_int(self.owner_id);
+        writer.write_var_long(self.price);
     }
 }
 
-impl DofusDeserialize for PaddockToSellFilterMessage {
+impl DofusDeserialize for PaddockSellBuyDialogMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            area_id: reader.read_int()?,
-            at_least_nb_mount: reader.read_byte()?,
-            at_least_nb_machine: reader.read_byte()?,
-            max_price: reader.read_var_long()?,
-            order_by: reader.read_byte()?,
+            bsell: reader.read_boolean()?,
+            owner_id: reader.read_var_int()?,
+            price: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for PaddockToSellFilterMessage {
-    const MESSAGE_ID: u16 = 6161;
+impl DofusMessage for PaddockSellBuyDialogMessage {
+    const MESSAGE_ID: u16 = 8137;
+}
+
+/// Protocol message — ID: 8442
+#[derive(Debug, Clone, Default)]
+pub struct GameDataPlayFarmObjectAnimationMessage {
+    pub cell_id: Vec<i16>,
+}
+
+impl DofusSerialize for GameDataPlayFarmObjectAnimationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.cell_id.len() as _);
+        for item in &self.cell_id {
+            writer.write_var_short(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for GameDataPlayFarmObjectAnimationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_id: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameDataPlayFarmObjectAnimationMessage {
+    const MESSAGE_ID: u16 = 8442;
 }
 

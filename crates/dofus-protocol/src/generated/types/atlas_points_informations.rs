@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 175
+/// Protocol type — ID: 6171
 #[derive(Debug, Clone, Default)]
 pub struct AtlasPointsInformations {
     pub r#type: u8,
@@ -40,6 +40,6 @@ impl DofusDeserialize for AtlasPointsInformations {
 }
 
 impl DofusType for AtlasPointsInformations {
-    const TYPE_ID: u16 = 175;
+    const TYPE_ID: u16 = 6171;
 }
 

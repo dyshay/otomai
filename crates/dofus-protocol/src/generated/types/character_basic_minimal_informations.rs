@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 503
+/// Protocol type — ID: 9273
 #[derive(Debug, Clone, Default)]
 pub struct CharacterBasicMinimalInformations {
     pub id: i64,
@@ -30,6 +30,6 @@ impl DofusDeserialize for CharacterBasicMinimalInformations {
 }
 
 impl DofusType for CharacterBasicMinimalInformations {
-    const TYPE_ID: u16 = 503;
+    const TYPE_ID: u16 = 9273;
 }
 

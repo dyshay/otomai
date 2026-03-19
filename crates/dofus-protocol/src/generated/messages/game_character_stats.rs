@@ -6,106 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 500
-#[derive(Debug, Clone, Default)]
-pub struct CharacterStatsListMessage {
-    pub stats: CharacterCharacteristicsInformations,
-}
-
-impl DofusSerialize for CharacterStatsListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.stats.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for CharacterStatsListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            stats: CharacterCharacteristicsInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterStatsListMessage {
-    const MESSAGE_ID: u16 = 500;
-}
-
-/// Protocol message — ID: 5658
-#[derive(Debug, Clone, Default)]
-pub struct UpdateLifePointsMessage {
-    pub life_points: i32,
-    pub max_life_points: i32,
-}
-
-impl DofusSerialize for UpdateLifePointsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.life_points);
-        writer.write_var_int(self.max_life_points);
-    }
-}
-
-impl DofusDeserialize for UpdateLifePointsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            life_points: reader.read_var_int()?,
-            max_life_points: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for UpdateLifePointsMessage {
-    const MESSAGE_ID: u16 = 5658;
-}
-
-/// Protocol message — ID: 5670
-#[derive(Debug, Clone, Default)]
-pub struct CharacterLevelUpMessage {
-    pub new_level: i16,
-}
-
-impl DofusSerialize for CharacterLevelUpMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.new_level);
-    }
-}
-
-impl DofusDeserialize for CharacterLevelUpMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            new_level: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterLevelUpMessage {
-    const MESSAGE_ID: u16 = 5670;
-}
-
-/// Protocol message — ID: 5684
-#[derive(Debug, Clone, Default)]
-pub struct LifePointsRegenBeginMessage {
-    pub regen_rate: u8,
-}
-
-impl DofusSerialize for LifePointsRegenBeginMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.regen_rate);
-    }
-}
-
-impl DofusDeserialize for LifePointsRegenBeginMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            regen_rate: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for LifePointsRegenBeginMessage {
-    const MESSAGE_ID: u16 = 5684;
-}
-
-/// Protocol message — ID: 5686
+/// Protocol message — ID: 1338
 #[derive(Debug, Clone, Default)]
 pub struct LifePointsRegenEndMessage {
     pub life_points: i32,
@@ -132,40 +33,37 @@ impl DofusDeserialize for LifePointsRegenEndMessage {
 }
 
 impl DofusMessage for LifePointsRegenEndMessage {
-    const MESSAGE_ID: u16 = 5686;
+    const MESSAGE_ID: u16 = 1338;
 }
 
-/// Protocol message — ID: 6076
+/// Protocol message — ID: 2752
 #[derive(Debug, Clone, Default)]
-pub struct CharacterLevelUpInformationMessage {
-    pub new_level: i16,
-    pub name: String,
-    pub id: i64,
+pub struct UpdateLifePointsMessage {
+    pub life_points: i32,
+    pub max_life_points: i32,
 }
 
-impl DofusSerialize for CharacterLevelUpInformationMessage {
+impl DofusSerialize for UpdateLifePointsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.new_level);
-        writer.write_utf(&self.name);
-        writer.write_var_long(self.id);
+        writer.write_var_int(self.life_points);
+        writer.write_var_int(self.max_life_points);
     }
 }
 
-impl DofusDeserialize for CharacterLevelUpInformationMessage {
+impl DofusDeserialize for UpdateLifePointsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            new_level: reader.read_var_short()?,
-            name: reader.read_utf()?,
-            id: reader.read_var_long()?,
+            life_points: reader.read_var_int()?,
+            max_life_points: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for CharacterLevelUpInformationMessage {
-    const MESSAGE_ID: u16 = 6076;
+impl DofusMessage for UpdateLifePointsMessage {
+    const MESSAGE_ID: u16 = 2752;
 }
 
-/// Protocol message — ID: 6321
+/// Protocol message — ID: 3122
 #[derive(Debug, Clone, Default)]
 pub struct CharacterExperienceGainMessage {
     pub experience_character: i64,
@@ -195,10 +93,112 @@ impl DofusDeserialize for CharacterExperienceGainMessage {
 }
 
 impl DofusMessage for CharacterExperienceGainMessage {
-    const MESSAGE_ID: u16 = 6321;
+    const MESSAGE_ID: u16 = 3122;
 }
 
-/// Protocol message — ID: 6322
+/// Protocol message — ID: 4037
+#[derive(Debug, Clone, Default)]
+pub struct CharacterLevelUpInformationMessage {
+    pub new_level: i16,
+    pub name: String,
+    pub id: i64,
+}
+
+impl DofusSerialize for CharacterLevelUpInformationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.new_level);
+        writer.write_utf(&self.name);
+        writer.write_var_long(self.id);
+    }
+}
+
+impl DofusDeserialize for CharacterLevelUpInformationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            new_level: reader.read_var_short()?,
+            name: reader.read_utf()?,
+            id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterLevelUpInformationMessage {
+    const MESSAGE_ID: u16 = 4037;
+}
+
+/// Protocol message — ID: 4663
+#[derive(Debug, Clone, Default)]
+pub struct CharacterStatsListMessage {
+    pub stats: CharacterCharacteristicsInformations,
+}
+
+impl DofusSerialize for CharacterStatsListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.stats.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for CharacterStatsListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            stats: CharacterCharacteristicsInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterStatsListMessage {
+    const MESSAGE_ID: u16 = 4663;
+}
+
+/// Protocol message — ID: 4759
+#[derive(Debug, Clone, Default)]
+pub struct CharacterLevelUpMessage {
+    pub new_level: i16,
+}
+
+impl DofusSerialize for CharacterLevelUpMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.new_level);
+    }
+}
+
+impl DofusDeserialize for CharacterLevelUpMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            new_level: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterLevelUpMessage {
+    const MESSAGE_ID: u16 = 4759;
+}
+
+/// Protocol message — ID: 7338
+#[derive(Debug, Clone, Default)]
+pub struct LifePointsRegenBeginMessage {
+    pub regen_rate: u8,
+}
+
+impl DofusSerialize for LifePointsRegenBeginMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.regen_rate);
+    }
+}
+
+impl DofusDeserialize for LifePointsRegenBeginMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            regen_rate: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for LifePointsRegenBeginMessage {
+    const MESSAGE_ID: u16 = 7338;
+}
+
+/// Protocol message — ID: 7728
 #[derive(Debug, Clone, Default)]
 pub struct FighterStatsListMessage {
     pub stats: CharacterCharacteristicsInformations,
@@ -219,10 +219,10 @@ impl DofusDeserialize for FighterStatsListMessage {
 }
 
 impl DofusMessage for FighterStatsListMessage {
-    const MESSAGE_ID: u16 = 6322;
+    const MESSAGE_ID: u16 = 7728;
 }
 
-/// Protocol message — ID: 6739
+/// Protocol message — ID: 7828
 #[derive(Debug, Clone, Default)]
 pub struct ResetCharacterStatsRequestMessage {
 }
@@ -240,6 +240,6 @@ impl DofusDeserialize for ResetCharacterStatsRequestMessage {
 }
 
 impl DofusMessage for ResetCharacterStatsRequestMessage {
-    const MESSAGE_ID: u16 = 6739;
+    const MESSAGE_ID: u16 = 7828;
 }
 

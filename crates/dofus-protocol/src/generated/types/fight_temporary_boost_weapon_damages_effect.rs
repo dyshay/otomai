@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 211
+/// Protocol type — ID: 4451
 #[derive(Debug, Clone, Default)]
 pub struct FightTemporaryBoostWeaponDamagesEffect {
     pub uid: i32,
@@ -51,6 +51,6 @@ impl DofusDeserialize for FightTemporaryBoostWeaponDamagesEffect {
 }
 
 impl DofusType for FightTemporaryBoostWeaponDamagesEffect {
-    const TYPE_ID: u16 = 211;
+    const TYPE_ID: u16 = 4451;
 }
 

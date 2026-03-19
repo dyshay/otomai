@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 509
+/// Protocol type — ID: 4322
 #[derive(Debug, Clone, Default)]
 pub struct PaddockInstancesInformations {
     pub max_outdoor_mount: i16,
@@ -41,6 +41,6 @@ impl DofusDeserialize for PaddockInstancesInformations {
 }
 
 impl DofusType for PaddockInstancesInformations {
-    const TYPE_ID: u16 = 509;
+    const TYPE_ID: u16 = 4322;
 }
 

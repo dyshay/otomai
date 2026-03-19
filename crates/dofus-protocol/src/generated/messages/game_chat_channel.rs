@@ -6,61 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 890
-#[derive(Debug, Clone, Default)]
-pub struct ChannelEnablingMessage {
-    pub channel: u8,
-    pub enable: bool,
-}
-
-impl DofusSerialize for ChannelEnablingMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.channel);
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for ChannelEnablingMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            channel: reader.read_byte()?,
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ChannelEnablingMessage {
-    const MESSAGE_ID: u16 = 890;
-}
-
-/// Protocol message — ID: 891
-#[derive(Debug, Clone, Default)]
-pub struct ChannelEnablingChangeMessage {
-    pub channel: u8,
-    pub enable: bool,
-}
-
-impl DofusSerialize for ChannelEnablingChangeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.channel);
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for ChannelEnablingChangeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            channel: reader.read_byte()?,
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ChannelEnablingChangeMessage {
-    const MESSAGE_ID: u16 = 891;
-}
-
-/// Protocol message — ID: 892
+/// Protocol message — ID: 1211
 #[derive(Debug, Clone, Default)]
 pub struct EnabledChannelsMessage {
     pub channels: Vec<u8>,
@@ -104,6 +50,60 @@ impl DofusDeserialize for EnabledChannelsMessage {
 }
 
 impl DofusMessage for EnabledChannelsMessage {
-    const MESSAGE_ID: u16 = 892;
+    const MESSAGE_ID: u16 = 1211;
+}
+
+/// Protocol message — ID: 1455
+#[derive(Debug, Clone, Default)]
+pub struct ChannelEnablingChangeMessage {
+    pub channel: u8,
+    pub enable: bool,
+}
+
+impl DofusSerialize for ChannelEnablingChangeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.channel);
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for ChannelEnablingChangeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            channel: reader.read_byte()?,
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ChannelEnablingChangeMessage {
+    const MESSAGE_ID: u16 = 1455;
+}
+
+/// Protocol message — ID: 1902
+#[derive(Debug, Clone, Default)]
+pub struct ChannelEnablingMessage {
+    pub channel: u8,
+    pub enable: bool,
+}
+
+impl DofusSerialize for ChannelEnablingMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.channel);
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for ChannelEnablingMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            channel: reader.read_byte()?,
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ChannelEnablingMessage {
+    const MESSAGE_ID: u16 = 1902;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6114
+/// Protocol message — ID: 3713
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlaySpellAnimMessage {
     pub caster_id: i64,
@@ -36,6 +36,6 @@ impl DofusDeserialize for GameRolePlaySpellAnimMessage {
 }
 
 impl DofusMessage for GameRolePlaySpellAnimMessage {
-    const MESSAGE_ID: u16 = 6114;
+    const MESSAGE_ID: u16 = 3713;
 }
 

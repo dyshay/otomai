@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 52
+/// Protocol type — ID: 5320
 #[derive(Debug, Clone, Default)]
 pub struct StartupActionAddObject {
     pub uid: i32,
@@ -52,6 +52,6 @@ impl DofusDeserialize for StartupActionAddObject {
 }
 
 impl DofusType for StartupActionAddObject {
-    const TYPE_ID: u16 = 52;
+    const TYPE_ID: u16 = 5320;
 }
 

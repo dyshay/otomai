@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 541
+/// Protocol type — ID: 1231
 #[derive(Debug, Clone, Default)]
 pub struct SimpleCharacterCharacteristicForPreset {
     pub keyword: String,
@@ -33,6 +33,6 @@ impl DofusDeserialize for SimpleCharacterCharacteristicForPreset {
 }
 
 impl DofusType for SimpleCharacterCharacteristicForPreset {
-    const TYPE_ID: u16 = 541;
+    const TYPE_ID: u16 = 1231;
 }
 

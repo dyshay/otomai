@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6493
+/// Protocol message — ID: 4867
 #[derive(Debug, Clone, Default)]
 pub struct AreaFightModificatorUpdateMessage {
     pub spell_pair_id: i32,
@@ -27,6 +27,6 @@ impl DofusDeserialize for AreaFightModificatorUpdateMessage {
 }
 
 impl DofusMessage for AreaFightModificatorUpdateMessage {
-    const MESSAGE_ID: u16 = 6493;
+    const MESSAGE_ID: u16 = 4867;
 }
 

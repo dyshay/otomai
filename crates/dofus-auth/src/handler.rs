@@ -34,10 +34,8 @@ pub async fn handle_client(mut session: Session, state: Arc<AuthState>) -> anyho
     tracing::info!(%peer, "Auth client connected");
 
     // Step 1: Send ProtocolRequired
-    let proto_version: i32 = state.config.protocol_version.parse().unwrap_or(0);
     session.send(&ProtocolRequired {
-        required_version: proto_version,
-        current_version: proto_version,
+        version: state.config.protocol_version.clone(),
     }).await?;
 
     // Step 2: Send HelloConnectMessage

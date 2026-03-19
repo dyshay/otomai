@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 108
+/// Protocol type — ID: 8031
 #[derive(Debug, Clone, Default)]
 pub struct StatedElement {
     pub element_id: i32,
@@ -36,6 +36,6 @@ impl DofusDeserialize for StatedElement {
 }
 
 impl DofusType for StatedElement {
-    const TYPE_ID: u16 = 108;
+    const TYPE_ID: u16 = 8031;
 }
 

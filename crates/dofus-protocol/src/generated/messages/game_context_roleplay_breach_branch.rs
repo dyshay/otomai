@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6812
+/// Protocol message — ID: 913
 #[derive(Debug, Clone, Default)]
 pub struct BreachBranchesMessage {
     pub branches: Vec<Vec<u8>>,
@@ -35,6 +35,6 @@ impl DofusDeserialize for BreachBranchesMessage {
 }
 
 impl DofusMessage for BreachBranchesMessage {
-    const MESSAGE_ID: u16 = 6812;
+    const MESSAGE_ID: u16 = 913;
 }
 

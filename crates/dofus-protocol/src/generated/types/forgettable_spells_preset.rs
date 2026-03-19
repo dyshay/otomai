@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 584
+/// Protocol type — ID: 7096
 #[derive(Debug, Clone, Default)]
 pub struct ForgettableSpellsPreset {
     pub id: i16,
@@ -43,6 +43,6 @@ impl DofusDeserialize for ForgettableSpellsPreset {
 }
 
 impl DofusType for ForgettableSpellsPreset {
-    const TYPE_ID: u16 = 584;
+    const TYPE_ID: u16 = 7096;
 }
 

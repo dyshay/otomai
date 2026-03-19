@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 75
+/// Protocol message — ID: 2223
 #[derive(Debug, Clone, Default)]
 pub struct ConsoleMessage {
     pub r#type: u8,
@@ -30,10 +30,10 @@ impl DofusDeserialize for ConsoleMessage {
 }
 
 impl DofusMessage for ConsoleMessage {
-    const MESSAGE_ID: u16 = 75;
+    const MESSAGE_ID: u16 = 2223;
 }
 
-/// Protocol message — ID: 76
+/// Protocol message — ID: 2983
 #[derive(Debug, Clone, Default)]
 pub struct AdminCommandMessage {
     pub content: String,
@@ -54,10 +54,10 @@ impl DofusDeserialize for AdminCommandMessage {
 }
 
 impl DofusMessage for AdminCommandMessage {
-    const MESSAGE_ID: u16 = 76;
+    const MESSAGE_ID: u16 = 2983;
 }
 
-/// Protocol message — ID: 5662
+/// Protocol message — ID: 5819
 #[derive(Debug, Clone, Default)]
 pub struct AdminQuietCommandMessage {
     pub content: String,
@@ -78,10 +78,10 @@ impl DofusDeserialize for AdminQuietCommandMessage {
 }
 
 impl DofusMessage for AdminQuietCommandMessage {
-    const MESSAGE_ID: u16 = 5662;
+    const MESSAGE_ID: u16 = 5819;
 }
 
-/// Protocol message — ID: 6127
+/// Protocol message — ID: 7414
 #[derive(Debug, Clone, Default)]
 pub struct ConsoleCommandsListMessage {
     pub aliases: Vec<String>,
@@ -138,6 +138,6 @@ impl DofusDeserialize for ConsoleCommandsListMessage {
 }
 
 impl DofusMessage for ConsoleCommandsListMessage {
-    const MESSAGE_ID: u16 = 6127;
+    const MESSAGE_ID: u16 = 7414;
 }
 

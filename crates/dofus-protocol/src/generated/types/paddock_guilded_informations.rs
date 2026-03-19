@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 508
+/// Protocol type — ID: 5112
 #[derive(Debug, Clone, Default)]
 pub struct PaddockGuildedInformations {
     pub price: i64,
@@ -36,6 +36,6 @@ impl DofusDeserialize for PaddockGuildedInformations {
 }
 
 impl DofusType for PaddockGuildedInformations {
-    const TYPE_ID: u16 = 508;
+    const TYPE_ID: u16 = 5112;
 }
 

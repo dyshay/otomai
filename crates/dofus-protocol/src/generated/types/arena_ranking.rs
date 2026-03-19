@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 554
+/// Protocol type — ID: 7102
 #[derive(Debug, Clone, Default)]
 pub struct ArenaRanking {
     pub rank: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ArenaRanking {
 }
 
 impl DofusType for ArenaRanking {
-    const TYPE_ID: u16 = 554;
+    const TYPE_ID: u16 = 7102;
 }
 

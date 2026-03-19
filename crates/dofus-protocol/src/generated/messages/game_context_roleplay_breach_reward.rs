@@ -6,7 +6,31 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6797
+/// Protocol message — ID: 836
+#[derive(Debug, Clone, Default)]
+pub struct BreachRewardBuyMessage {
+    pub id: i32,
+}
+
+impl DofusSerialize for BreachRewardBuyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.id);
+    }
+}
+
+impl DofusDeserialize for BreachRewardBuyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachRewardBuyMessage {
+    const MESSAGE_ID: u16 = 836;
+}
+
+/// Protocol message — ID: 1374
 #[derive(Debug, Clone, Default)]
 pub struct BreachRewardBoughtMessage {
     pub id: i32,
@@ -30,34 +54,10 @@ impl DofusDeserialize for BreachRewardBoughtMessage {
 }
 
 impl DofusMessage for BreachRewardBoughtMessage {
-    const MESSAGE_ID: u16 = 6797;
+    const MESSAGE_ID: u16 = 1374;
 }
 
-/// Protocol message — ID: 6803
-#[derive(Debug, Clone, Default)]
-pub struct BreachRewardBuyMessage {
-    pub id: i32,
-}
-
-impl DofusSerialize for BreachRewardBuyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.id);
-    }
-}
-
-impl DofusDeserialize for BreachRewardBuyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachRewardBuyMessage {
-    const MESSAGE_ID: u16 = 6803;
-}
-
-/// Protocol message — ID: 6813
+/// Protocol message — ID: 5563
 #[derive(Debug, Clone, Default)]
 pub struct BreachRewardsMessage {
     pub rewards: Vec<BreachReward>,
@@ -88,6 +88,6 @@ impl DofusDeserialize for BreachRewardsMessage {
 }
 
 impl DofusMessage for BreachRewardsMessage {
-    const MESSAGE_ID: u16 = 6813;
+    const MESSAGE_ID: u16 = 5563;
 }
 

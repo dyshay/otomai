@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 205
+/// Protocol type — ID: 9167
 #[derive(Debug, Clone, Default)]
 pub struct GameFightSpellCooldown {
     pub spell_id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for GameFightSpellCooldown {
 }
 
 impl DofusType for GameFightSpellCooldown {
-    const TYPE_ID: u16 = 205;
+    const TYPE_ID: u16 = 9167;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 202
+/// Protocol type — ID: 5506
 #[derive(Debug, Clone, Default)]
 pub struct ActorExtendedAlignmentInformations {
     pub alignment_side: u8,
@@ -48,6 +48,6 @@ impl DofusDeserialize for ActorExtendedAlignmentInformations {
 }
 
 impl DofusType for ActorExtendedAlignmentInformations {
-    const TYPE_ID: u16 = 202;
+    const TYPE_ID: u16 = 5506;
 }
 

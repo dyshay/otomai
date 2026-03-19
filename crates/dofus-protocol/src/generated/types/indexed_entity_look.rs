@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 405
+/// Protocol type — ID: 2950
 #[derive(Debug, Clone, Default)]
 pub struct IndexedEntityLook {
     pub look: EntityLook,
@@ -30,6 +30,6 @@ impl DofusDeserialize for IndexedEntityLook {
 }
 
 impl DofusType for IndexedEntityLook {
-    const TYPE_ID: u16 = 405;
+    const TYPE_ID: u16 = 2950;
 }
 

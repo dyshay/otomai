@@ -6,7 +6,133 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6205
+/// Protocol message — ID: 518
+#[derive(Debug, Clone, Default)]
+pub struct AchievementFinishedMessage {
+    pub achievement: AchievementAchievedRewardable,
+}
+
+impl DofusSerialize for AchievementFinishedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.achievement.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AchievementFinishedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            achievement: AchievementAchievedRewardable::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for AchievementFinishedMessage {
+    const MESSAGE_ID: u16 = 518;
+}
+
+/// Protocol message — ID: 535
+#[derive(Debug, Clone, Default)]
+pub struct AchievementDetailsMessage {
+    pub achievement: Achievement,
+}
+
+impl DofusSerialize for AchievementDetailsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.achievement.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AchievementDetailsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            achievement: Achievement::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for AchievementDetailsMessage {
+    const MESSAGE_ID: u16 = 535;
+}
+
+/// Protocol message — ID: 1659
+#[derive(Debug, Clone, Default)]
+pub struct AchievementFinishedInformationMessage {
+    pub achievement: AchievementAchievedRewardable,
+    pub name: String,
+    pub player_id: i64,
+}
+
+impl DofusSerialize for AchievementFinishedInformationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.achievement.serialize(writer);
+        writer.write_utf(&self.name);
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for AchievementFinishedInformationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            achievement: AchievementAchievedRewardable::deserialize(reader)?,
+            name: reader.read_utf()?,
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for AchievementFinishedInformationMessage {
+    const MESSAGE_ID: u16 = 1659;
+}
+
+/// Protocol message — ID: 2035
+#[derive(Debug, Clone, Default)]
+pub struct FriendGuildWarnOnAchievementCompleteStateMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for FriendGuildWarnOnAchievementCompleteStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for FriendGuildWarnOnAchievementCompleteStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendGuildWarnOnAchievementCompleteStateMessage {
+    const MESSAGE_ID: u16 = 2035;
+}
+
+/// Protocol message — ID: 2811
+#[derive(Debug, Clone, Default)]
+pub struct AchievementDetailsRequestMessage {
+    pub achievement_id: i16,
+}
+
+impl DofusSerialize for AchievementDetailsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.achievement_id);
+    }
+}
+
+impl DofusDeserialize for AchievementDetailsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            achievement_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for AchievementDetailsRequestMessage {
+    const MESSAGE_ID: u16 = 2811;
+}
+
+/// Protocol message — ID: 3313
 #[derive(Debug, Clone, Default)]
 pub struct AchievementListMessage {
     pub finished_achievements: Vec<Vec<u8>>,
@@ -35,58 +161,10 @@ impl DofusDeserialize for AchievementListMessage {
 }
 
 impl DofusMessage for AchievementListMessage {
-    const MESSAGE_ID: u16 = 6205;
+    const MESSAGE_ID: u16 = 3313;
 }
 
-/// Protocol message — ID: 6208
-#[derive(Debug, Clone, Default)]
-pub struct AchievementFinishedMessage {
-    pub achievement: AchievementAchievedRewardable,
-}
-
-impl DofusSerialize for AchievementFinishedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.achievement.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AchievementFinishedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            achievement: AchievementAchievedRewardable::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementFinishedMessage {
-    const MESSAGE_ID: u16 = 6208;
-}
-
-/// Protocol message — ID: 6357
-#[derive(Debug, Clone, Default)]
-pub struct AchievementDetailedListRequestMessage {
-    pub category_id: i16,
-}
-
-impl DofusSerialize for AchievementDetailedListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.category_id);
-    }
-}
-
-impl DofusDeserialize for AchievementDetailedListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            category_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementDetailedListRequestMessage {
-    const MESSAGE_ID: u16 = 6357;
-}
-
-/// Protocol message — ID: 6358
+/// Protocol message — ID: 4019
 #[derive(Debug, Clone, Default)]
 pub struct AchievementDetailedListMessage {
     pub started_achievements: Vec<Achievement>,
@@ -130,58 +208,10 @@ impl DofusDeserialize for AchievementDetailedListMessage {
 }
 
 impl DofusMessage for AchievementDetailedListMessage {
-    const MESSAGE_ID: u16 = 6358;
+    const MESSAGE_ID: u16 = 4019;
 }
 
-/// Protocol message — ID: 6375
-#[derive(Debug, Clone, Default)]
-pub struct AchievementRewardErrorMessage {
-    pub achievement_id: i16,
-}
-
-impl DofusSerialize for AchievementRewardErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.achievement_id);
-    }
-}
-
-impl DofusDeserialize for AchievementRewardErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            achievement_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementRewardErrorMessage {
-    const MESSAGE_ID: u16 = 6375;
-}
-
-/// Protocol message — ID: 6376
-#[derive(Debug, Clone, Default)]
-pub struct AchievementRewardSuccessMessage {
-    pub achievement_id: i16,
-}
-
-impl DofusSerialize for AchievementRewardSuccessMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.achievement_id);
-    }
-}
-
-impl DofusDeserialize for AchievementRewardSuccessMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            achievement_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementRewardSuccessMessage {
-    const MESSAGE_ID: u16 = 6376;
-}
-
-/// Protocol message — ID: 6377
+/// Protocol message — ID: 4816
 #[derive(Debug, Clone, Default)]
 pub struct AchievementRewardRequestMessage {
     pub achievement_id: i16,
@@ -202,88 +232,34 @@ impl DofusDeserialize for AchievementRewardRequestMessage {
 }
 
 impl DofusMessage for AchievementRewardRequestMessage {
-    const MESSAGE_ID: u16 = 6377;
+    const MESSAGE_ID: u16 = 4816;
 }
 
-/// Protocol message — ID: 6378
+/// Protocol message — ID: 5062
 #[derive(Debug, Clone, Default)]
-pub struct AchievementDetailsMessage {
-    pub achievement: Achievement,
-}
-
-impl DofusSerialize for AchievementDetailsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.achievement.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AchievementDetailsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            achievement: Achievement::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementDetailsMessage {
-    const MESSAGE_ID: u16 = 6378;
-}
-
-/// Protocol message — ID: 6380
-#[derive(Debug, Clone, Default)]
-pub struct AchievementDetailsRequestMessage {
+pub struct AchievementRewardSuccessMessage {
     pub achievement_id: i16,
 }
 
-impl DofusSerialize for AchievementDetailsRequestMessage {
+impl DofusSerialize for AchievementRewardSuccessMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.achievement_id);
+        writer.write_short(self.achievement_id);
     }
 }
 
-impl DofusDeserialize for AchievementDetailsRequestMessage {
+impl DofusDeserialize for AchievementRewardSuccessMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            achievement_id: reader.read_var_short()?,
+            achievement_id: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for AchievementDetailsRequestMessage {
-    const MESSAGE_ID: u16 = 6380;
+impl DofusMessage for AchievementRewardSuccessMessage {
+    const MESSAGE_ID: u16 = 5062;
 }
 
-/// Protocol message — ID: 6381
-#[derive(Debug, Clone, Default)]
-pub struct AchievementFinishedInformationMessage {
-    pub achievement: AchievementAchievedRewardable,
-    pub name: String,
-    pub player_id: i64,
-}
-
-impl DofusSerialize for AchievementFinishedInformationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.achievement.serialize(writer);
-        writer.write_utf(&self.name);
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for AchievementFinishedInformationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            achievement: AchievementAchievedRewardable::deserialize(reader)?,
-            name: reader.read_utf()?,
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for AchievementFinishedInformationMessage {
-    const MESSAGE_ID: u16 = 6381;
-}
-
-/// Protocol message — ID: 6382
+/// Protocol message — ID: 5495
 #[derive(Debug, Clone, Default)]
 pub struct FriendGuildSetWarnOnAchievementCompleteMessage {
     pub enable: bool,
@@ -304,30 +280,54 @@ impl DofusDeserialize for FriendGuildSetWarnOnAchievementCompleteMessage {
 }
 
 impl DofusMessage for FriendGuildSetWarnOnAchievementCompleteMessage {
-    const MESSAGE_ID: u16 = 6382;
+    const MESSAGE_ID: u16 = 5495;
 }
 
-/// Protocol message — ID: 6383
+/// Protocol message — ID: 5517
 #[derive(Debug, Clone, Default)]
-pub struct FriendGuildWarnOnAchievementCompleteStateMessage {
-    pub enable: bool,
+pub struct AchievementRewardErrorMessage {
+    pub achievement_id: i16,
 }
 
-impl DofusSerialize for FriendGuildWarnOnAchievementCompleteStateMessage {
+impl DofusSerialize for AchievementRewardErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
+        writer.write_short(self.achievement_id);
     }
 }
 
-impl DofusDeserialize for FriendGuildWarnOnAchievementCompleteStateMessage {
+impl DofusDeserialize for AchievementRewardErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            enable: reader.read_boolean()?,
+            achievement_id: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for FriendGuildWarnOnAchievementCompleteStateMessage {
-    const MESSAGE_ID: u16 = 6383;
+impl DofusMessage for AchievementRewardErrorMessage {
+    const MESSAGE_ID: u16 = 5517;
+}
+
+/// Protocol message — ID: 8701
+#[derive(Debug, Clone, Default)]
+pub struct AchievementDetailedListRequestMessage {
+    pub category_id: i16,
+}
+
+impl DofusSerialize for AchievementDetailedListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.category_id);
+    }
+}
+
+impl DofusDeserialize for AchievementDetailedListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            category_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for AchievementDetailedListRequestMessage {
+    const MESSAGE_ID: u16 = 8701;
 }
 

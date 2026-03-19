@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5675
+/// Protocol message — ID: 6648
 #[derive(Debug, Clone, Default)]
 pub struct DocumentReadingBeginMessage {
     pub document_id: i16,
@@ -27,6 +27,6 @@ impl DofusDeserialize for DocumentReadingBeginMessage {
 }
 
 impl DofusMessage for DocumentReadingBeginMessage {
-    const MESSAGE_ID: u16 = 5675;
+    const MESSAGE_ID: u16 = 6648;
 }
 

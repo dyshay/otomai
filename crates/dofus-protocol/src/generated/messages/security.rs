@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5607
+/// Protocol message — ID: 992
 #[derive(Debug, Clone, Default)]
 pub struct ClientKeyMessage {
     pub key: String,
@@ -27,37 +27,10 @@ impl DofusDeserialize for ClientKeyMessage {
 }
 
 impl DofusMessage for ClientKeyMessage {
-    const MESSAGE_ID: u16 = 5607;
+    const MESSAGE_ID: u16 = 992;
 }
 
-/// Protocol message — ID: 6154
-#[derive(Debug, Clone, Default)]
-pub struct CheckFileRequestMessage {
-    pub filename: String,
-    pub r#type: u8,
-}
-
-impl DofusSerialize for CheckFileRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.filename);
-        writer.write_byte(self.r#type);
-    }
-}
-
-impl DofusDeserialize for CheckFileRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            filename: reader.read_utf()?,
-            r#type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for CheckFileRequestMessage {
-    const MESSAGE_ID: u16 = 6154;
-}
-
-/// Protocol message — ID: 6156
+/// Protocol message — ID: 2262
 #[derive(Debug, Clone, Default)]
 pub struct CheckFileMessage {
     pub filename_hash: String,
@@ -84,7 +57,34 @@ impl DofusDeserialize for CheckFileMessage {
 }
 
 impl DofusMessage for CheckFileMessage {
-    const MESSAGE_ID: u16 = 6156;
+    const MESSAGE_ID: u16 = 2262;
+}
+
+/// Protocol message — ID: 3787
+#[derive(Debug, Clone, Default)]
+pub struct CheckFileRequestMessage {
+    pub filename: String,
+    pub r#type: u8,
+}
+
+impl DofusSerialize for CheckFileRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.filename);
+        writer.write_byte(self.r#type);
+    }
+}
+
+impl DofusDeserialize for CheckFileRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            filename: reader.read_utf()?,
+            r#type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for CheckFileRequestMessage {
+    const MESSAGE_ID: u16 = 3787;
 }
 
 /// Protocol message — ID: 6253
@@ -121,7 +121,7 @@ impl DofusMessage for RawDataMessage {
     const MESSAGE_ID: u16 = 6253;
 }
 
-/// Protocol message — ID: 6372
+/// Protocol message — ID: 8389
 #[derive(Debug, Clone, Default)]
 pub struct CheckIntegrityMessage {
     pub data: Vec<u8>,
@@ -152,6 +152,6 @@ impl DofusDeserialize for CheckIntegrityMessage {
 }
 
 impl DofusMessage for CheckIntegrityMessage {
-    const MESSAGE_ID: u16 = 6372;
+    const MESSAGE_ID: u16 = 8389;
 }
 

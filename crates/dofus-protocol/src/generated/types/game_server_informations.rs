@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 25
+/// Protocol type — ID: 1852
 #[derive(Debug, Clone, Default)]
 pub struct GameServerInformations {
     pub is_mono_account: bool,
@@ -54,6 +54,6 @@ impl DofusDeserialize for GameServerInformations {
 }
 
 impl DofusType for GameServerInformations {
-    const TYPE_ID: u16 = 25;
+    const TYPE_ID: u16 = 1852;
 }
 

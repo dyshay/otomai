@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6700
+/// Protocol message — ID: 2158
 #[derive(Debug, Clone, Default)]
 pub struct ArenaFighterLeaveMessage {
     pub leaver: CharacterBasicMinimalInformations,
@@ -27,6 +27,6 @@ impl DofusDeserialize for ArenaFighterLeaveMessage {
 }
 
 impl DofusMessage for ArenaFighterLeaveMessage {
-    const MESSAGE_ID: u16 = 6700;
+    const MESSAGE_ID: u16 = 2158;
 }
 

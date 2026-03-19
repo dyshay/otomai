@@ -6,100 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6363
-#[derive(Debug, Clone, Default)]
-pub struct TitlesAndOrnamentsListRequestMessage {
-}
-
-impl DofusSerialize for TitlesAndOrnamentsListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for TitlesAndOrnamentsListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for TitlesAndOrnamentsListRequestMessage {
-    const MESSAGE_ID: u16 = 6363;
-}
-
-/// Protocol message — ID: 6364
-#[derive(Debug, Clone, Default)]
-pub struct TitleGainedMessage {
-    pub title_id: i16,
-}
-
-impl DofusSerialize for TitleGainedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.title_id);
-    }
-}
-
-impl DofusDeserialize for TitleGainedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            title_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TitleGainedMessage {
-    const MESSAGE_ID: u16 = 6364;
-}
-
-/// Protocol message — ID: 6365
-#[derive(Debug, Clone, Default)]
-pub struct TitleSelectRequestMessage {
-    pub title_id: i16,
-}
-
-impl DofusSerialize for TitleSelectRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.title_id);
-    }
-}
-
-impl DofusDeserialize for TitleSelectRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            title_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TitleSelectRequestMessage {
-    const MESSAGE_ID: u16 = 6365;
-}
-
-/// Protocol message — ID: 6366
-#[derive(Debug, Clone, Default)]
-pub struct TitleSelectedMessage {
-    pub title_id: i16,
-}
-
-impl DofusSerialize for TitleSelectedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.title_id);
-    }
-}
-
-impl DofusDeserialize for TitleSelectedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            title_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TitleSelectedMessage {
-    const MESSAGE_ID: u16 = 6366;
-}
-
-/// Protocol message — ID: 6367
+/// Protocol message — ID: 1979
 #[derive(Debug, Clone, Default)]
 pub struct TitlesAndOrnamentsListMessage {
     pub titles: Vec<i16>,
@@ -149,130 +56,10 @@ impl DofusDeserialize for TitlesAndOrnamentsListMessage {
 }
 
 impl DofusMessage for TitlesAndOrnamentsListMessage {
-    const MESSAGE_ID: u16 = 6367;
+    const MESSAGE_ID: u16 = 1979;
 }
 
-/// Protocol message — ID: 6368
-#[derive(Debug, Clone, Default)]
-pub struct OrnamentGainedMessage {
-    pub ornament_id: i16,
-}
-
-impl DofusSerialize for OrnamentGainedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.ornament_id);
-    }
-}
-
-impl DofusDeserialize for OrnamentGainedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ornament_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for OrnamentGainedMessage {
-    const MESSAGE_ID: u16 = 6368;
-}
-
-/// Protocol message — ID: 6369
-#[derive(Debug, Clone, Default)]
-pub struct OrnamentSelectedMessage {
-    pub ornament_id: i16,
-}
-
-impl DofusSerialize for OrnamentSelectedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.ornament_id);
-    }
-}
-
-impl DofusDeserialize for OrnamentSelectedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ornament_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for OrnamentSelectedMessage {
-    const MESSAGE_ID: u16 = 6369;
-}
-
-/// Protocol message — ID: 6370
-#[derive(Debug, Clone, Default)]
-pub struct OrnamentSelectErrorMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for OrnamentSelectErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for OrnamentSelectErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for OrnamentSelectErrorMessage {
-    const MESSAGE_ID: u16 = 6370;
-}
-
-/// Protocol message — ID: 6371
-#[derive(Debug, Clone, Default)]
-pub struct TitleLostMessage {
-    pub title_id: i16,
-}
-
-impl DofusSerialize for TitleLostMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.title_id);
-    }
-}
-
-impl DofusDeserialize for TitleLostMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            title_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TitleLostMessage {
-    const MESSAGE_ID: u16 = 6371;
-}
-
-/// Protocol message — ID: 6373
-#[derive(Debug, Clone, Default)]
-pub struct TitleSelectErrorMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for TitleSelectErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for TitleSelectErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TitleSelectErrorMessage {
-    const MESSAGE_ID: u16 = 6373;
-}
-
-/// Protocol message — ID: 6374
+/// Protocol message — ID: 3929
 #[derive(Debug, Clone, Default)]
 pub struct OrnamentSelectRequestMessage {
     pub ornament_id: i16,
@@ -293,10 +80,151 @@ impl DofusDeserialize for OrnamentSelectRequestMessage {
 }
 
 impl DofusMessage for OrnamentSelectRequestMessage {
-    const MESSAGE_ID: u16 = 6374;
+    const MESSAGE_ID: u16 = 3929;
 }
 
-/// Protocol message — ID: 6770
+/// Protocol message — ID: 5637
+#[derive(Debug, Clone, Default)]
+pub struct TitlesAndOrnamentsListRequestMessage {
+}
+
+impl DofusSerialize for TitlesAndOrnamentsListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for TitlesAndOrnamentsListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for TitlesAndOrnamentsListRequestMessage {
+    const MESSAGE_ID: u16 = 5637;
+}
+
+/// Protocol message — ID: 6085
+#[derive(Debug, Clone, Default)]
+pub struct OrnamentSelectErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for OrnamentSelectErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for OrnamentSelectErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for OrnamentSelectErrorMessage {
+    const MESSAGE_ID: u16 = 6085;
+}
+
+/// Protocol message — ID: 6677
+#[derive(Debug, Clone, Default)]
+pub struct TitleGainedMessage {
+    pub title_id: i16,
+}
+
+impl DofusSerialize for TitleGainedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.title_id);
+    }
+}
+
+impl DofusDeserialize for TitleGainedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            title_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TitleGainedMessage {
+    const MESSAGE_ID: u16 = 6677;
+}
+
+/// Protocol message — ID: 7106
+#[derive(Debug, Clone, Default)]
+pub struct TitleSelectErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for TitleSelectErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for TitleSelectErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TitleSelectErrorMessage {
+    const MESSAGE_ID: u16 = 7106;
+}
+
+/// Protocol message — ID: 7295
+#[derive(Debug, Clone, Default)]
+pub struct OrnamentGainedMessage {
+    pub ornament_id: i16,
+}
+
+impl DofusSerialize for OrnamentGainedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.ornament_id);
+    }
+}
+
+impl DofusDeserialize for OrnamentGainedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ornament_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for OrnamentGainedMessage {
+    const MESSAGE_ID: u16 = 7295;
+}
+
+/// Protocol message — ID: 7521
+#[derive(Debug, Clone, Default)]
+pub struct TitleLostMessage {
+    pub title_id: i16,
+}
+
+impl DofusSerialize for TitleLostMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.title_id);
+    }
+}
+
+impl DofusDeserialize for TitleLostMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            title_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TitleLostMessage {
+    const MESSAGE_ID: u16 = 7521;
+}
+
+/// Protocol message — ID: 8465
 #[derive(Debug, Clone, Default)]
 pub struct OrnamentLostMessage {
     pub ornament_id: i16,
@@ -317,6 +245,78 @@ impl DofusDeserialize for OrnamentLostMessage {
 }
 
 impl DofusMessage for OrnamentLostMessage {
-    const MESSAGE_ID: u16 = 6770;
+    const MESSAGE_ID: u16 = 8465;
+}
+
+/// Protocol message — ID: 8478
+#[derive(Debug, Clone, Default)]
+pub struct TitleSelectRequestMessage {
+    pub title_id: i16,
+}
+
+impl DofusSerialize for TitleSelectRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.title_id);
+    }
+}
+
+impl DofusDeserialize for TitleSelectRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            title_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TitleSelectRequestMessage {
+    const MESSAGE_ID: u16 = 8478;
+}
+
+/// Protocol message — ID: 8881
+#[derive(Debug, Clone, Default)]
+pub struct OrnamentSelectedMessage {
+    pub ornament_id: i16,
+}
+
+impl DofusSerialize for OrnamentSelectedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.ornament_id);
+    }
+}
+
+impl DofusDeserialize for OrnamentSelectedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ornament_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for OrnamentSelectedMessage {
+    const MESSAGE_ID: u16 = 8881;
+}
+
+/// Protocol message — ID: 9932
+#[derive(Debug, Clone, Default)]
+pub struct TitleSelectedMessage {
+    pub title_id: i16,
+}
+
+impl DofusSerialize for TitleSelectedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.title_id);
+    }
+}
+
+impl DofusDeserialize for TitleSelectedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            title_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TitleSelectedMessage {
+    const MESSAGE_ID: u16 = 9932;
 }
 

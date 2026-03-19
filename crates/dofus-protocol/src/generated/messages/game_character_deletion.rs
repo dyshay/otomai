@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 165
+/// Protocol message — ID: 3569
 #[derive(Debug, Clone, Default)]
 pub struct CharacterDeletionRequestMessage {
     pub character_id: i64,
@@ -30,10 +30,10 @@ impl DofusDeserialize for CharacterDeletionRequestMessage {
 }
 
 impl DofusMessage for CharacterDeletionRequestMessage {
-    const MESSAGE_ID: u16 = 165;
+    const MESSAGE_ID: u16 = 3569;
 }
 
-/// Protocol message — ID: 166
+/// Protocol message — ID: 9769
 #[derive(Debug, Clone, Default)]
 pub struct CharacterDeletionErrorMessage {
     pub reason: u8,
@@ -54,6 +54,6 @@ impl DofusDeserialize for CharacterDeletionErrorMessage {
 }
 
 impl DofusMessage for CharacterDeletionErrorMessage {
-    const MESSAGE_ID: u16 = 166;
+    const MESSAGE_ID: u16 = 9769;
 }
 

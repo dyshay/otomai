@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 567
+/// Protocol type — ID: 904
 #[derive(Debug, Clone, Default)]
 pub struct GameContextSummonsInformation {
     pub spawn_information: Box<SpawnInformationVariant>,
@@ -55,6 +55,6 @@ impl DofusDeserialize for GameContextSummonsInformation {
 }
 
 impl DofusType for GameContextSummonsInformation {
-    const TYPE_ID: u16 = 567;
+    const TYPE_ID: u16 = 904;
 }
 

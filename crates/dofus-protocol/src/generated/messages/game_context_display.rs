@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6563
+/// Protocol message — ID: 5004
 #[derive(Debug, Clone, Default)]
 pub struct DisplayNumericalValuePaddockMessage {
     pub ride_id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for DisplayNumericalValuePaddockMessage {
 }
 
 impl DofusMessage for DisplayNumericalValuePaddockMessage {
-    const MESSAGE_ID: u16 = 6563;
+    const MESSAGE_ID: u16 = 5004;
 }
 

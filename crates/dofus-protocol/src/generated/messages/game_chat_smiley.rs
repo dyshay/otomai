@@ -6,175 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 800
-#[derive(Debug, Clone, Default)]
-pub struct ChatSmileyRequestMessage {
-    pub smiley_id: i16,
-}
-
-impl DofusSerialize for ChatSmileyRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.smiley_id);
-    }
-}
-
-impl DofusDeserialize for ChatSmileyRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            smiley_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ChatSmileyRequestMessage {
-    const MESSAGE_ID: u16 = 800;
-}
-
-/// Protocol message — ID: 801
-#[derive(Debug, Clone, Default)]
-pub struct ChatSmileyMessage {
-    pub entity_id: f64,
-    pub smiley_id: i16,
-    pub account_id: i32,
-}
-
-impl DofusSerialize for ChatSmileyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.entity_id);
-        writer.write_var_short(self.smiley_id);
-        writer.write_int(self.account_id);
-    }
-}
-
-impl DofusDeserialize for ChatSmileyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            entity_id: reader.read_double()?,
-            smiley_id: reader.read_var_short()?,
-            account_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ChatSmileyMessage {
-    const MESSAGE_ID: u16 = 801;
-}
-
-/// Protocol message — ID: 6185
-#[derive(Debug, Clone, Default)]
-pub struct LocalizedChatSmileyMessage {
-    pub entity_id: f64,
-    pub smiley_id: i16,
-    pub account_id: i32,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for LocalizedChatSmileyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.entity_id);
-        writer.write_var_short(self.smiley_id);
-        writer.write_int(self.account_id);
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for LocalizedChatSmileyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            entity_id: reader.read_double()?,
-            smiley_id: reader.read_var_short()?,
-            account_id: reader.read_int()?,
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for LocalizedChatSmileyMessage {
-    const MESSAGE_ID: u16 = 6185;
-}
-
-/// Protocol message — ID: 6192
-#[derive(Debug, Clone, Default)]
-pub struct MoodSmileyRequestMessage {
-    pub smiley_id: i16,
-}
-
-impl DofusSerialize for MoodSmileyRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.smiley_id);
-    }
-}
-
-impl DofusDeserialize for MoodSmileyRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            smiley_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MoodSmileyRequestMessage {
-    const MESSAGE_ID: u16 = 6192;
-}
-
-/// Protocol message — ID: 6196
-#[derive(Debug, Clone, Default)]
-pub struct MoodSmileyResultMessage {
-    pub result_code: u8,
-    pub smiley_id: i16,
-}
-
-impl DofusSerialize for MoodSmileyResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.result_code);
-        writer.write_var_short(self.smiley_id);
-    }
-}
-
-impl DofusDeserialize for MoodSmileyResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            result_code: reader.read_byte()?,
-            smiley_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MoodSmileyResultMessage {
-    const MESSAGE_ID: u16 = 6196;
-}
-
-/// Protocol message — ID: 6388
-#[derive(Debug, Clone, Default)]
-pub struct MoodSmileyUpdateMessage {
-    pub account_id: i32,
-    pub player_id: i64,
-    pub smiley_id: i16,
-}
-
-impl DofusSerialize for MoodSmileyUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.account_id);
-        writer.write_var_long(self.player_id);
-        writer.write_var_short(self.smiley_id);
-    }
-}
-
-impl DofusDeserialize for MoodSmileyUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            account_id: reader.read_int()?,
-            player_id: reader.read_var_long()?,
-            smiley_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MoodSmileyUpdateMessage {
-    const MESSAGE_ID: u16 = 6388;
-}
-
-/// Protocol message — ID: 6596
+/// Protocol message — ID: 6
 #[derive(Debug, Clone, Default)]
 pub struct ChatSmileyExtraPackListMessage {
     pub pack_ids: Vec<u8>,
@@ -205,6 +37,174 @@ impl DofusDeserialize for ChatSmileyExtraPackListMessage {
 }
 
 impl DofusMessage for ChatSmileyExtraPackListMessage {
-    const MESSAGE_ID: u16 = 6596;
+    const MESSAGE_ID: u16 = 6;
+}
+
+/// Protocol message — ID: 670
+#[derive(Debug, Clone, Default)]
+pub struct MoodSmileyRequestMessage {
+    pub smiley_id: i16,
+}
+
+impl DofusSerialize for MoodSmileyRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.smiley_id);
+    }
+}
+
+impl DofusDeserialize for MoodSmileyRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            smiley_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MoodSmileyRequestMessage {
+    const MESSAGE_ID: u16 = 670;
+}
+
+/// Protocol message — ID: 2233
+#[derive(Debug, Clone, Default)]
+pub struct MoodSmileyResultMessage {
+    pub result_code: u8,
+    pub smiley_id: i16,
+}
+
+impl DofusSerialize for MoodSmileyResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.result_code);
+        writer.write_var_short(self.smiley_id);
+    }
+}
+
+impl DofusDeserialize for MoodSmileyResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            result_code: reader.read_byte()?,
+            smiley_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MoodSmileyResultMessage {
+    const MESSAGE_ID: u16 = 2233;
+}
+
+/// Protocol message — ID: 2736
+#[derive(Debug, Clone, Default)]
+pub struct ChatSmileyMessage {
+    pub entity_id: f64,
+    pub smiley_id: i16,
+    pub account_id: i32,
+}
+
+impl DofusSerialize for ChatSmileyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.entity_id);
+        writer.write_var_short(self.smiley_id);
+        writer.write_int(self.account_id);
+    }
+}
+
+impl DofusDeserialize for ChatSmileyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            entity_id: reader.read_double()?,
+            smiley_id: reader.read_var_short()?,
+            account_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ChatSmileyMessage {
+    const MESSAGE_ID: u16 = 2736;
+}
+
+/// Protocol message — ID: 4794
+#[derive(Debug, Clone, Default)]
+pub struct MoodSmileyUpdateMessage {
+    pub account_id: i32,
+    pub player_id: i64,
+    pub smiley_id: i16,
+}
+
+impl DofusSerialize for MoodSmileyUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.account_id);
+        writer.write_var_long(self.player_id);
+        writer.write_var_short(self.smiley_id);
+    }
+}
+
+impl DofusDeserialize for MoodSmileyUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            account_id: reader.read_int()?,
+            player_id: reader.read_var_long()?,
+            smiley_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MoodSmileyUpdateMessage {
+    const MESSAGE_ID: u16 = 4794;
+}
+
+/// Protocol message — ID: 5172
+#[derive(Debug, Clone, Default)]
+pub struct ChatSmileyRequestMessage {
+    pub smiley_id: i16,
+}
+
+impl DofusSerialize for ChatSmileyRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.smiley_id);
+    }
+}
+
+impl DofusDeserialize for ChatSmileyRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            smiley_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ChatSmileyRequestMessage {
+    const MESSAGE_ID: u16 = 5172;
+}
+
+/// Protocol message — ID: 7234
+#[derive(Debug, Clone, Default)]
+pub struct LocalizedChatSmileyMessage {
+    pub entity_id: f64,
+    pub smiley_id: i16,
+    pub account_id: i32,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for LocalizedChatSmileyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.entity_id);
+        writer.write_var_short(self.smiley_id);
+        writer.write_int(self.account_id);
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for LocalizedChatSmileyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            entity_id: reader.read_double()?,
+            smiley_id: reader.read_var_short()?,
+            account_id: reader.read_int()?,
+            cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for LocalizedChatSmileyMessage {
+    const MESSAGE_ID: u16 = 7234;
 }
 

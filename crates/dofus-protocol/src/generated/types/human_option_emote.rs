@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 407
+/// Protocol type — ID: 7370
 #[derive(Debug, Clone, Default)]
 pub struct HumanOptionEmote {
     pub emote_id: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for HumanOptionEmote {
 }
 
 impl DofusType for HumanOptionEmote {
-    const TYPE_ID: u16 = 407;
+    const TYPE_ID: u16 = 7370;
 }
 

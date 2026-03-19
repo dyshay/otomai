@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 581
+/// Protocol type — ID: 8617
 #[derive(Debug, Clone, Default)]
 pub struct SpawnScaledMonsterInformation {
     pub creature_generic_id: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for SpawnScaledMonsterInformation {
 }
 
 impl DofusType for SpawnScaledMonsterInformation {
-    const TYPE_ID: u16 = 581;
+    const TYPE_ID: u16 = 8617;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5700
+/// Protocol message — ID: 1431
 #[derive(Debug, Clone, Default)]
 pub struct HouseGuildRightsViewMessage {
     pub house_id: i32,
@@ -30,40 +30,43 @@ impl DofusDeserialize for HouseGuildRightsViewMessage {
 }
 
 impl DofusMessage for HouseGuildRightsViewMessage {
-    const MESSAGE_ID: u16 = 5700;
+    const MESSAGE_ID: u16 = 1431;
 }
 
-/// Protocol message — ID: 5701
+/// Protocol message — ID: 5396
 #[derive(Debug, Clone, Default)]
-pub struct HouseGuildNoneMessage {
+pub struct HouseGuildShareRequestMessage {
     pub house_id: i32,
     pub instance_id: i32,
-    pub second_hand: bool,
+    pub enable: bool,
+    pub rights: i32,
 }
 
-impl DofusSerialize for HouseGuildNoneMessage {
+impl DofusSerialize for HouseGuildShareRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_int(self.house_id);
         writer.write_int(self.instance_id);
-        writer.write_boolean(self.second_hand);
+        writer.write_boolean(self.enable);
+        writer.write_var_int(self.rights);
     }
 }
 
-impl DofusDeserialize for HouseGuildNoneMessage {
+impl DofusDeserialize for HouseGuildShareRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             house_id: reader.read_var_int()?,
             instance_id: reader.read_int()?,
-            second_hand: reader.read_boolean()?,
+            enable: reader.read_boolean()?,
+            rights: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for HouseGuildNoneMessage {
-    const MESSAGE_ID: u16 = 5701;
+impl DofusMessage for HouseGuildShareRequestMessage {
+    const MESSAGE_ID: u16 = 5396;
 }
 
-/// Protocol message — ID: 5703
+/// Protocol message — ID: 8301
 #[derive(Debug, Clone, Default)]
 pub struct HouseGuildRightsMessage {
     pub house_id: i32,
@@ -96,39 +99,36 @@ impl DofusDeserialize for HouseGuildRightsMessage {
 }
 
 impl DofusMessage for HouseGuildRightsMessage {
-    const MESSAGE_ID: u16 = 5703;
+    const MESSAGE_ID: u16 = 8301;
 }
 
-/// Protocol message — ID: 5704
+/// Protocol message — ID: 9517
 #[derive(Debug, Clone, Default)]
-pub struct HouseGuildShareRequestMessage {
+pub struct HouseGuildNoneMessage {
     pub house_id: i32,
     pub instance_id: i32,
-    pub enable: bool,
-    pub rights: i32,
+    pub second_hand: bool,
 }
 
-impl DofusSerialize for HouseGuildShareRequestMessage {
+impl DofusSerialize for HouseGuildNoneMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_int(self.house_id);
         writer.write_int(self.instance_id);
-        writer.write_boolean(self.enable);
-        writer.write_var_int(self.rights);
+        writer.write_boolean(self.second_hand);
     }
 }
 
-impl DofusDeserialize for HouseGuildShareRequestMessage {
+impl DofusDeserialize for HouseGuildNoneMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             house_id: reader.read_var_int()?,
             instance_id: reader.read_int()?,
-            enable: reader.read_boolean()?,
-            rights: reader.read_var_int()?,
+            second_hand: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for HouseGuildShareRequestMessage {
-    const MESSAGE_ID: u16 = 5704;
+impl DofusMessage for HouseGuildNoneMessage {
+    const MESSAGE_ID: u16 = 9517;
 }
 

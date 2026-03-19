@@ -6,166 +6,37 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 3
+/// Protocol message — ID: 95
 #[derive(Debug, Clone, Default)]
-pub struct HelloConnectMessage {
-    pub salt: String,
-    pub key: Vec<u8>,
-}
-
-impl DofusSerialize for HelloConnectMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.salt);
-        writer.write_var_int(self.key.len() as _);
-        for item in &self.key {
-            writer.write_byte(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for HelloConnectMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            salt: reader.read_utf()?,
-            key: {
-                let count = reader.read_var_int()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for HelloConnectMessage {
-    const MESSAGE_ID: u16 = 3;
-}
-
-/// Protocol message — ID: 4
-#[derive(Debug, Clone, Default)]
-pub struct IdentificationMessage {
-    pub autoconnect: bool,
-    pub use_certificate: bool,
-    pub use_login_token: bool,
-    pub version: Version,
-    pub lang: String,
-    pub credentials: Vec<u8>,
+pub struct SelectedServerRefusedMessage {
     pub server_id: i16,
-    pub session_optional_salt: i64,
-    pub failed_attempts: Vec<i16>,
+    pub error: u8,
+    pub server_status: u8,
 }
 
-impl DofusSerialize for IdentificationMessage {
+impl DofusSerialize for SelectedServerRefusedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.autoconnect).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.use_certificate).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 2, self.use_login_token).unwrap();
-        writer.write_byte(_flag);
-        self.version.serialize(writer);
-        writer.write_utf(&self.lang);
-        writer.write_var_int(self.credentials.len() as _);
-        for item in &self.credentials {
-            writer.write_byte(*item);
-        }
-        writer.write_short(self.server_id);
-        writer.write_var_long(self.session_optional_salt);
-        writer.write_short(self.failed_attempts.len() as _);
-        for item in &self.failed_attempts {
-            writer.write_var_short(*item);
-        }
+        writer.write_var_short(self.server_id);
+        writer.write_byte(self.error);
+        writer.write_byte(self.server_status);
     }
 }
 
-impl DofusDeserialize for IdentificationMessage {
+impl DofusDeserialize for SelectedServerRefusedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        let _flag0 = reader.read_byte()?;
         Ok(Self {
-            autoconnect: boolean_byte_wrapper::get_flag(_flag0, 0)?,
-            use_certificate: boolean_byte_wrapper::get_flag(_flag0, 1)?,
-            use_login_token: boolean_byte_wrapper::get_flag(_flag0, 2)?,
-            version: Version::deserialize(reader)?,
-            lang: reader.read_utf()?,
-            credentials: {
-                let count = reader.read_var_int()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-            server_id: reader.read_short()?,
-            session_optional_salt: reader.read_var_long()?,
-            failed_attempts: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
+            server_id: reader.read_var_short()?,
+            error: reader.read_byte()?,
+            server_status: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for IdentificationMessage {
-    const MESSAGE_ID: u16 = 4;
+impl DofusMessage for SelectedServerRefusedMessage {
+    const MESSAGE_ID: u16 = 95;
 }
 
-/// Protocol message — ID: 20
-#[derive(Debug, Clone, Default)]
-pub struct IdentificationFailedMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for IdentificationFailedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for IdentificationFailedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for IdentificationFailedMessage {
-    const MESSAGE_ID: u16 = 20;
-}
-
-/// Protocol message — ID: 21
-#[derive(Debug, Clone, Default)]
-pub struct IdentificationFailedForBadVersionMessage {
-    pub reason: u8,
-    pub required_version: Version,
-}
-
-impl DofusSerialize for IdentificationFailedForBadVersionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-        self.required_version.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for IdentificationFailedForBadVersionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-            required_version: Version::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for IdentificationFailedForBadVersionMessage {
-    const MESSAGE_ID: u16 = 21;
-}
-
-/// Protocol message — ID: 22
+/// Protocol message — ID: 149
 #[derive(Debug, Clone, Default)]
 pub struct IdentificationSuccessMessage {
     pub has_rights: bool,
@@ -222,144 +93,31 @@ impl DofusDeserialize for IdentificationSuccessMessage {
 }
 
 impl DofusMessage for IdentificationSuccessMessage {
-    const MESSAGE_ID: u16 = 22;
+    const MESSAGE_ID: u16 = 149;
 }
 
-/// Protocol message — ID: 30
+/// Protocol message — ID: 1251
 #[derive(Debug, Clone, Default)]
-pub struct ServersListMessage {
-    pub servers: Vec<GameServerInformations>,
-    pub already_connected_to_server_id: i16,
-    pub can_create_new_character: bool,
+pub struct HelloConnectMessage {
+    pub salt: String,
+    pub key: Vec<u8>,
 }
 
-impl DofusSerialize for ServersListMessage {
+impl DofusSerialize for HelloConnectMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.servers.len() as _);
-        for item in &self.servers {
-            item.serialize(writer);
-        }
-        writer.write_var_short(self.already_connected_to_server_id);
-        writer.write_boolean(self.can_create_new_character);
-    }
-}
-
-impl DofusDeserialize for ServersListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            servers: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameServerInformations::deserialize(reader)?);
-                }
-                v
-            },
-            already_connected_to_server_id: reader.read_var_short()?,
-            can_create_new_character: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ServersListMessage {
-    const MESSAGE_ID: u16 = 30;
-}
-
-/// Protocol message — ID: 40
-#[derive(Debug, Clone, Default)]
-pub struct ServerSelectionMessage {
-    pub server_id: i16,
-}
-
-impl DofusSerialize for ServerSelectionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.server_id);
-    }
-}
-
-impl DofusDeserialize for ServerSelectionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            server_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ServerSelectionMessage {
-    const MESSAGE_ID: u16 = 40;
-}
-
-/// Protocol message — ID: 41
-#[derive(Debug, Clone, Default)]
-pub struct SelectedServerRefusedMessage {
-    pub server_id: i16,
-    pub error: u8,
-    pub server_status: u8,
-}
-
-impl DofusSerialize for SelectedServerRefusedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.server_id);
-        writer.write_byte(self.error);
-        writer.write_byte(self.server_status);
-    }
-}
-
-impl DofusDeserialize for SelectedServerRefusedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            server_id: reader.read_var_short()?,
-            error: reader.read_byte()?,
-            server_status: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for SelectedServerRefusedMessage {
-    const MESSAGE_ID: u16 = 41;
-}
-
-/// Protocol message — ID: 42
-#[derive(Debug, Clone, Default)]
-pub struct SelectedServerDataMessage {
-    pub server_id: i16,
-    pub address: String,
-    pub ports: Vec<i16>,
-    pub can_create_new_character: bool,
-    pub ticket: Vec<u8>,
-}
-
-impl DofusSerialize for SelectedServerDataMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.server_id);
-        writer.write_utf(&self.address);
-        writer.write_short(self.ports.len() as _);
-        for item in &self.ports {
-            writer.write_var_short(*item);
-        }
-        writer.write_boolean(self.can_create_new_character);
-        writer.write_var_int(self.ticket.len() as _);
-        for item in &self.ticket {
+        writer.write_utf(&self.salt);
+        writer.write_var_int(self.key.len() as _);
+        for item in &self.key {
             writer.write_byte(*item);
         }
     }
 }
 
-impl DofusDeserialize for SelectedServerDataMessage {
+impl DofusDeserialize for HelloConnectMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            server_id: reader.read_var_short()?,
-            address: reader.read_utf()?,
-            ports: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-            can_create_new_character: reader.read_boolean()?,
-            ticket: {
+            salt: reader.read_utf()?,
+            key: {
                 let count = reader.read_var_int()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -371,11 +129,56 @@ impl DofusDeserialize for SelectedServerDataMessage {
     }
 }
 
-impl DofusMessage for SelectedServerDataMessage {
-    const MESSAGE_ID: u16 = 42;
+impl DofusMessage for HelloConnectMessage {
+    const MESSAGE_ID: u16 = 1251;
 }
 
-/// Protocol message — ID: 50
+/// Protocol message — ID: 1345
+#[derive(Debug, Clone, Default)]
+pub struct IdentificationFailedMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for IdentificationFailedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for IdentificationFailedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for IdentificationFailedMessage {
+    const MESSAGE_ID: u16 = 1345;
+}
+
+/// Protocol message — ID: 1409
+#[derive(Debug, Clone, Default)]
+pub struct CredentialsAcknowledgementMessage {
+}
+
+impl DofusSerialize for CredentialsAcknowledgementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CredentialsAcknowledgementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CredentialsAcknowledgementMessage {
+    const MESSAGE_ID: u16 = 1409;
+}
+
+/// Protocol message — ID: 2105
 #[derive(Debug, Clone, Default)]
 pub struct ServerStatusUpdateMessage {
     pub server: GameServerInformations,
@@ -396,10 +199,10 @@ impl DofusDeserialize for ServerStatusUpdateMessage {
 }
 
 impl DofusMessage for ServerStatusUpdateMessage {
-    const MESSAGE_ID: u16 = 50;
+    const MESSAGE_ID: u16 = 2105;
 }
 
-/// Protocol message — ID: 6119
+/// Protocol message — ID: 4574
 #[derive(Debug, Clone, Default)]
 pub struct IdentificationAccountForceMessage {
     pub autoconnect: bool,
@@ -470,10 +273,10 @@ impl DofusDeserialize for IdentificationAccountForceMessage {
 }
 
 impl DofusMessage for IdentificationAccountForceMessage {
-    const MESSAGE_ID: u16 = 6119;
+    const MESSAGE_ID: u16 = 4574;
 }
 
-/// Protocol message — ID: 6174
+/// Protocol message — ID: 5027
 #[derive(Debug, Clone, Default)]
 pub struct IdentificationFailedBannedMessage {
     pub reason: u8,
@@ -497,10 +300,10 @@ impl DofusDeserialize for IdentificationFailedBannedMessage {
 }
 
 impl DofusMessage for IdentificationFailedBannedMessage {
-    const MESSAGE_ID: u16 = 6174;
+    const MESSAGE_ID: u16 = 5027;
 }
 
-/// Protocol message — ID: 6209
+/// Protocol message — ID: 6160
 #[derive(Debug, Clone, Default)]
 pub struct IdentificationSuccessWithLoginTokenMessage {
     pub has_rights: bool,
@@ -560,31 +363,10 @@ impl DofusDeserialize for IdentificationSuccessWithLoginTokenMessage {
 }
 
 impl DofusMessage for IdentificationSuccessWithLoginTokenMessage {
-    const MESSAGE_ID: u16 = 6209;
+    const MESSAGE_ID: u16 = 6160;
 }
 
-/// Protocol message — ID: 6314
-#[derive(Debug, Clone, Default)]
-pub struct CredentialsAcknowledgementMessage {
-}
-
-impl DofusSerialize for CredentialsAcknowledgementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CredentialsAcknowledgementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CredentialsAcknowledgementMessage {
-    const MESSAGE_ID: u16 = 6314;
-}
-
-/// Protocol message — ID: 6469
+/// Protocol message — ID: 7321
 #[derive(Debug, Clone, Default)]
 pub struct SelectedServerDataExtendedMessage {
     pub server_id: i16,
@@ -650,10 +432,172 @@ impl DofusDeserialize for SelectedServerDataExtendedMessage {
 }
 
 impl DofusMessage for SelectedServerDataExtendedMessage {
-    const MESSAGE_ID: u16 = 6469;
+    const MESSAGE_ID: u16 = 7321;
 }
 
-/// Protocol message — ID: 6731
+/// Protocol message — ID: 7603
+#[derive(Debug, Clone, Default)]
+pub struct ServersListMessage {
+    pub servers: Vec<GameServerInformations>,
+    pub already_connected_to_server_id: i16,
+    pub can_create_new_character: bool,
+}
+
+impl DofusSerialize for ServersListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.servers.len() as _);
+        for item in &self.servers {
+            item.serialize(writer);
+        }
+        writer.write_var_short(self.already_connected_to_server_id);
+        writer.write_boolean(self.can_create_new_character);
+    }
+}
+
+impl DofusDeserialize for ServersListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            servers: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameServerInformations::deserialize(reader)?);
+                }
+                v
+            },
+            already_connected_to_server_id: reader.read_var_short()?,
+            can_create_new_character: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ServersListMessage {
+    const MESSAGE_ID: u16 = 7603;
+}
+
+/// Protocol message — ID: 7721
+#[derive(Debug, Clone, Default)]
+pub struct ServerSelectionMessage {
+    pub server_id: i16,
+}
+
+impl DofusSerialize for ServerSelectionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.server_id);
+    }
+}
+
+impl DofusDeserialize for ServerSelectionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            server_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ServerSelectionMessage {
+    const MESSAGE_ID: u16 = 7721;
+}
+
+/// Protocol message — ID: 8050
+#[derive(Debug, Clone, Default)]
+pub struct IdentificationMessage {
+    pub autoconnect: bool,
+    pub use_certificate: bool,
+    pub use_login_token: bool,
+    pub version: Version,
+    pub lang: String,
+    pub credentials: Vec<u8>,
+    pub server_id: i16,
+    pub session_optional_salt: i64,
+    pub failed_attempts: Vec<i16>,
+}
+
+impl DofusSerialize for IdentificationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        let mut _flag: u8 = 0;
+        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.autoconnect).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.use_certificate).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 2, self.use_login_token).unwrap();
+        writer.write_byte(_flag);
+        self.version.serialize(writer);
+        writer.write_utf(&self.lang);
+        writer.write_var_int(self.credentials.len() as _);
+        for item in &self.credentials {
+            writer.write_byte(*item);
+        }
+        writer.write_short(self.server_id);
+        writer.write_var_long(self.session_optional_salt);
+        writer.write_short(self.failed_attempts.len() as _);
+        for item in &self.failed_attempts {
+            writer.write_var_short(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for IdentificationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        let _flag0 = reader.read_byte()?;
+        Ok(Self {
+            autoconnect: boolean_byte_wrapper::get_flag(_flag0, 0)?,
+            use_certificate: boolean_byte_wrapper::get_flag(_flag0, 1)?,
+            use_login_token: boolean_byte_wrapper::get_flag(_flag0, 2)?,
+            version: Version::deserialize(reader)?,
+            lang: reader.read_utf()?,
+            credentials: {
+                let count = reader.read_var_int()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+            server_id: reader.read_short()?,
+            session_optional_salt: reader.read_var_long()?,
+            failed_attempts: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for IdentificationMessage {
+    const MESSAGE_ID: u16 = 8050;
+}
+
+/// Protocol message — ID: 8907
+#[derive(Debug, Clone, Default)]
+pub struct IdentificationFailedForBadVersionMessage {
+    pub reason: u8,
+    pub required_version: Version,
+}
+
+impl DofusSerialize for IdentificationFailedForBadVersionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+        self.required_version.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for IdentificationFailedForBadVersionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+            required_version: Version::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for IdentificationFailedForBadVersionMessage {
+    const MESSAGE_ID: u16 = 8907;
+}
+
+/// Protocol message — ID: 9270
 #[derive(Debug, Clone, Default)]
 pub struct MigratedServerListMessage {
     pub migrated_server_ids: Vec<i16>,
@@ -684,6 +628,62 @@ impl DofusDeserialize for MigratedServerListMessage {
 }
 
 impl DofusMessage for MigratedServerListMessage {
-    const MESSAGE_ID: u16 = 6731;
+    const MESSAGE_ID: u16 = 9270;
+}
+
+/// Protocol message — ID: 9610
+#[derive(Debug, Clone, Default)]
+pub struct SelectedServerDataMessage {
+    pub server_id: i16,
+    pub address: String,
+    pub ports: Vec<i16>,
+    pub can_create_new_character: bool,
+    pub ticket: Vec<u8>,
+}
+
+impl DofusSerialize for SelectedServerDataMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.server_id);
+        writer.write_utf(&self.address);
+        writer.write_short(self.ports.len() as _);
+        for item in &self.ports {
+            writer.write_var_short(*item);
+        }
+        writer.write_boolean(self.can_create_new_character);
+        writer.write_var_int(self.ticket.len() as _);
+        for item in &self.ticket {
+            writer.write_byte(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for SelectedServerDataMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            server_id: reader.read_var_short()?,
+            address: reader.read_utf()?,
+            ports: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+            can_create_new_character: reader.read_boolean()?,
+            ticket: {
+                let count = reader.read_var_int()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for SelectedServerDataMessage {
+    const MESSAGE_ID: u16 = 9610;
 }
 

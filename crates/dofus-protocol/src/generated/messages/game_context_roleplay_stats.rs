@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5609
+/// Protocol message — ID: 929
 #[derive(Debug, Clone, Default)]
 pub struct StatsUpgradeResultMessage {
     pub result: u8,
@@ -30,10 +30,10 @@ impl DofusDeserialize for StatsUpgradeResultMessage {
 }
 
 impl DofusMessage for StatsUpgradeResultMessage {
-    const MESSAGE_ID: u16 = 5609;
+    const MESSAGE_ID: u16 = 929;
 }
 
-/// Protocol message — ID: 5610
+/// Protocol message — ID: 9735
 #[derive(Debug, Clone, Default)]
 pub struct StatsUpgradeRequestMessage {
     pub use_additionnal: bool,
@@ -60,6 +60,6 @@ impl DofusDeserialize for StatsUpgradeRequestMessage {
 }
 
 impl DofusMessage for StatsUpgradeRequestMessage {
-    const MESSAGE_ID: u16 = 5610;
+    const MESSAGE_ID: u16 = 9735;
 }
 

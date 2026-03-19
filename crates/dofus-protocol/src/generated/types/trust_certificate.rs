@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 377
+/// Protocol type — ID: 327
 #[derive(Debug, Clone, Default)]
 pub struct TrustCertificate {
     pub id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for TrustCertificate {
 }
 
 impl DofusType for TrustCertificate {
-    const TYPE_ID: u16 = 377;
+    const TYPE_ID: u16 = 327;
 }
 

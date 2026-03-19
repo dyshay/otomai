@@ -6,42 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6865
-#[derive(Debug, Clone, Default)]
-pub struct DebtsUpdateMessage {
-    pub action: u8,
-    pub debts: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for DebtsUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.action);
-        writer.write_short(self.debts.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for DebtsUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action: reader.read_byte()?,
-            debts: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for DebtsUpdateMessage {
-    const MESSAGE_ID: u16 = 6865;
-}
-
-/// Protocol message — ID: 6866
+/// Protocol message — ID: 5452
 #[derive(Debug, Clone, Default)]
 pub struct DebtsDeleteMessage {
     pub reason: u8,
@@ -75,6 +40,41 @@ impl DofusDeserialize for DebtsDeleteMessage {
 }
 
 impl DofusMessage for DebtsDeleteMessage {
-    const MESSAGE_ID: u16 = 6866;
+    const MESSAGE_ID: u16 = 5452;
+}
+
+/// Protocol message — ID: 9975
+#[derive(Debug, Clone, Default)]
+pub struct DebtsUpdateMessage {
+    pub action: u8,
+    pub debts: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for DebtsUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.action);
+        writer.write_short(self.debts.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for DebtsUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action: reader.read_byte()?,
+            debts: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for DebtsUpdateMessage {
+    const MESSAGE_ID: u16 = 9975;
 }
 

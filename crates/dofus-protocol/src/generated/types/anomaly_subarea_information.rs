@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 565
+/// Protocol type — ID: 9877
 #[derive(Debug, Clone, Default)]
 pub struct AnomalySubareaInformation {
     pub sub_area_id: i16,
@@ -36,6 +36,6 @@ impl DofusDeserialize for AnomalySubareaInformation {
 }
 
 impl DofusType for AnomalySubareaInformation {
-    const TYPE_ID: u16 = 565;
+    const TYPE_ID: u16 = 9877;
 }
 

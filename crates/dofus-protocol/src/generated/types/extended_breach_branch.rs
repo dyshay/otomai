@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 560
+/// Protocol type — ID: 4962
 #[derive(Debug, Clone, Default)]
 pub struct ExtendedBreachBranch {
     pub room: u8,
@@ -84,6 +84,6 @@ impl DofusDeserialize for ExtendedBreachBranch {
 }
 
 impl DofusType for ExtendedBreachBranch {
-    const TYPE_ID: u16 = 560;
+    const TYPE_ID: u16 = 4962;
 }
 

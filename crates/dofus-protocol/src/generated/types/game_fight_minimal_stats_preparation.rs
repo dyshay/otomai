@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 360
+/// Protocol type — ID: 9464
 #[derive(Debug, Clone, Default)]
 pub struct GameFightMinimalStatsPreparation {
     pub life_points: i32,
@@ -156,6 +156,6 @@ impl DofusDeserialize for GameFightMinimalStatsPreparation {
 }
 
 impl DofusType for GameFightMinimalStatsPreparation {
-    const TYPE_ID: u16 = 360;
+    const TYPE_ID: u16 = 9464;
 }
 

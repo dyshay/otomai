@@ -6,7 +6,109 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 1301
+/// Protocol message — ID: 1188
+#[derive(Debug, Clone, Default)]
+pub struct StartupActionAddMessage {
+    pub new_action: StartupActionAddObject,
+}
+
+impl DofusSerialize for StartupActionAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.new_action.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for StartupActionAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            new_action: StartupActionAddObject::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for StartupActionAddMessage {
+    const MESSAGE_ID: u16 = 1188;
+}
+
+/// Protocol message — ID: 5775
+#[derive(Debug, Clone, Default)]
+pub struct StartupActionsExecuteMessage {
+}
+
+impl DofusSerialize for StartupActionsExecuteMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for StartupActionsExecuteMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for StartupActionsExecuteMessage {
+    const MESSAGE_ID: u16 = 5775;
+}
+
+/// Protocol message — ID: 6836
+#[derive(Debug, Clone, Default)]
+pub struct StartupActionsAllAttributionMessage {
+    pub character_id: i64,
+}
+
+impl DofusSerialize for StartupActionsAllAttributionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.character_id);
+    }
+}
+
+impl DofusDeserialize for StartupActionsAllAttributionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            character_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for StartupActionsAllAttributionMessage {
+    const MESSAGE_ID: u16 = 6836;
+}
+
+/// Protocol message — ID: 7923
+#[derive(Debug, Clone, Default)]
+pub struct StartupActionFinishedMessage {
+    pub success: bool,
+    pub automatic_action: bool,
+    pub action_id: i32,
+}
+
+impl DofusSerialize for StartupActionFinishedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        let mut _flag: u8 = 0;
+        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.success).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.automatic_action).unwrap();
+        writer.write_byte(_flag);
+        writer.write_int(self.action_id);
+    }
+}
+
+impl DofusDeserialize for StartupActionFinishedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        let _flag0 = reader.read_byte()?;
+        Ok(Self {
+            success: boolean_byte_wrapper::get_flag(_flag0, 0)?,
+            automatic_action: boolean_byte_wrapper::get_flag(_flag0, 1)?,
+            action_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for StartupActionFinishedMessage {
+    const MESSAGE_ID: u16 = 7923;
+}
+
+/// Protocol message — ID: 9417
 #[derive(Debug, Clone, Default)]
 pub struct StartupActionsListMessage {
     pub actions: Vec<StartupActionAddObject>,
@@ -37,31 +139,10 @@ impl DofusDeserialize for StartupActionsListMessage {
 }
 
 impl DofusMessage for StartupActionsListMessage {
-    const MESSAGE_ID: u16 = 1301;
+    const MESSAGE_ID: u16 = 9417;
 }
 
-/// Protocol message — ID: 1302
-#[derive(Debug, Clone, Default)]
-pub struct StartupActionsExecuteMessage {
-}
-
-impl DofusSerialize for StartupActionsExecuteMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for StartupActionsExecuteMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for StartupActionsExecuteMessage {
-    const MESSAGE_ID: u16 = 1302;
-}
-
-/// Protocol message — ID: 1303
+/// Protocol message — ID: 9830
 #[derive(Debug, Clone, Default)]
 pub struct StartupActionsObjetAttributionMessage {
     pub action_id: i32,
@@ -85,87 +166,6 @@ impl DofusDeserialize for StartupActionsObjetAttributionMessage {
 }
 
 impl DofusMessage for StartupActionsObjetAttributionMessage {
-    const MESSAGE_ID: u16 = 1303;
-}
-
-/// Protocol message — ID: 1304
-#[derive(Debug, Clone, Default)]
-pub struct StartupActionFinishedMessage {
-    pub success: bool,
-    pub automatic_action: bool,
-    pub action_id: i32,
-}
-
-impl DofusSerialize for StartupActionFinishedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.success).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.automatic_action).unwrap();
-        writer.write_byte(_flag);
-        writer.write_int(self.action_id);
-    }
-}
-
-impl DofusDeserialize for StartupActionFinishedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        let _flag0 = reader.read_byte()?;
-        Ok(Self {
-            success: boolean_byte_wrapper::get_flag(_flag0, 0)?,
-            automatic_action: boolean_byte_wrapper::get_flag(_flag0, 1)?,
-            action_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for StartupActionFinishedMessage {
-    const MESSAGE_ID: u16 = 1304;
-}
-
-/// Protocol message — ID: 6537
-#[derive(Debug, Clone, Default)]
-pub struct StartupActionsAllAttributionMessage {
-    pub character_id: i64,
-}
-
-impl DofusSerialize for StartupActionsAllAttributionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.character_id);
-    }
-}
-
-impl DofusDeserialize for StartupActionsAllAttributionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            character_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for StartupActionsAllAttributionMessage {
-    const MESSAGE_ID: u16 = 6537;
-}
-
-/// Protocol message — ID: 6538
-#[derive(Debug, Clone, Default)]
-pub struct StartupActionAddMessage {
-    pub new_action: StartupActionAddObject,
-}
-
-impl DofusSerialize for StartupActionAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.new_action.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for StartupActionAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            new_action: StartupActionAddObject::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for StartupActionAddMessage {
-    const MESSAGE_ID: u16 = 6538;
+    const MESSAGE_ID: u16 = 9830;
 }
 

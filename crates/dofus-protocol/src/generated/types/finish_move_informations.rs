@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 506
+/// Protocol type — ID: 7837
 #[derive(Debug, Clone, Default)]
 pub struct FinishMoveInformations {
     pub finish_move_id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for FinishMoveInformations {
 }
 
 impl DofusType for FinishMoveInformations {
-    const TYPE_ID: u16 = 506;
+    const TYPE_ID: u16 = 7837;
 }
 

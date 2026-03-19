@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 93
+/// Protocol type — ID: 7417
 #[derive(Debug, Clone, Default)]
 pub struct FriendSpouseOnlineInformations {
     pub spouse_account_id: i32,
@@ -66,6 +66,6 @@ impl DofusDeserialize for FriendSpouseOnlineInformations {
 }
 
 impl DofusType for FriendSpouseOnlineInformations {
-    const TYPE_ID: u16 = 93;
+    const TYPE_ID: u16 = 7417;
 }
 

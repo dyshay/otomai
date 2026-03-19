@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 547
+/// Protocol type — ID: 3630
 #[derive(Debug, Clone, Default)]
 pub struct RecycledItem {
     pub id: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for RecycledItem {
 }
 
 impl DofusType for RecycledItem {
-    const TYPE_ID: u16 = 547;
+    const TYPE_ID: u16 = 3630;
 }
 

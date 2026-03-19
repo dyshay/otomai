@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 395
+/// Protocol type — ID: 7146
 #[derive(Debug, Clone, Default)]
 pub struct MonsterInGroupLightInformations {
     pub generic_id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for MonsterInGroupLightInformations {
 }
 
 impl DofusType for MonsterInGroupLightInformations {
-    const TYPE_ID: u16 = 395;
+    const TYPE_ID: u16 = 7146;
 }
 

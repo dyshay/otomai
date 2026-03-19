@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 81
+/// Protocol type — ID: 6916
 #[derive(Debug, Clone, Default)]
 pub struct ObjectEffectLadder {
     pub action_id: i16,
@@ -33,6 +33,6 @@ impl DofusDeserialize for ObjectEffectLadder {
 }
 
 impl DofusType for ObjectEffectLadder {
-    const TYPE_ID: u16 = 81;
+    const TYPE_ID: u16 = 6916;
 }
 

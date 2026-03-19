@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 544
+/// Protocol type — ID: 6762
 #[derive(Debug, Clone, Default)]
 pub struct ShortcutEntitiesPreset {
     pub slot: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ShortcutEntitiesPreset {
 }
 
 impl DofusType for ShortcutEntitiesPreset {
-    const TYPE_ID: u16 = 544;
+    const TYPE_ID: u16 = 6762;
 }
 

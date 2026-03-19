@@ -6,85 +6,58 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6789
+/// Protocol message — ID: 1305
 #[derive(Debug, Clone, Default)]
-pub struct BreachKickResponseMessage {
-    pub target: CharacterMinimalInformations,
-    pub kicked: bool,
+pub struct BreachKickRequestMessage {
+    pub target: i64,
 }
 
-impl DofusSerialize for BreachKickResponseMessage {
+impl DofusSerialize for BreachKickRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.target.serialize(writer);
-        writer.write_boolean(self.kicked);
+        writer.write_var_long(self.target);
     }
 }
 
-impl DofusDeserialize for BreachKickResponseMessage {
+impl DofusDeserialize for BreachKickRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            target: CharacterMinimalInformations::deserialize(reader)?,
-            kicked: reader.read_boolean()?,
+            target: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for BreachKickResponseMessage {
-    const MESSAGE_ID: u16 = 6789;
+impl DofusMessage for BreachKickRequestMessage {
+    const MESSAGE_ID: u16 = 1305;
 }
 
-/// Protocol message — ID: 6790
+/// Protocol message — ID: 3906
 #[derive(Debug, Clone, Default)]
-pub struct BreachInvitationCloseMessage {
+pub struct BreachInvitationOfferMessage {
     pub host: CharacterMinimalInformations,
+    pub time_left_before_cancel: i32,
 }
 
-impl DofusSerialize for BreachInvitationCloseMessage {
+impl DofusSerialize for BreachInvitationOfferMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         self.host.serialize(writer);
+        writer.write_var_int(self.time_left_before_cancel);
     }
 }
 
-impl DofusDeserialize for BreachInvitationCloseMessage {
+impl DofusDeserialize for BreachInvitationOfferMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             host: CharacterMinimalInformations::deserialize(reader)?,
+            time_left_before_cancel: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for BreachInvitationCloseMessage {
-    const MESSAGE_ID: u16 = 6790;
+impl DofusMessage for BreachInvitationOfferMessage {
+    const MESSAGE_ID: u16 = 3906;
 }
 
-/// Protocol message — ID: 6792
-#[derive(Debug, Clone, Default)]
-pub struct BreachInvitationResponseMessage {
-    pub guest: CharacterMinimalInformations,
-    pub accept: bool,
-}
-
-impl DofusSerialize for BreachInvitationResponseMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.guest.serialize(writer);
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for BreachInvitationResponseMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            guest: CharacterMinimalInformations::deserialize(reader)?,
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachInvitationResponseMessage {
-    const MESSAGE_ID: u16 = 6792;
-}
-
-/// Protocol message — ID: 6794
+/// Protocol message — ID: 4246
 #[derive(Debug, Clone, Default)]
 pub struct BreachInvitationRequestMessage {
     pub guests: Vec<i64>,
@@ -115,10 +88,64 @@ impl DofusDeserialize for BreachInvitationRequestMessage {
 }
 
 impl DofusMessage for BreachInvitationRequestMessage {
-    const MESSAGE_ID: u16 = 6794;
+    const MESSAGE_ID: u16 = 4246;
 }
 
-/// Protocol message — ID: 6795
+/// Protocol message — ID: 5951
+#[derive(Debug, Clone, Default)]
+pub struct BreachKickResponseMessage {
+    pub target: CharacterMinimalInformations,
+    pub kicked: bool,
+}
+
+impl DofusSerialize for BreachKickResponseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.target.serialize(writer);
+        writer.write_boolean(self.kicked);
+    }
+}
+
+impl DofusDeserialize for BreachKickResponseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            target: CharacterMinimalInformations::deserialize(reader)?,
+            kicked: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachKickResponseMessage {
+    const MESSAGE_ID: u16 = 5951;
+}
+
+/// Protocol message — ID: 6740
+#[derive(Debug, Clone, Default)]
+pub struct BreachInvitationResponseMessage {
+    pub guest: CharacterMinimalInformations,
+    pub accept: bool,
+}
+
+impl DofusSerialize for BreachInvitationResponseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.guest.serialize(writer);
+        writer.write_boolean(self.accept);
+    }
+}
+
+impl DofusDeserialize for BreachInvitationResponseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            guest: CharacterMinimalInformations::deserialize(reader)?,
+            accept: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BreachInvitationResponseMessage {
+    const MESSAGE_ID: u16 = 6740;
+}
+
+/// Protocol message — ID: 7999
 #[derive(Debug, Clone, Default)]
 pub struct BreachInvitationAnswerMessage {
     pub accept: bool,
@@ -139,57 +166,30 @@ impl DofusDeserialize for BreachInvitationAnswerMessage {
 }
 
 impl DofusMessage for BreachInvitationAnswerMessage {
-    const MESSAGE_ID: u16 = 6795;
+    const MESSAGE_ID: u16 = 7999;
 }
 
-/// Protocol message — ID: 6804
+/// Protocol message — ID: 8376
 #[derive(Debug, Clone, Default)]
-pub struct BreachKickRequestMessage {
-    pub target: i64,
-}
-
-impl DofusSerialize for BreachKickRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.target);
-    }
-}
-
-impl DofusDeserialize for BreachKickRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            target: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for BreachKickRequestMessage {
-    const MESSAGE_ID: u16 = 6804;
-}
-
-/// Protocol message — ID: 6805
-#[derive(Debug, Clone, Default)]
-pub struct BreachInvitationOfferMessage {
+pub struct BreachInvitationCloseMessage {
     pub host: CharacterMinimalInformations,
-    pub time_left_before_cancel: i32,
 }
 
-impl DofusSerialize for BreachInvitationOfferMessage {
+impl DofusSerialize for BreachInvitationCloseMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         self.host.serialize(writer);
-        writer.write_var_int(self.time_left_before_cancel);
     }
 }
 
-impl DofusDeserialize for BreachInvitationOfferMessage {
+impl DofusDeserialize for BreachInvitationCloseMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             host: CharacterMinimalInformations::deserialize(reader)?,
-            time_left_before_cancel: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for BreachInvitationOfferMessage {
-    const MESSAGE_ID: u16 = 6805;
+impl DofusMessage for BreachInvitationCloseMessage {
+    const MESSAGE_ID: u16 = 8376;
 }
 

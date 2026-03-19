@@ -6,7 +6,608 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 1004
+/// Protocol message — ID: 423
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightLifeAndShieldPointsLostMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub loss: i32,
+    pub permanent_damages: i32,
+    pub element_id: i32,
+    pub shield_loss: i16,
+}
+
+impl DofusSerialize for GameActionFightLifeAndShieldPointsLostMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_var_int(self.loss);
+        writer.write_var_int(self.permanent_damages);
+        writer.write_var_int(self.element_id);
+        writer.write_var_short(self.shield_loss);
+    }
+}
+
+impl DofusDeserialize for GameActionFightLifeAndShieldPointsLostMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            loss: reader.read_var_int()?,
+            permanent_damages: reader.read_var_int()?,
+            element_id: reader.read_var_int()?,
+            shield_loss: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightLifeAndShieldPointsLostMessage {
+    const MESSAGE_ID: u16 = 423;
+}
+
+/// Protocol message — ID: 449
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightActivateGlyphTrapMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub mark_id: i16,
+    pub active: bool,
+}
+
+impl DofusSerialize for GameActionFightActivateGlyphTrapMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_short(self.mark_id);
+        writer.write_boolean(self.active);
+    }
+}
+
+impl DofusDeserialize for GameActionFightActivateGlyphTrapMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            mark_id: reader.read_short()?,
+            active: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightActivateGlyphTrapMessage {
+    const MESSAGE_ID: u16 = 449;
+}
+
+/// Protocol message — ID: 622
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightVanishMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameActionFightVanishMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightVanishMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightVanishMessage {
+    const MESSAGE_ID: u16 = 622;
+}
+
+/// Protocol message — ID: 640
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightExchangePositionsMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub caster_cell_id: i16,
+    pub target_cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightExchangePositionsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.caster_cell_id);
+        writer.write_short(self.target_cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightExchangePositionsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            caster_cell_id: reader.read_short()?,
+            target_cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightExchangePositionsMessage {
+    const MESSAGE_ID: u16 = 640;
+}
+
+/// Protocol message — ID: 772
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightSpellCooldownVariationMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub spell_id: i16,
+    pub value: i16,
+}
+
+impl DofusSerialize for GameActionFightSpellCooldownVariationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_var_short(self.spell_id);
+        writer.write_var_short(self.value);
+    }
+}
+
+impl DofusDeserialize for GameActionFightSpellCooldownVariationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            spell_id: reader.read_var_short()?,
+            value: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightSpellCooldownVariationMessage {
+    const MESSAGE_ID: u16 = 772;
+}
+
+/// Protocol message — ID: 1076
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightSpellImmunityMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub spell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightSpellImmunityMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_var_short(self.spell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightSpellImmunityMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            spell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightSpellImmunityMessage {
+    const MESSAGE_ID: u16 = 1076;
+}
+
+/// Protocol message — ID: 1408
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightDispellMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub verbose_cast: bool,
+}
+
+impl DofusSerialize for GameActionFightDispellMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_boolean(self.verbose_cast);
+    }
+}
+
+impl DofusDeserialize for GameActionFightDispellMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            verbose_cast: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightDispellMessage {
+    const MESSAGE_ID: u16 = 1408;
+}
+
+/// Protocol message — ID: 1453
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightReflectSpellMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameActionFightReflectSpellMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightReflectSpellMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightReflectSpellMessage {
+    const MESSAGE_ID: u16 = 1453;
+}
+
+/// Protocol message — ID: 1470
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightCastRequestMessage {
+    pub spell_id: i16,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightCastRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.spell_id);
+        writer.write_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightCastRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            spell_id: reader.read_var_short()?,
+            cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightCastRequestMessage {
+    const MESSAGE_ID: u16 = 1470;
+}
+
+/// Protocol message — ID: 1531
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightLifePointsGainMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub delta: i32,
+}
+
+impl DofusSerialize for GameActionFightLifePointsGainMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_var_int(self.delta);
+    }
+}
+
+impl DofusDeserialize for GameActionFightLifePointsGainMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            delta: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightLifePointsGainMessage {
+    const MESSAGE_ID: u16 = 1531;
+}
+
+/// Protocol message — ID: 1538
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightMarkCellsMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub mark: GameActionMark,
+}
+
+impl DofusSerialize for GameActionFightMarkCellsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        self.mark.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameActionFightMarkCellsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            mark: GameActionMark::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightMarkCellsMessage {
+    const MESSAGE_ID: u16 = 1538;
+}
+
+/// Protocol message — ID: 1549
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightSlideMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub start_cell_id: i16,
+    pub end_cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightSlideMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.start_cell_id);
+        writer.write_short(self.end_cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightSlideMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            start_cell_id: reader.read_short()?,
+            end_cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightSlideMessage {
+    const MESSAGE_ID: u16 = 1549;
+}
+
+/// Protocol message — ID: 1575
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightInvisibilityMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub state: u8,
+}
+
+impl DofusSerialize for GameActionFightInvisibilityMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_byte(self.state);
+    }
+}
+
+impl DofusDeserialize for GameActionFightInvisibilityMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            state: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightInvisibilityMessage {
+    const MESSAGE_ID: u16 = 1575;
+}
+
+/// Protocol message — ID: 2159
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightNoSpellCastMessage {
+    pub spell_level_id: i32,
+}
+
+impl DofusSerialize for GameActionFightNoSpellCastMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.spell_level_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightNoSpellCastMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            spell_level_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightNoSpellCastMessage {
+    const MESSAGE_ID: u16 = 2159;
+}
+
+/// Protocol message — ID: 2232
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightCloseCombatMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub silent_cast: bool,
+    pub verbose_cast: bool,
+    pub target_id: f64,
+    pub destination_cell_id: i16,
+    pub critical: u8,
+    pub weapon_generic_id: i16,
+}
+
+impl DofusSerialize for GameActionFightCloseCombatMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        let mut _flag: u8 = 0;
+        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.silent_cast).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.verbose_cast).unwrap();
+        writer.write_byte(_flag);
+        writer.write_double(self.target_id);
+        writer.write_short(self.destination_cell_id);
+        writer.write_byte(self.critical);
+        writer.write_var_short(self.weapon_generic_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightCloseCombatMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        let _flag0 = reader.read_byte()?;
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            silent_cast: boolean_byte_wrapper::get_flag(_flag0, 0)?,
+            verbose_cast: boolean_byte_wrapper::get_flag(_flag0, 1)?,
+            target_id: reader.read_double()?,
+            destination_cell_id: reader.read_short()?,
+            critical: reader.read_byte()?,
+            weapon_generic_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightCloseCombatMessage {
+    const MESSAGE_ID: u16 = 2232;
+}
+
+/// Protocol message — ID: 2534
+#[derive(Debug, Clone, Default)]
+pub struct GameActionUpdateEffectTriggerCountMessage {
+    pub target_ids: Vec<GameFightEffectTriggerCount>,
+}
+
+impl DofusSerialize for GameActionUpdateEffectTriggerCountMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.target_ids.len() as _);
+        for item in &self.target_ids {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameActionUpdateEffectTriggerCountMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            target_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameActionUpdateEffectTriggerCountMessage {
+    const MESSAGE_ID: u16 = 2534;
+}
+
+/// Protocol message — ID: 3225
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightDeathMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameActionFightDeathMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightDeathMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightDeathMessage {
+    const MESSAGE_ID: u16 = 3225;
+}
+
+/// Protocol message — ID: 3652
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightCarryCharacterMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightCarryCharacterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightCarryCharacterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightCarryCharacterMessage {
+    const MESSAGE_ID: u16 = 3652;
+}
+
+/// Protocol message — ID: 3775
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightTackledMessage {
     pub action_id: i16,
@@ -43,37 +644,73 @@ impl DofusDeserialize for GameActionFightTackledMessage {
 }
 
 impl DofusMessage for GameActionFightTackledMessage {
-    const MESSAGE_ID: u16 = 1004;
+    const MESSAGE_ID: u16 = 3775;
 }
 
-/// Protocol message — ID: 1005
+/// Protocol message — ID: 4737
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightCastRequestMessage {
-    pub spell_id: i16,
+pub struct GameActionFightInvisibleDetectedMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
     pub cell_id: i16,
 }
 
-impl DofusSerialize for GameActionFightCastRequestMessage {
+impl DofusSerialize for GameActionFightInvisibleDetectedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.spell_id);
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
         writer.write_short(self.cell_id);
     }
 }
 
-impl DofusDeserialize for GameActionFightCastRequestMessage {
+impl DofusDeserialize for GameActionFightInvisibleDetectedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            spell_id: reader.read_var_short()?,
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
             cell_id: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for GameActionFightCastRequestMessage {
-    const MESSAGE_ID: u16 = 1005;
+impl DofusMessage for GameActionFightInvisibleDetectedMessage {
+    const MESSAGE_ID: u16 = 4737;
 }
 
-/// Protocol message — ID: 1010
+/// Protocol message — ID: 4963
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightUnmarkCellsMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub mark_id: i16,
+}
+
+impl DofusSerialize for GameActionFightUnmarkCellsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_short(self.mark_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightUnmarkCellsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            mark_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightUnmarkCellsMessage {
+    const MESSAGE_ID: u16 = 4963;
+}
+
+/// Protocol message — ID: 5026
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightSpellCastMessage {
     pub action_id: i16,
@@ -134,10 +771,75 @@ impl DofusDeserialize for GameActionFightSpellCastMessage {
 }
 
 impl DofusMessage for GameActionFightSpellCastMessage {
-    const MESSAGE_ID: u16 = 1010;
+    const MESSAGE_ID: u16 = 5026;
 }
 
-/// Protocol message — ID: 1030
+/// Protocol message — ID: 5036
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightMultipleSummonMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub summons: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for GameActionFightMultipleSummonMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_short(self.summons.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for GameActionFightMultipleSummonMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            summons: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightMultipleSummonMessage {
+    const MESSAGE_ID: u16 = 5036;
+}
+
+/// Protocol message — ID: 5055
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightCastOnTargetRequestMessage {
+    pub spell_id: i16,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameActionFightCastOnTargetRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.spell_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightCastOnTargetRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            spell_id: reader.read_var_short()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightCastOnTargetRequestMessage {
+    const MESSAGE_ID: u16 = 5055;
+}
+
+/// Protocol message — ID: 5415
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightPointsVariationMessage {
     pub action_id: i16,
@@ -167,238 +869,10 @@ impl DofusDeserialize for GameActionFightPointsVariationMessage {
 }
 
 impl DofusMessage for GameActionFightPointsVariationMessage {
-    const MESSAGE_ID: u16 = 1030;
+    const MESSAGE_ID: u16 = 5415;
 }
 
-/// Protocol message — ID: 1099
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightDeathMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameActionFightDeathMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightDeathMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightDeathMessage {
-    const MESSAGE_ID: u16 = 1099;
-}
-
-/// Protocol message — ID: 5525
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightSlideMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub start_cell_id: i16,
-    pub end_cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightSlideMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.start_cell_id);
-        writer.write_short(self.end_cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightSlideMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            start_cell_id: reader.read_short()?,
-            end_cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightSlideMessage {
-    const MESSAGE_ID: u16 = 5525;
-}
-
-/// Protocol message — ID: 5526
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightReduceDamagesMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub amount: i32,
-}
-
-impl DofusSerialize for GameActionFightReduceDamagesMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_int(self.amount);
-    }
-}
-
-impl DofusDeserialize for GameActionFightReduceDamagesMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            amount: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightReduceDamagesMessage {
-    const MESSAGE_ID: u16 = 5526;
-}
-
-/// Protocol message — ID: 5527
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightExchangePositionsMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub caster_cell_id: i16,
-    pub target_cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightExchangePositionsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.caster_cell_id);
-        writer.write_short(self.target_cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightExchangePositionsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            caster_cell_id: reader.read_short()?,
-            target_cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightExchangePositionsMessage {
-    const MESSAGE_ID: u16 = 5527;
-}
-
-/// Protocol message — ID: 5528
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightTeleportOnSameMapMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightTeleportOnSameMapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightTeleportOnSameMapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightTeleportOnSameMapMessage {
-    const MESSAGE_ID: u16 = 5528;
-}
-
-/// Protocol message — ID: 5530
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightReflectDamagesMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameActionFightReflectDamagesMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightReflectDamagesMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightReflectDamagesMessage {
-    const MESSAGE_ID: u16 = 5530;
-}
-
-/// Protocol message — ID: 5531
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightReflectSpellMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameActionFightReflectSpellMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightReflectSpellMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightReflectSpellMessage {
-    const MESSAGE_ID: u16 = 5531;
-}
-
-/// Protocol message — ID: 5532
+/// Protocol message — ID: 5574
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightChangeLookMessage {
     pub action_id: i16,
@@ -428,408 +902,10 @@ impl DofusDeserialize for GameActionFightChangeLookMessage {
 }
 
 impl DofusMessage for GameActionFightChangeLookMessage {
-    const MESSAGE_ID: u16 = 5532;
+    const MESSAGE_ID: u16 = 5574;
 }
 
-/// Protocol message — ID: 5533
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightDispellMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub verbose_cast: bool,
-}
-
-impl DofusSerialize for GameActionFightDispellMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_boolean(self.verbose_cast);
-    }
-}
-
-impl DofusDeserialize for GameActionFightDispellMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            verbose_cast: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightDispellMessage {
-    const MESSAGE_ID: u16 = 5533;
-}
-
-/// Protocol message — ID: 5535
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightStealKamaMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub amount: i64,
-}
-
-impl DofusSerialize for GameActionFightStealKamaMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_long(self.amount);
-    }
-}
-
-impl DofusDeserialize for GameActionFightStealKamaMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            amount: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightStealKamaMessage {
-    const MESSAGE_ID: u16 = 5535;
-}
-
-/// Protocol message — ID: 5540
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightMarkCellsMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub mark: GameActionMark,
-}
-
-impl DofusSerialize for GameActionFightMarkCellsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        self.mark.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameActionFightMarkCellsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            mark: GameActionMark::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightMarkCellsMessage {
-    const MESSAGE_ID: u16 = 5540;
-}
-
-/// Protocol message — ID: 5570
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightUnmarkCellsMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub mark_id: i16,
-}
-
-impl DofusSerialize for GameActionFightUnmarkCellsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_short(self.mark_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightUnmarkCellsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            mark_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightUnmarkCellsMessage {
-    const MESSAGE_ID: u16 = 5570;
-}
-
-/// Protocol message — ID: 5571
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightKillMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameActionFightKillMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightKillMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightKillMessage {
-    const MESSAGE_ID: u16 = 5571;
-}
-
-/// Protocol message — ID: 5741
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightTriggerGlyphTrapMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub mark_id: i16,
-    pub mark_impact_cell: i16,
-    pub triggering_character_id: f64,
-    pub triggered_spell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightTriggerGlyphTrapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_short(self.mark_id);
-        writer.write_var_short(self.mark_impact_cell);
-        writer.write_double(self.triggering_character_id);
-        writer.write_var_short(self.triggered_spell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightTriggerGlyphTrapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            mark_id: reader.read_short()?,
-            mark_impact_cell: reader.read_var_short()?,
-            triggering_character_id: reader.read_double()?,
-            triggered_spell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightTriggerGlyphTrapMessage {
-    const MESSAGE_ID: u16 = 5741;
-}
-
-/// Protocol message — ID: 5821
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightInvisibilityMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub state: u8,
-}
-
-impl DofusSerialize for GameActionFightInvisibilityMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_byte(self.state);
-    }
-}
-
-impl DofusDeserialize for GameActionFightInvisibilityMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            state: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightInvisibilityMessage {
-    const MESSAGE_ID: u16 = 5821;
-}
-
-/// Protocol message — ID: 5825
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightSummonMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub summons: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for GameActionFightSummonMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_short(self.summons.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for GameActionFightSummonMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            summons: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightSummonMessage {
-    const MESSAGE_ID: u16 = 5825;
-}
-
-/// Protocol message — ID: 5826
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightDropCharacterMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightDropCharacterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightDropCharacterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightDropCharacterMessage {
-    const MESSAGE_ID: u16 = 5826;
-}
-
-/// Protocol message — ID: 5828
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightDodgePointLossMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub amount: i16,
-}
-
-impl DofusSerialize for GameActionFightDodgePointLossMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_short(self.amount);
-    }
-}
-
-impl DofusDeserialize for GameActionFightDodgePointLossMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            amount: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightDodgePointLossMessage {
-    const MESSAGE_ID: u16 = 5828;
-}
-
-/// Protocol message — ID: 5829
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightThrowCharacterMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightThrowCharacterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightThrowCharacterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightThrowCharacterMessage {
-    const MESSAGE_ID: u16 = 5829;
-}
-
-/// Protocol message — ID: 5830
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightCarryCharacterMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightCarryCharacterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightCarryCharacterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightCarryCharacterMessage {
-    const MESSAGE_ID: u16 = 5830;
-}
-
-/// Protocol message — ID: 6070
+/// Protocol message — ID: 5910
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightDispellableEffectMessage {
     pub action_id: i16,
@@ -860,94 +936,139 @@ impl DofusDeserialize for GameActionFightDispellableEffectMessage {
 }
 
 impl DofusMessage for GameActionFightDispellableEffectMessage {
-    const MESSAGE_ID: u16 = 6070;
+    const MESSAGE_ID: u16 = 5910;
 }
 
-/// Protocol message — ID: 6113
+/// Protocol message — ID: 6074
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightDispellEffectMessage {
+pub struct GameActionFightReduceDamagesMessage {
     pub action_id: i16,
     pub source_id: f64,
     pub target_id: f64,
-    pub verbose_cast: bool,
-    pub boost_u_i_d: i32,
+    pub amount: i32,
 }
 
-impl DofusSerialize for GameActionFightDispellEffectMessage {
+impl DofusSerialize for GameActionFightReduceDamagesMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
         writer.write_double(self.target_id);
-        writer.write_boolean(self.verbose_cast);
-        writer.write_int(self.boost_u_i_d);
+        writer.write_var_int(self.amount);
     }
 }
 
-impl DofusDeserialize for GameActionFightDispellEffectMessage {
+impl DofusDeserialize for GameActionFightReduceDamagesMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             action_id: reader.read_var_short()?,
             source_id: reader.read_double()?,
             target_id: reader.read_double()?,
-            verbose_cast: reader.read_boolean()?,
-            boost_u_i_d: reader.read_int()?,
+            amount: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for GameActionFightDispellEffectMessage {
-    const MESSAGE_ID: u16 = 6113;
+impl DofusMessage for GameActionFightReduceDamagesMessage {
+    const MESSAGE_ID: u16 = 6074;
 }
 
-/// Protocol message — ID: 6116
+/// Protocol message — ID: 6413
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightCloseCombatMessage {
+pub struct GameActionFightModifyEffectsDurationMessage {
     pub action_id: i16,
     pub source_id: f64,
-    pub silent_cast: bool,
-    pub verbose_cast: bool,
     pub target_id: f64,
-    pub destination_cell_id: i16,
-    pub critical: u8,
-    pub weapon_generic_id: i16,
+    pub delta: i16,
 }
 
-impl DofusSerialize for GameActionFightCloseCombatMessage {
+impl DofusSerialize for GameActionFightModifyEffectsDurationMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.silent_cast).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.verbose_cast).unwrap();
-        writer.write_byte(_flag);
         writer.write_double(self.target_id);
-        writer.write_short(self.destination_cell_id);
-        writer.write_byte(self.critical);
-        writer.write_var_short(self.weapon_generic_id);
+        writer.write_short(self.delta);
     }
 }
 
-impl DofusDeserialize for GameActionFightCloseCombatMessage {
+impl DofusDeserialize for GameActionFightModifyEffectsDurationMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        let _flag0 = reader.read_byte()?;
         Ok(Self {
             action_id: reader.read_var_short()?,
             source_id: reader.read_double()?,
-            silent_cast: boolean_byte_wrapper::get_flag(_flag0, 0)?,
-            verbose_cast: boolean_byte_wrapper::get_flag(_flag0, 1)?,
             target_id: reader.read_double()?,
-            destination_cell_id: reader.read_short()?,
-            critical: reader.read_byte()?,
-            weapon_generic_id: reader.read_var_short()?,
+            delta: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for GameActionFightCloseCombatMessage {
-    const MESSAGE_ID: u16 = 6116;
+impl DofusMessage for GameActionFightModifyEffectsDurationMessage {
+    const MESSAGE_ID: u16 = 6413;
 }
 
-/// Protocol message — ID: 6118
+/// Protocol message — ID: 6663
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightStealKamaMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub amount: i64,
+}
+
+impl DofusSerialize for GameActionFightStealKamaMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_var_long(self.amount);
+    }
+}
+
+impl DofusDeserialize for GameActionFightStealKamaMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            amount: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightStealKamaMessage {
+    const MESSAGE_ID: u16 = 6663;
+}
+
+/// Protocol message — ID: 7605
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightReflectDamagesMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameActionFightReflectDamagesMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightReflectDamagesMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightReflectDamagesMessage {
+    const MESSAGE_ID: u16 = 7605;
+}
+
+/// Protocol message — ID: 7655
 #[derive(Debug, Clone, Default)]
 pub struct AbstractGameActionFightTargetedAbilityMessage {
     pub action_id: i16,
@@ -989,36 +1110,12 @@ impl DofusDeserialize for AbstractGameActionFightTargetedAbilityMessage {
 }
 
 impl DofusMessage for AbstractGameActionFightTargetedAbilityMessage {
-    const MESSAGE_ID: u16 = 6118;
+    const MESSAGE_ID: u16 = 7655;
 }
 
-/// Protocol message — ID: 6132
+/// Protocol message — ID: 7947
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightNoSpellCastMessage {
-    pub spell_level_id: i32,
-}
-
-impl DofusSerialize for GameActionFightNoSpellCastMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.spell_level_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightNoSpellCastMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            spell_level_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightNoSpellCastMessage {
-    const MESSAGE_ID: u16 = 6132;
-}
-
-/// Protocol message — ID: 6147
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightTriggerEffectMessage {
+pub struct GameActionFightDispellEffectMessage {
     pub action_id: i16,
     pub source_id: f64,
     pub target_id: f64,
@@ -1026,7 +1123,7 @@ pub struct GameActionFightTriggerEffectMessage {
     pub boost_u_i_d: i32,
 }
 
-impl DofusSerialize for GameActionFightTriggerEffectMessage {
+impl DofusSerialize for GameActionFightDispellEffectMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
@@ -1036,7 +1133,7 @@ impl DofusSerialize for GameActionFightTriggerEffectMessage {
     }
 }
 
-impl DofusDeserialize for GameActionFightTriggerEffectMessage {
+impl DofusDeserialize for GameActionFightDispellEffectMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             action_id: reader.read_var_short()?,
@@ -1048,55 +1145,91 @@ impl DofusDeserialize for GameActionFightTriggerEffectMessage {
     }
 }
 
-impl DofusMessage for GameActionFightTriggerEffectMessage {
-    const MESSAGE_ID: u16 = 6147;
+impl DofusMessage for GameActionFightDispellEffectMessage {
+    const MESSAGE_ID: u16 = 7947;
 }
 
-/// Protocol message — ID: 6176
+/// Protocol message — ID: 7952
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightDispellSpellMessage {
+pub struct GameActionFightDodgePointLossMessage {
     pub action_id: i16,
     pub source_id: f64,
     pub target_id: f64,
-    pub verbose_cast: bool,
-    pub spell_id: i16,
+    pub amount: i16,
 }
 
-impl DofusSerialize for GameActionFightDispellSpellMessage {
+impl DofusSerialize for GameActionFightDodgePointLossMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
         writer.write_double(self.target_id);
-        writer.write_boolean(self.verbose_cast);
-        writer.write_var_short(self.spell_id);
+        writer.write_var_short(self.amount);
     }
 }
 
-impl DofusDeserialize for GameActionFightDispellSpellMessage {
+impl DofusDeserialize for GameActionFightDodgePointLossMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             action_id: reader.read_var_short()?,
             source_id: reader.read_double()?,
             target_id: reader.read_double()?,
-            verbose_cast: reader.read_boolean()?,
-            spell_id: reader.read_var_short()?,
+            amount: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for GameActionFightDispellSpellMessage {
-    const MESSAGE_ID: u16 = 6176;
+impl DofusMessage for GameActionFightDodgePointLossMessage {
+    const MESSAGE_ID: u16 = 7952;
 }
 
-/// Protocol message — ID: 6217
+/// Protocol message — ID: 8084
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightVanishMessage {
+pub struct GameActionFightTriggerGlyphTrapMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub mark_id: i16,
+    pub mark_impact_cell: i16,
+    pub triggering_character_id: f64,
+    pub triggered_spell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightTriggerGlyphTrapMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_short(self.mark_id);
+        writer.write_var_short(self.mark_impact_cell);
+        writer.write_double(self.triggering_character_id);
+        writer.write_var_short(self.triggered_spell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightTriggerGlyphTrapMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            mark_id: reader.read_short()?,
+            mark_impact_cell: reader.read_var_short()?,
+            triggering_character_id: reader.read_double()?,
+            triggered_spell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightTriggerGlyphTrapMessage {
+    const MESSAGE_ID: u16 = 8084;
+}
+
+/// Protocol message — ID: 8275
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightKillMessage {
     pub action_id: i16,
     pub source_id: f64,
     pub target_id: f64,
 }
 
-impl DofusSerialize for GameActionFightVanishMessage {
+impl DofusSerialize for GameActionFightKillMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
@@ -1104,7 +1237,7 @@ impl DofusSerialize for GameActionFightVanishMessage {
     }
 }
 
-impl DofusDeserialize for GameActionFightVanishMessage {
+impl DofusDeserialize for GameActionFightKillMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             action_id: reader.read_var_short()?,
@@ -1114,188 +1247,11 @@ impl DofusDeserialize for GameActionFightVanishMessage {
     }
 }
 
-impl DofusMessage for GameActionFightVanishMessage {
-    const MESSAGE_ID: u16 = 6217;
+impl DofusMessage for GameActionFightKillMessage {
+    const MESSAGE_ID: u16 = 8275;
 }
 
-/// Protocol message — ID: 6219
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightSpellCooldownVariationMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub spell_id: i16,
-    pub value: i16,
-}
-
-impl DofusSerialize for GameActionFightSpellCooldownVariationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_short(self.spell_id);
-        writer.write_var_short(self.value);
-    }
-}
-
-impl DofusDeserialize for GameActionFightSpellCooldownVariationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            spell_id: reader.read_var_short()?,
-            value: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightSpellCooldownVariationMessage {
-    const MESSAGE_ID: u16 = 6219;
-}
-
-/// Protocol message — ID: 6221
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightSpellImmunityMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub spell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightSpellImmunityMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_short(self.spell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightSpellImmunityMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            spell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightSpellImmunityMessage {
-    const MESSAGE_ID: u16 = 6221;
-}
-
-/// Protocol message — ID: 6304
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightModifyEffectsDurationMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub delta: i16,
-}
-
-impl DofusSerialize for GameActionFightModifyEffectsDurationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.delta);
-    }
-}
-
-impl DofusDeserialize for GameActionFightModifyEffectsDurationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            delta: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightModifyEffectsDurationMessage {
-    const MESSAGE_ID: u16 = 6304;
-}
-
-/// Protocol message — ID: 6310
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightLifeAndShieldPointsLostMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub loss: i32,
-    pub permanent_damages: i32,
-    pub element_id: i32,
-    pub shield_loss: i16,
-}
-
-impl DofusSerialize for GameActionFightLifeAndShieldPointsLostMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_int(self.loss);
-        writer.write_var_int(self.permanent_damages);
-        writer.write_var_int(self.element_id);
-        writer.write_var_short(self.shield_loss);
-    }
-}
-
-impl DofusDeserialize for GameActionFightLifeAndShieldPointsLostMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            loss: reader.read_var_int()?,
-            permanent_damages: reader.read_var_int()?,
-            element_id: reader.read_var_int()?,
-            shield_loss: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightLifeAndShieldPointsLostMessage {
-    const MESSAGE_ID: u16 = 6310;
-}
-
-/// Protocol message — ID: 6311
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightLifePointsGainMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub delta: i32,
-}
-
-impl DofusSerialize for GameActionFightLifePointsGainMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_var_int(self.delta);
-    }
-}
-
-impl DofusDeserialize for GameActionFightLifePointsGainMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            delta: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightLifePointsGainMessage {
-    const MESSAGE_ID: u16 = 6311;
-}
-
-/// Protocol message — ID: 6312
+/// Protocol message — ID: 8747
 #[derive(Debug, Clone, Default)]
 pub struct GameActionFightLifePointsLostMessage {
     pub action_id: i16,
@@ -1331,111 +1287,18 @@ impl DofusDeserialize for GameActionFightLifePointsLostMessage {
 }
 
 impl DofusMessage for GameActionFightLifePointsLostMessage {
-    const MESSAGE_ID: u16 = 6312;
+    const MESSAGE_ID: u16 = 8747;
 }
 
-/// Protocol message — ID: 6320
+/// Protocol message — ID: 8796
 #[derive(Debug, Clone, Default)]
-pub struct GameActionFightInvisibleDetectedMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameActionFightInvisibleDetectedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
-        writer.write_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightInvisibleDetectedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
-            cell_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightInvisibleDetectedMessage {
-    const MESSAGE_ID: u16 = 6320;
-}
-
-/// Protocol message — ID: 6330
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightCastOnTargetRequestMessage {
-    pub spell_id: i16,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameActionFightCastOnTargetRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.spell_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameActionFightCastOnTargetRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            spell_id: reader.read_var_short()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightCastOnTargetRequestMessage {
-    const MESSAGE_ID: u16 = 6330;
-}
-
-/// Protocol message — ID: 6545
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightActivateGlyphTrapMessage {
-    pub action_id: i16,
-    pub source_id: f64,
-    pub mark_id: i16,
-    pub active: bool,
-}
-
-impl DofusSerialize for GameActionFightActivateGlyphTrapMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
-        writer.write_short(self.mark_id);
-        writer.write_boolean(self.active);
-    }
-}
-
-impl DofusDeserialize for GameActionFightActivateGlyphTrapMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            mark_id: reader.read_short()?,
-            active: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameActionFightActivateGlyphTrapMessage {
-    const MESSAGE_ID: u16 = 6545;
-}
-
-/// Protocol message — ID: 6837
-#[derive(Debug, Clone, Default)]
-pub struct GameActionFightMultipleSummonMessage {
+pub struct GameActionFightSummonMessage {
     pub action_id: i16,
     pub source_id: f64,
     pub summons: Vec<Vec<u8>>,
 }
 
-impl DofusSerialize for GameActionFightMultipleSummonMessage {
+impl DofusSerialize for GameActionFightSummonMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.action_id);
         writer.write_double(self.source_id);
@@ -1444,7 +1307,7 @@ impl DofusSerialize for GameActionFightMultipleSummonMessage {
     }
 }
 
-impl DofusDeserialize for GameActionFightMultipleSummonMessage {
+impl DofusDeserialize for GameActionFightSummonMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             action_id: reader.read_var_short()?,
@@ -1461,41 +1324,178 @@ impl DofusDeserialize for GameActionFightMultipleSummonMessage {
     }
 }
 
-impl DofusMessage for GameActionFightMultipleSummonMessage {
-    const MESSAGE_ID: u16 = 6837;
+impl DofusMessage for GameActionFightSummonMessage {
+    const MESSAGE_ID: u16 = 8796;
 }
 
-/// Protocol message — ID: 6838
+/// Protocol message — ID: 8910
 #[derive(Debug, Clone, Default)]
-pub struct GameActionUpdateEffectTriggerCountMessage {
-    pub target_ids: Vec<GameFightEffectTriggerCount>,
+pub struct GameActionFightDropCharacterMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub cell_id: i16,
 }
 
-impl DofusSerialize for GameActionUpdateEffectTriggerCountMessage {
+impl DofusSerialize for GameActionFightDropCharacterMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.target_ids.len() as _);
-        for item in &self.target_ids {
-            item.serialize(writer);
-        }
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.cell_id);
     }
 }
 
-impl DofusDeserialize for GameActionUpdateEffectTriggerCountMessage {
+impl DofusDeserialize for GameActionFightDropCharacterMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            target_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
-                }
-                v
-            },
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            cell_id: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for GameActionUpdateEffectTriggerCountMessage {
-    const MESSAGE_ID: u16 = 6838;
+impl DofusMessage for GameActionFightDropCharacterMessage {
+    const MESSAGE_ID: u16 = 8910;
+}
+
+/// Protocol message — ID: 9016
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightThrowCharacterMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightThrowCharacterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightThrowCharacterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightThrowCharacterMessage {
+    const MESSAGE_ID: u16 = 9016;
+}
+
+/// Protocol message — ID: 9063
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightTeleportOnSameMapMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightTeleportOnSameMapMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightTeleportOnSameMapMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            cell_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightTeleportOnSameMapMessage {
+    const MESSAGE_ID: u16 = 9063;
+}
+
+/// Protocol message — ID: 9184
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightDispellSpellMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub verbose_cast: bool,
+    pub spell_id: i16,
+}
+
+impl DofusSerialize for GameActionFightDispellSpellMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_boolean(self.verbose_cast);
+        writer.write_var_short(self.spell_id);
+    }
+}
+
+impl DofusDeserialize for GameActionFightDispellSpellMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            verbose_cast: reader.read_boolean()?,
+            spell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightDispellSpellMessage {
+    const MESSAGE_ID: u16 = 9184;
+}
+
+/// Protocol message — ID: 9562
+#[derive(Debug, Clone, Default)]
+pub struct GameActionFightTriggerEffectMessage {
+    pub action_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+    pub verbose_cast: bool,
+    pub boost_u_i_d: i32,
+}
+
+impl DofusSerialize for GameActionFightTriggerEffectMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+        writer.write_boolean(self.verbose_cast);
+        writer.write_int(self.boost_u_i_d);
+    }
+}
+
+impl DofusDeserialize for GameActionFightTriggerEffectMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+            verbose_cast: reader.read_boolean()?,
+            boost_u_i_d: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GameActionFightTriggerEffectMessage {
+    const MESSAGE_ID: u16 = 9562;
 }
 

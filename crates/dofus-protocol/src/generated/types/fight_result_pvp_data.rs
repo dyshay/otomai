@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 190
+/// Protocol type — ID: 3462
 #[derive(Debug, Clone, Default)]
 pub struct FightResultPvpData {
     pub grade: u8,
@@ -39,6 +39,6 @@ impl DofusDeserialize for FightResultPvpData {
 }
 
 impl DofusType for FightResultPvpData {
-    const TYPE_ID: u16 = 190;
+    const TYPE_ID: u16 = 3462;
 }
 

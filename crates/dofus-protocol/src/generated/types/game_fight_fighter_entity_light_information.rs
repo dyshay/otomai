@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 548
+/// Protocol type — ID: 6182
 #[derive(Debug, Clone, Default)]
 pub struct GameFightFighterEntityLightInformation {
     pub sex: bool,
@@ -51,6 +51,6 @@ impl DofusDeserialize for GameFightFighterEntityLightInformation {
 }
 
 impl DofusType for GameFightFighterEntityLightInformation {
-    const TYPE_ID: u16 = 548;
+    const TYPE_ID: u16 = 6182;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 955
+/// Protocol message — ID: 5293
 #[derive(Debug, Clone, Default)]
 pub struct SequenceStartMessage {
     pub sequence_type: u8,
@@ -30,10 +30,10 @@ impl DofusDeserialize for SequenceStartMessage {
 }
 
 impl DofusMessage for SequenceStartMessage {
-    const MESSAGE_ID: u16 = 955;
+    const MESSAGE_ID: u16 = 5293;
 }
 
-/// Protocol message — ID: 956
+/// Protocol message — ID: 7632
 #[derive(Debug, Clone, Default)]
 pub struct SequenceEndMessage {
     pub action_id: i16,
@@ -60,6 +60,6 @@ impl DofusDeserialize for SequenceEndMessage {
 }
 
 impl DofusMessage for SequenceEndMessage {
-    const MESSAGE_ID: u16 = 956;
+    const MESSAGE_ID: u16 = 7632;
 }
 

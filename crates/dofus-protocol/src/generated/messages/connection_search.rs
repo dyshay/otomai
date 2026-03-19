@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6142
+/// Protocol message — ID: 1800
 #[derive(Debug, Clone, Default)]
 pub struct AcquaintanceServerListMessage {
     pub servers: Vec<i16>,
@@ -37,10 +37,10 @@ impl DofusDeserialize for AcquaintanceServerListMessage {
 }
 
 impl DofusMessage for AcquaintanceServerListMessage {
-    const MESSAGE_ID: u16 = 6142;
+    const MESSAGE_ID: u16 = 1800;
 }
 
-/// Protocol message — ID: 6143
+/// Protocol message — ID: 2175
 #[derive(Debug, Clone, Default)]
 pub struct AcquaintanceSearchErrorMessage {
     pub reason: u8,
@@ -61,10 +61,10 @@ impl DofusDeserialize for AcquaintanceSearchErrorMessage {
 }
 
 impl DofusMessage for AcquaintanceSearchErrorMessage {
-    const MESSAGE_ID: u16 = 6143;
+    const MESSAGE_ID: u16 = 2175;
 }
 
-/// Protocol message — ID: 6144
+/// Protocol message — ID: 4981
 #[derive(Debug, Clone, Default)]
 pub struct AcquaintanceSearchMessage {
     pub nickname: String,
@@ -85,6 +85,6 @@ impl DofusDeserialize for AcquaintanceSearchMessage {
 }
 
 impl DofusMessage for AcquaintanceSearchMessage {
-    const MESSAGE_ID: u16 = 6144;
+    const MESSAGE_ID: u16 = 4981;
 }
 

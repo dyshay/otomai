@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 82
+/// Protocol type — ID: 9076
 #[derive(Debug, Clone, Default)]
 pub struct ObjectEffectMinMax {
     pub action_id: i16,
@@ -33,6 +33,6 @@ impl DofusDeserialize for ObjectEffectMinMax {
 }
 
 impl DofusType for ObjectEffectMinMax {
-    const TYPE_ID: u16 = 82;
+    const TYPE_ID: u16 = 9076;
 }
 

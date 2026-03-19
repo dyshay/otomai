@@ -6,31 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6459
-#[derive(Debug, Clone, Default)]
-pub struct ClientUIOpenedMessage {
-    pub r#type: u8,
-}
-
-impl DofusSerialize for ClientUIOpenedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.r#type);
-    }
-}
-
-impl DofusDeserialize for ClientUIOpenedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            r#type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ClientUIOpenedMessage {
-    const MESSAGE_ID: u16 = 6459;
-}
-
-/// Protocol message — ID: 6463
+/// Protocol message — ID: 4274
 #[derive(Debug, Clone, Default)]
 pub struct ClientUIOpenedByObjectMessage {
     pub r#type: u8,
@@ -54,6 +30,30 @@ impl DofusDeserialize for ClientUIOpenedByObjectMessage {
 }
 
 impl DofusMessage for ClientUIOpenedByObjectMessage {
-    const MESSAGE_ID: u16 = 6463;
+    const MESSAGE_ID: u16 = 4274;
+}
+
+/// Protocol message — ID: 4819
+#[derive(Debug, Clone, Default)]
+pub struct ClientUIOpenedMessage {
+    pub r#type: u8,
+}
+
+impl DofusSerialize for ClientUIOpenedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.r#type);
+    }
+}
+
+impl DofusDeserialize for ClientUIOpenedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            r#type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ClientUIOpenedMessage {
+    const MESSAGE_ID: u16 = 4819;
 }
 

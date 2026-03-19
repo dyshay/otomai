@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 215
+/// Protocol type — ID: 9332
 #[derive(Debug, Clone, Default)]
 pub struct CharacterSpellModification {
     pub modification_type: u8,
@@ -33,6 +33,6 @@ impl DofusDeserialize for CharacterSpellModification {
 }
 
 impl DofusType for CharacterSpellModification {
-    const TYPE_ID: u16 = 215;
+    const TYPE_ID: u16 = 9332;
 }
 

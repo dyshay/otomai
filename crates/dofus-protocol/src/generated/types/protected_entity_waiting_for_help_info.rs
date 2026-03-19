@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 186
+/// Protocol type — ID: 6130
 #[derive(Debug, Clone, Default)]
 pub struct ProtectedEntityWaitingForHelpInfo {
     pub time_left_before_fight: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for ProtectedEntityWaitingForHelpInfo {
 }
 
 impl DofusType for ProtectedEntityWaitingForHelpInfo {
-    const TYPE_ID: u16 = 186;
+    const TYPE_ID: u16 = 6130;
 }
 

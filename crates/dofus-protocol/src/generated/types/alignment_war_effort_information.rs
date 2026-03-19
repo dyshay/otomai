@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 571
+/// Protocol type — ID: 2771
 #[derive(Debug, Clone, Default)]
 pub struct AlignmentWarEffortInformation {
     pub alignment_side: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for AlignmentWarEffortInformation {
 }
 
 impl DofusType for AlignmentWarEffortInformation {
-    const TYPE_ID: u16 = 571;
+    const TYPE_ID: u16 = 2771;
 }
 

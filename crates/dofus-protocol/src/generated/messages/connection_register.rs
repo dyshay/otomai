@@ -6,31 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5638
-#[derive(Debug, Clone, Default)]
-pub struct NicknameRefusedMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for NicknameRefusedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for NicknameRefusedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for NicknameRefusedMessage {
-    const MESSAGE_ID: u16 = 5638;
-}
-
-/// Protocol message — ID: 5639
+/// Protocol message — ID: 4237
 #[derive(Debug, Clone, Default)]
 pub struct NicknameChoiceRequestMessage {
     pub nickname: String,
@@ -51,10 +27,10 @@ impl DofusDeserialize for NicknameChoiceRequestMessage {
 }
 
 impl DofusMessage for NicknameChoiceRequestMessage {
-    const MESSAGE_ID: u16 = 5639;
+    const MESSAGE_ID: u16 = 4237;
 }
 
-/// Protocol message — ID: 5640
+/// Protocol message — ID: 6627
 #[derive(Debug, Clone, Default)]
 pub struct NicknameRegistrationMessage {
 }
@@ -72,10 +48,10 @@ impl DofusDeserialize for NicknameRegistrationMessage {
 }
 
 impl DofusMessage for NicknameRegistrationMessage {
-    const MESSAGE_ID: u16 = 5640;
+    const MESSAGE_ID: u16 = 6627;
 }
 
-/// Protocol message — ID: 5641
+/// Protocol message — ID: 7967
 #[derive(Debug, Clone, Default)]
 pub struct NicknameAcceptedMessage {
 }
@@ -93,10 +69,10 @@ impl DofusDeserialize for NicknameAcceptedMessage {
 }
 
 impl DofusMessage for NicknameAcceptedMessage {
-    const MESSAGE_ID: u16 = 5641;
+    const MESSAGE_ID: u16 = 7967;
 }
 
-/// Protocol message — ID: 6607
+/// Protocol message — ID: 7982
 #[derive(Debug, Clone, Default)]
 pub struct AccountLinkRequiredMessage {
 }
@@ -114,6 +90,30 @@ impl DofusDeserialize for AccountLinkRequiredMessage {
 }
 
 impl DofusMessage for AccountLinkRequiredMessage {
-    const MESSAGE_ID: u16 = 6607;
+    const MESSAGE_ID: u16 = 7982;
+}
+
+/// Protocol message — ID: 8144
+#[derive(Debug, Clone, Default)]
+pub struct NicknameRefusedMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for NicknameRefusedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for NicknameRefusedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for NicknameRefusedMessage {
+    const MESSAGE_ID: u16 = 8144;
 }
 

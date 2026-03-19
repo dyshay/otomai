@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6809
+/// Protocol message — ID: 6696
 #[derive(Debug, Clone, Default)]
 pub struct BreachGameFightEndMessage {
     pub duration: i32,
@@ -60,6 +60,6 @@ impl DofusDeserialize for BreachGameFightEndMessage {
 }
 
 impl DofusMessage for BreachGameFightEndMessage {
-    const MESSAGE_ID: u16 = 6809;
+    const MESSAGE_ID: u16 = 6696;
 }
 

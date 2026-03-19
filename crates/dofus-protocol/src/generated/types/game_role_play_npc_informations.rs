@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 156
+/// Protocol type — ID: 8307
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayNpcInformations {
     pub contextual_id: f64,
@@ -46,6 +46,6 @@ impl DofusDeserialize for GameRolePlayNpcInformations {
 }
 
 impl DofusType for GameRolePlayNpcInformations {
-    const TYPE_ID: u16 = 156;
+    const TYPE_ID: u16 = 8307;
 }
 

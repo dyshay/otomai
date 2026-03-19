@@ -6,34 +6,55 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6642
+/// Protocol message — ID: 205
 #[derive(Debug, Clone, Default)]
-pub struct InviteInHavenBagMessage {
-    pub guest_informations: CharacterMinimalInformations,
+pub struct TeleportHavenBagAnswerMessage {
     pub accept: bool,
 }
 
-impl DofusSerialize for InviteInHavenBagMessage {
+impl DofusSerialize for TeleportHavenBagAnswerMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.guest_informations.serialize(writer);
         writer.write_boolean(self.accept);
     }
 }
 
-impl DofusDeserialize for InviteInHavenBagMessage {
+impl DofusDeserialize for TeleportHavenBagAnswerMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            guest_informations: CharacterMinimalInformations::deserialize(reader)?,
             accept: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for InviteInHavenBagMessage {
-    const MESSAGE_ID: u16 = 6642;
+impl DofusMessage for TeleportHavenBagAnswerMessage {
+    const MESSAGE_ID: u16 = 205;
 }
 
-/// Protocol message — ID: 6643
+/// Protocol message — ID: 1466
+#[derive(Debug, Clone, Default)]
+pub struct HavenBagPermissionsUpdateMessage {
+    pub permissions: i32,
+}
+
+impl DofusSerialize for HavenBagPermissionsUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.permissions);
+    }
+}
+
+impl DofusDeserialize for HavenBagPermissionsUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            permissions: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for HavenBagPermissionsUpdateMessage {
+    const MESSAGE_ID: u16 = 1466;
+}
+
+/// Protocol message — ID: 2889
 #[derive(Debug, Clone, Default)]
 pub struct InviteInHavenBagOfferMessage {
     pub host_informations: CharacterMinimalInformations,
@@ -57,106 +78,10 @@ impl DofusDeserialize for InviteInHavenBagOfferMessage {
 }
 
 impl DofusMessage for InviteInHavenBagOfferMessage {
-    const MESSAGE_ID: u16 = 6643;
+    const MESSAGE_ID: u16 = 2889;
 }
 
-/// Protocol message — ID: 6645
-#[derive(Debug, Clone, Default)]
-pub struct InviteInHavenBagClosedMessage {
-    pub host_informations: CharacterMinimalInformations,
-}
-
-impl DofusSerialize for InviteInHavenBagClosedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.host_informations.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for InviteInHavenBagClosedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            host_informations: CharacterMinimalInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for InviteInHavenBagClosedMessage {
-    const MESSAGE_ID: u16 = 6645;
-}
-
-/// Protocol message — ID: 6646
-#[derive(Debug, Clone, Default)]
-pub struct TeleportHavenBagAnswerMessage {
-    pub accept: bool,
-}
-
-impl DofusSerialize for TeleportHavenBagAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for TeleportHavenBagAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportHavenBagAnswerMessage {
-    const MESSAGE_ID: u16 = 6646;
-}
-
-/// Protocol message — ID: 6647
-#[derive(Debug, Clone, Default)]
-pub struct TeleportHavenBagRequestMessage {
-    pub guest_id: i64,
-}
-
-impl DofusSerialize for TeleportHavenBagRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.guest_id);
-    }
-}
-
-impl DofusDeserialize for TeleportHavenBagRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            guest_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportHavenBagRequestMessage {
-    const MESSAGE_ID: u16 = 6647;
-}
-
-/// Protocol message — ID: 6713
-#[derive(Debug, Clone, Default)]
-pub struct HavenBagPermissionsUpdateMessage {
-    pub permissions: i32,
-}
-
-impl DofusSerialize for HavenBagPermissionsUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.permissions);
-    }
-}
-
-impl DofusDeserialize for HavenBagPermissionsUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            permissions: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for HavenBagPermissionsUpdateMessage {
-    const MESSAGE_ID: u16 = 6713;
-}
-
-/// Protocol message — ID: 6714
+/// Protocol message — ID: 4397
 #[derive(Debug, Clone, Default)]
 pub struct HavenBagPermissionsUpdateRequestMessage {
     pub permissions: i32,
@@ -177,6 +102,81 @@ impl DofusDeserialize for HavenBagPermissionsUpdateRequestMessage {
 }
 
 impl DofusMessage for HavenBagPermissionsUpdateRequestMessage {
-    const MESSAGE_ID: u16 = 6714;
+    const MESSAGE_ID: u16 = 4397;
+}
+
+/// Protocol message — ID: 5508
+#[derive(Debug, Clone, Default)]
+pub struct TeleportHavenBagRequestMessage {
+    pub guest_id: i64,
+}
+
+impl DofusSerialize for TeleportHavenBagRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.guest_id);
+    }
+}
+
+impl DofusDeserialize for TeleportHavenBagRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            guest_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for TeleportHavenBagRequestMessage {
+    const MESSAGE_ID: u16 = 5508;
+}
+
+/// Protocol message — ID: 5627
+#[derive(Debug, Clone, Default)]
+pub struct InviteInHavenBagMessage {
+    pub guest_informations: CharacterMinimalInformations,
+    pub accept: bool,
+}
+
+impl DofusSerialize for InviteInHavenBagMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.guest_informations.serialize(writer);
+        writer.write_boolean(self.accept);
+    }
+}
+
+impl DofusDeserialize for InviteInHavenBagMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            guest_informations: CharacterMinimalInformations::deserialize(reader)?,
+            accept: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for InviteInHavenBagMessage {
+    const MESSAGE_ID: u16 = 5627;
+}
+
+/// Protocol message — ID: 5649
+#[derive(Debug, Clone, Default)]
+pub struct InviteInHavenBagClosedMessage {
+    pub host_informations: CharacterMinimalInformations,
+}
+
+impl DofusSerialize for InviteInHavenBagClosedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.host_informations.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for InviteInHavenBagClosedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            host_informations: CharacterMinimalInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for InviteInHavenBagClosedMessage {
+    const MESSAGE_ID: u16 = 5649;
 }
 

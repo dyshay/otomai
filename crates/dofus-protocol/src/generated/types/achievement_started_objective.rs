@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 402
+/// Protocol type — ID: 3401
 #[derive(Debug, Clone, Default)]
 pub struct AchievementStartedObjective {
     pub id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for AchievementStartedObjective {
 }
 
 impl DofusType for AchievementStartedObjective {
-    const TYPE_ID: u16 = 402;
+    const TYPE_ID: u16 = 3401;
 }
 

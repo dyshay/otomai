@@ -6,7 +6,76 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 170
+/// Protocol message — ID: 4222
+#[derive(Debug, Clone, Default)]
+pub struct ServerExperienceModificatorMessage {
+    pub experience_percent: i16,
+}
+
+impl DofusSerialize for ServerExperienceModificatorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.experience_percent);
+    }
+}
+
+impl DofusDeserialize for ServerExperienceModificatorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            experience_percent: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ServerExperienceModificatorMessage {
+    const MESSAGE_ID: u16 = 4222;
+}
+
+/// Protocol message — ID: 4557
+#[derive(Debug, Clone, Default)]
+pub struct OnConnectionEventMessage {
+    pub event_type: u8,
+}
+
+impl DofusSerialize for OnConnectionEventMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.event_type);
+    }
+}
+
+impl DofusDeserialize for OnConnectionEventMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            event_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for OnConnectionEventMessage {
+    const MESSAGE_ID: u16 = 4557;
+}
+
+/// Protocol message — ID: 7087
+#[derive(Debug, Clone, Default)]
+pub struct CharacterLoadingCompleteMessage {
+}
+
+impl DofusSerialize for CharacterLoadingCompleteMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharacterLoadingCompleteMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharacterLoadingCompleteMessage {
+    const MESSAGE_ID: u16 = 7087;
+}
+
+/// Protocol message — ID: 8111
 #[derive(Debug, Clone, Default)]
 pub struct SetCharacterRestrictionsMessage {
     pub actor_id: f64,
@@ -30,58 +99,10 @@ impl DofusDeserialize for SetCharacterRestrictionsMessage {
 }
 
 impl DofusMessage for SetCharacterRestrictionsMessage {
-    const MESSAGE_ID: u16 = 170;
+    const MESSAGE_ID: u16 = 8111;
 }
 
-/// Protocol message — ID: 5726
-#[derive(Debug, Clone, Default)]
-pub struct OnConnectionEventMessage {
-    pub event_type: u8,
-}
-
-impl DofusSerialize for OnConnectionEventMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.event_type);
-    }
-}
-
-impl DofusDeserialize for OnConnectionEventMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            event_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for OnConnectionEventMessage {
-    const MESSAGE_ID: u16 = 5726;
-}
-
-/// Protocol message — ID: 6237
-#[derive(Debug, Clone, Default)]
-pub struct ServerExperienceModificatorMessage {
-    pub experience_percent: i16,
-}
-
-impl DofusSerialize for ServerExperienceModificatorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.experience_percent);
-    }
-}
-
-impl DofusDeserialize for ServerExperienceModificatorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            experience_percent: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ServerExperienceModificatorMessage {
-    const MESSAGE_ID: u16 = 6237;
-}
-
-/// Protocol message — ID: 6339
+/// Protocol message — ID: 9322
 #[derive(Debug, Clone, Default)]
 pub struct CharacterCapabilitiesMessage {
     pub guild_emblem_symbol_categories: i32,
@@ -102,27 +123,6 @@ impl DofusDeserialize for CharacterCapabilitiesMessage {
 }
 
 impl DofusMessage for CharacterCapabilitiesMessage {
-    const MESSAGE_ID: u16 = 6339;
-}
-
-/// Protocol message — ID: 6471
-#[derive(Debug, Clone, Default)]
-pub struct CharacterLoadingCompleteMessage {
-}
-
-impl DofusSerialize for CharacterLoadingCompleteMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharacterLoadingCompleteMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharacterLoadingCompleteMessage {
-    const MESSAGE_ID: u16 = 6471;
+    const MESSAGE_ID: u16 = 9322;
 }
 

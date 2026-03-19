@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5542
+/// Protocol message — ID: 3344
 #[derive(Debug, Clone, Default)]
 pub struct SubscriptionLimitationMessage {
     pub reason: u8,
@@ -27,10 +27,10 @@ impl DofusDeserialize for SubscriptionLimitationMessage {
 }
 
 impl DofusMessage for SubscriptionLimitationMessage {
-    const MESSAGE_ID: u16 = 5542;
+    const MESSAGE_ID: u16 = 3344;
 }
 
-/// Protocol message — ID: 5573
+/// Protocol message — ID: 5540
 #[derive(Debug, Clone, Default)]
 pub struct SubscriptionZoneMessage {
     pub active: bool,
@@ -51,6 +51,6 @@ impl DofusDeserialize for SubscriptionZoneMessage {
 }
 
 impl DofusMessage for SubscriptionZoneMessage {
-    const MESSAGE_ID: u16 = 5573;
+    const MESSAGE_ID: u16 = 5540;
 }
 

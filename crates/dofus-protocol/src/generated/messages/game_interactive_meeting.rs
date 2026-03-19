@@ -6,91 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6287
-#[derive(Debug, Clone, Default)]
-pub struct TeleportToBuddyOfferMessage {
-    pub dungeon_id: i16,
-    pub buddy_id: i64,
-    pub time_left: i32,
-}
-
-impl DofusSerialize for TeleportToBuddyOfferMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.dungeon_id);
-        writer.write_var_long(self.buddy_id);
-        writer.write_var_int(self.time_left);
-    }
-}
-
-impl DofusDeserialize for TeleportToBuddyOfferMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dungeon_id: reader.read_var_short()?,
-            buddy_id: reader.read_var_long()?,
-            time_left: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportToBuddyOfferMessage {
-    const MESSAGE_ID: u16 = 6287;
-}
-
-/// Protocol message — ID: 6289
-#[derive(Debug, Clone, Default)]
-pub struct TeleportBuddiesMessage {
-    pub dungeon_id: i16,
-}
-
-impl DofusSerialize for TeleportBuddiesMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.dungeon_id);
-    }
-}
-
-impl DofusDeserialize for TeleportBuddiesMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dungeon_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportBuddiesMessage {
-    const MESSAGE_ID: u16 = 6289;
-}
-
-/// Protocol message — ID: 6293
-#[derive(Debug, Clone, Default)]
-pub struct TeleportToBuddyAnswerMessage {
-    pub dungeon_id: i16,
-    pub buddy_id: i64,
-    pub accept: bool,
-}
-
-impl DofusSerialize for TeleportToBuddyAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.dungeon_id);
-        writer.write_var_long(self.buddy_id);
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for TeleportToBuddyAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dungeon_id: reader.read_var_short()?,
-            buddy_id: reader.read_var_long()?,
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for TeleportToBuddyAnswerMessage {
-    const MESSAGE_ID: u16 = 6293;
-}
-
-/// Protocol message — ID: 6294
+/// Protocol message — ID: 396
 #[derive(Debug, Clone, Default)]
 pub struct TeleportBuddiesAnswerMessage {
     pub accept: bool,
@@ -111,10 +27,10 @@ impl DofusDeserialize for TeleportBuddiesAnswerMessage {
 }
 
 impl DofusMessage for TeleportBuddiesAnswerMessage {
-    const MESSAGE_ID: u16 = 6294;
+    const MESSAGE_ID: u16 = 396;
 }
 
-/// Protocol message — ID: 6302
+/// Protocol message — ID: 2270
 #[derive(Debug, Clone, Default)]
 pub struct TeleportBuddiesRequestedMessage {
     pub dungeon_id: i16,
@@ -151,10 +67,10 @@ impl DofusDeserialize for TeleportBuddiesRequestedMessage {
 }
 
 impl DofusMessage for TeleportBuddiesRequestedMessage {
-    const MESSAGE_ID: u16 = 6302;
+    const MESSAGE_ID: u16 = 2270;
 }
 
-/// Protocol message — ID: 6303
+/// Protocol message — ID: 2919
 #[derive(Debug, Clone, Default)]
 pub struct TeleportToBuddyCloseMessage {
     pub dungeon_id: i16,
@@ -178,6 +94,90 @@ impl DofusDeserialize for TeleportToBuddyCloseMessage {
 }
 
 impl DofusMessage for TeleportToBuddyCloseMessage {
-    const MESSAGE_ID: u16 = 6303;
+    const MESSAGE_ID: u16 = 2919;
+}
+
+/// Protocol message — ID: 4262
+#[derive(Debug, Clone, Default)]
+pub struct TeleportToBuddyAnswerMessage {
+    pub dungeon_id: i16,
+    pub buddy_id: i64,
+    pub accept: bool,
+}
+
+impl DofusSerialize for TeleportToBuddyAnswerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.dungeon_id);
+        writer.write_var_long(self.buddy_id);
+        writer.write_boolean(self.accept);
+    }
+}
+
+impl DofusDeserialize for TeleportToBuddyAnswerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dungeon_id: reader.read_var_short()?,
+            buddy_id: reader.read_var_long()?,
+            accept: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for TeleportToBuddyAnswerMessage {
+    const MESSAGE_ID: u16 = 4262;
+}
+
+/// Protocol message — ID: 5505
+#[derive(Debug, Clone, Default)]
+pub struct TeleportToBuddyOfferMessage {
+    pub dungeon_id: i16,
+    pub buddy_id: i64,
+    pub time_left: i32,
+}
+
+impl DofusSerialize for TeleportToBuddyOfferMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.dungeon_id);
+        writer.write_var_long(self.buddy_id);
+        writer.write_var_int(self.time_left);
+    }
+}
+
+impl DofusDeserialize for TeleportToBuddyOfferMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dungeon_id: reader.read_var_short()?,
+            buddy_id: reader.read_var_long()?,
+            time_left: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for TeleportToBuddyOfferMessage {
+    const MESSAGE_ID: u16 = 5505;
+}
+
+/// Protocol message — ID: 8443
+#[derive(Debug, Clone, Default)]
+pub struct TeleportBuddiesMessage {
+    pub dungeon_id: i16,
+}
+
+impl DofusSerialize for TeleportBuddiesMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.dungeon_id);
+    }
+}
+
+impl DofusDeserialize for TeleportBuddiesMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dungeon_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TeleportBuddiesMessage {
+    const MESSAGE_ID: u16 = 8443;
 }
 

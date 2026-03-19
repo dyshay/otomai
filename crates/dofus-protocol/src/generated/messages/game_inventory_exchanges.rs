@@ -6,79 +6,49 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5505
+/// Protocol message — ID: 35
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeRequestMessage {
-    pub exchange_type: u8,
+pub struct ExchangeBuyOkMessage {
 }
 
-impl DofusSerialize for ExchangeRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-    }
-}
-
-impl DofusDeserialize for ExchangeRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeRequestMessage {
-    const MESSAGE_ID: u16 = 5505;
-}
-
-/// Protocol message — ID: 5508
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeAcceptMessage {
-}
-
-impl DofusSerialize for ExchangeAcceptMessage {
+impl DofusSerialize for ExchangeBuyOkMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
     }
 }
 
-impl DofusDeserialize for ExchangeAcceptMessage {
+impl DofusDeserialize for ExchangeBuyOkMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
         })
     }
 }
 
-impl DofusMessage for ExchangeAcceptMessage {
-    const MESSAGE_ID: u16 = 5508;
+impl DofusMessage for ExchangeBuyOkMessage {
+    const MESSAGE_ID: u16 = 35;
 }
 
-/// Protocol message — ID: 5509
+/// Protocol message — ID: 69
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeIsReadyMessage {
-    pub id: f64,
-    pub ready: bool,
+pub struct ExchangeRequestOnTaxCollectorMessage {
 }
 
-impl DofusSerialize for ExchangeIsReadyMessage {
+impl DofusSerialize for ExchangeRequestOnTaxCollectorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        writer.write_boolean(self.ready);
     }
 }
 
-impl DofusDeserialize for ExchangeIsReadyMessage {
+impl DofusDeserialize for ExchangeRequestOnTaxCollectorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            id: reader.read_double()?,
-            ready: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeIsReadyMessage {
-    const MESSAGE_ID: u16 = 5509;
+impl DofusMessage for ExchangeRequestOnTaxCollectorMessage {
+    const MESSAGE_ID: u16 = 69;
 }
 
-/// Protocol message — ID: 5511
+/// Protocol message — ID: 118
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeReadyMessage {
     pub ready: bool,
@@ -102,166 +72,655 @@ impl DofusDeserialize for ExchangeReadyMessage {
 }
 
 impl DofusMessage for ExchangeReadyMessage {
-    const MESSAGE_ID: u16 = 5511;
+    const MESSAGE_ID: u16 = 118;
 }
 
-/// Protocol message — ID: 5512
+/// Protocol message — ID: 173
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedMessage {
-    pub exchange_type: u8,
+pub struct ExchangeHandleMountsMessage {
+    pub action_type: u8,
+    pub rides_id: Vec<i32>,
 }
 
-impl DofusSerialize for ExchangeStartedMessage {
+impl DofusSerialize for ExchangeHandleMountsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
+        writer.write_byte(self.action_type);
+        writer.write_short(self.rides_id.len() as _);
+        for item in &self.rides_id {
+            writer.write_var_int(*item);
+        }
     }
 }
 
-impl DofusDeserialize for ExchangeStartedMessage {
+impl DofusDeserialize for ExchangeHandleMountsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action_type: reader.read_byte()?,
+            rides_id: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeHandleMountsMessage {
+    const MESSAGE_ID: u16 = 173;
+}
+
+/// Protocol message — ID: 230
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShopStockMultiMovementUpdatedMessage {
+    pub object_info_list: Vec<ObjectItemToSell>,
+}
+
+impl DofusSerialize for ExchangeShopStockMultiMovementUpdatedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.object_info_list.len() as _);
+        for item in &self.object_info_list {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeShopStockMultiMovementUpdatedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_info_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItemToSell::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeShopStockMultiMovementUpdatedMessage {
+    const MESSAGE_ID: u16 = 230;
+}
+
+/// Protocol message — ID: 255
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkRecycleTradeMessage {
+    pub percent_to_prism: i16,
+    pub percent_to_player: i16,
+}
+
+impl DofusSerialize for ExchangeStartOkRecycleTradeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.percent_to_prism);
+        writer.write_short(self.percent_to_player);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkRecycleTradeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            percent_to_prism: reader.read_short()?,
+            percent_to_player: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkRecycleTradeMessage {
+    const MESSAGE_ID: u16 = 255;
+}
+
+/// Protocol message — ID: 270
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseTypeMessage {
+    pub r#type: i32,
+    pub follow: bool,
+}
+
+impl DofusSerialize for ExchangeBidHouseTypeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.r#type);
+        writer.write_boolean(self.follow);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseTypeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            r#type: reader.read_var_int()?,
+            follow: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseTypeMessage {
+    const MESSAGE_ID: u16 = 270;
+}
+
+/// Protocol message — ID: 418
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShopStockMovementRemovedMessage {
+    pub object_id: i32,
+}
+
+impl DofusSerialize for ExchangeShopStockMovementRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeShopStockMovementRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeShopStockMovementRemovedMessage {
+    const MESSAGE_ID: u16 = 418;
+}
+
+/// Protocol message — ID: 526
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeItemAutoCraftStopedMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for ExchangeItemAutoCraftStopedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for ExchangeItemAutoCraftStopedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeItemAutoCraftStopedMessage {
+    const MESSAGE_ID: u16 = 526;
+}
+
+/// Protocol message — ID: 636
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseGenericItemRemovedMessage {
+    pub obj_generic_id: i16,
+}
+
+impl DofusSerialize for ExchangeBidHouseGenericItemRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.obj_generic_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseGenericItemRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            obj_generic_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseGenericItemRemovedMessage {
+    const MESSAGE_ID: u16 = 636;
+}
+
+/// Protocol message — ID: 678
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeSellOkMessage {
+}
+
+impl DofusSerialize for ExchangeSellOkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeSellOkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeSellOkMessage {
+    const MESSAGE_ID: u16 = 678;
+}
+
+/// Protocol message — ID: 806
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseItemAddOkMessage {
+    pub item_info: ObjectItemToSellInBid,
+}
+
+impl DofusSerialize for ExchangeBidHouseItemAddOkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.item_info.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseItemAddOkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            item_info: ObjectItemToSellInBid::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseItemAddOkMessage {
+    const MESSAGE_ID: u16 = 806;
+}
+
+/// Protocol message — ID: 819
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftInformationObjectMessage {
+    pub craft_result: u8,
+    pub object_generic_id: i16,
+    pub player_id: i64,
+}
+
+impl DofusSerialize for ExchangeCraftInformationObjectMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.craft_result);
+        writer.write_var_short(self.object_generic_id);
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftInformationObjectMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            craft_result: reader.read_byte()?,
+            object_generic_id: reader.read_var_short()?,
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftInformationObjectMessage {
+    const MESSAGE_ID: u16 = 819;
+}
+
+/// Protocol message — ID: 839
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountsStableBornAddMessage {
+    pub mount_description: Vec<MountClientData>,
+}
+
+impl DofusSerialize for ExchangeMountsStableBornAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.mount_description.len() as _);
+        for item in &self.mount_description {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeMountsStableBornAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountsStableBornAddMessage {
+    const MESSAGE_ID: u16 = 839;
+}
+
+/// Protocol message — ID: 989
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeWeightMessage {
+    pub current_weight: i32,
+    pub max_weight: i32,
+}
+
+impl DofusSerialize for ExchangeWeightMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.current_weight);
+        writer.write_var_int(self.max_weight);
+    }
+}
+
+impl DofusDeserialize for ExchangeWeightMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            current_weight: reader.read_var_int()?,
+            max_weight: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeWeightMessage {
+    const MESSAGE_ID: u16 = 989;
+}
+
+/// Protocol message — ID: 1221
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectTransfertAllFromInvMessage {
+}
+
+impl DofusSerialize for ExchangeObjectTransfertAllFromInvMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectTransfertAllFromInvMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectTransfertAllFromInvMessage {
+    const MESSAGE_ID: u16 = 1221;
+}
+
+/// Protocol message — ID: 1260
+#[derive(Debug, Clone, Default)]
+pub struct FocusedExchangeReadyMessage {
+    pub ready: bool,
+    pub step: i16,
+    pub focus_action_id: i32,
+}
+
+impl DofusSerialize for FocusedExchangeReadyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.ready);
+        writer.write_var_short(self.step);
+        writer.write_var_int(self.focus_action_id);
+    }
+}
+
+impl DofusDeserialize for FocusedExchangeReadyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ready: reader.read_boolean()?,
+            step: reader.read_var_short()?,
+            focus_action_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for FocusedExchangeReadyMessage {
+    const MESSAGE_ID: u16 = 1260;
+}
+
+/// Protocol message — ID: 1264
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShopStockMultiMovementRemovedMessage {
+    pub object_id_list: Vec<i32>,
+}
+
+impl DofusSerialize for ExchangeShopStockMultiMovementRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.object_id_list.len() as _);
+        for item in &self.object_id_list {
+            writer.write_var_int(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeShopStockMultiMovementRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_id_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeShopStockMultiMovementRemovedMessage {
+    const MESSAGE_ID: u16 = 1264;
+}
+
+/// Protocol message — ID: 1285
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseListMessage {
+    pub id: i16,
+    pub follow: bool,
+}
+
+impl DofusSerialize for ExchangeBidHouseListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.id);
+        writer.write_boolean(self.follow);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_short()?,
+            follow: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseListMessage {
+    const MESSAGE_ID: u16 = 1285;
+}
+
+/// Protocol message — ID: 1385
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedBidSellerMessage {
+    pub seller_descriptor: SellerBuyerDescriptor,
+    pub objects_infos: Vec<ObjectItemToSellInBid>,
+}
+
+impl DofusSerialize for ExchangeStartedBidSellerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.seller_descriptor.serialize(writer);
+        writer.write_short(self.objects_infos.len() as _);
+        for item in &self.objects_infos {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedBidSellerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            seller_descriptor: SellerBuyerDescriptor::deserialize(reader)?,
+            objects_infos: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItemToSellInBid::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartedBidSellerMessage {
+    const MESSAGE_ID: u16 = 1385;
+}
+
+/// Protocol message — ID: 1407
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseInListAddedMessage {
+    pub item_u_i_d: i32,
+    pub object_g_i_d: i16,
+    pub object_type: i32,
+    pub effects: Vec<Vec<u8>>,
+    pub prices: Vec<i64>,
+}
+
+impl DofusSerialize for ExchangeBidHouseInListAddedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.item_u_i_d);
+        writer.write_var_short(self.object_g_i_d);
+        writer.write_int(self.object_type);
+        writer.write_short(self.effects.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.prices.len() as _);
+        for item in &self.prices {
+            writer.write_var_long(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseInListAddedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            item_u_i_d: reader.read_int()?,
+            object_g_i_d: reader.read_var_short()?,
+            object_type: reader.read_int()?,
+            effects: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            prices: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_long()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseInListAddedMessage {
+    const MESSAGE_ID: u16 = 1407;
+}
+
+/// Protocol message — ID: 1444
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseInListRemovedMessage {
+    pub item_u_i_d: i32,
+    pub object_g_i_d: i16,
+    pub object_type: i32,
+}
+
+impl DofusSerialize for ExchangeBidHouseInListRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.item_u_i_d);
+        writer.write_var_short(self.object_g_i_d);
+        writer.write_int(self.object_type);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseInListRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            item_u_i_d: reader.read_int()?,
+            object_g_i_d: reader.read_var_short()?,
+            object_type: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseInListRemovedMessage {
+    const MESSAGE_ID: u16 = 1444;
+}
+
+/// Protocol message — ID: 1507
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectsAddedMessage {
+    pub remote: bool,
+    pub object: Vec<ObjectItem>,
+}
+
+impl DofusSerialize for ExchangeObjectsAddedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.remote);
+        writer.write_short(self.object.len() as _);
+        for item in &self.object {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectsAddedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            remote: reader.read_boolean()?,
+            object: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItem::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectsAddedMessage {
+    const MESSAGE_ID: u16 = 1507;
+}
+
+/// Protocol message — ID: 1554
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedWithPodsMessage {
+    pub exchange_type: u8,
+    pub first_character_id: f64,
+    pub first_character_current_weight: i32,
+    pub first_character_max_weight: i32,
+    pub second_character_id: f64,
+    pub second_character_current_weight: i32,
+    pub second_character_max_weight: i32,
+}
+
+impl DofusSerialize for ExchangeStartedWithPodsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+        writer.write_double(self.first_character_id);
+        writer.write_var_int(self.first_character_current_weight);
+        writer.write_var_int(self.first_character_max_weight);
+        writer.write_double(self.second_character_id);
+        writer.write_var_int(self.second_character_current_weight);
+        writer.write_var_int(self.second_character_max_weight);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedWithPodsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             exchange_type: reader.read_byte()?,
+            first_character_id: reader.read_double()?,
+            first_character_current_weight: reader.read_var_int()?,
+            first_character_max_weight: reader.read_var_int()?,
+            second_character_id: reader.read_double()?,
+            second_character_current_weight: reader.read_var_int()?,
+            second_character_max_weight: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeStartedMessage {
-    const MESSAGE_ID: u16 = 5512;
+impl DofusMessage for ExchangeStartedWithPodsMessage {
+    const MESSAGE_ID: u16 = 1554;
 }
 
-/// Protocol message — ID: 5513
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeErrorMessage {
-    pub error_type: u8,
-}
-
-impl DofusSerialize for ExchangeErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.error_type);
-    }
-}
-
-impl DofusDeserialize for ExchangeErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            error_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeErrorMessage {
-    const MESSAGE_ID: u16 = 5513;
-}
-
-/// Protocol message — ID: 5514
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectMovePricedMessage {
-    pub object_u_i_d: i32,
-    pub quantity: i32,
-    pub price: i64,
-}
-
-impl DofusSerialize for ExchangeObjectMovePricedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_u_i_d);
-        writer.write_var_int(self.quantity);
-        writer.write_var_long(self.price);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectMovePricedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-            price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectMovePricedMessage {
-    const MESSAGE_ID: u16 = 5514;
-}
-
-/// Protocol message — ID: 5515
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectMessage {
-    pub remote: bool,
-}
-
-impl DofusSerialize for ExchangeObjectMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.remote);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            remote: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectMessage {
-    const MESSAGE_ID: u16 = 5515;
-}
-
-/// Protocol message — ID: 5516
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectAddedMessage {
-    pub remote: bool,
-    pub object: ObjectItem,
-}
-
-impl DofusSerialize for ExchangeObjectAddedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.remote);
-        self.object.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectAddedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            remote: reader.read_boolean()?,
-            object: ObjectItem::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectAddedMessage {
-    const MESSAGE_ID: u16 = 5516;
-}
-
-/// Protocol message — ID: 5518
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectMoveMessage {
-    pub object_u_i_d: i32,
-    pub quantity: i32,
-}
-
-impl DofusSerialize for ExchangeObjectMoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_u_i_d);
-        writer.write_var_int(self.quantity);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectMoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectMoveMessage {
-    const MESSAGE_ID: u16 = 5518;
-}
-
-/// Protocol message — ID: 5520
+/// Protocol message — ID: 1621
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeObjectMoveKamaMessage {
     pub quantity: i64,
@@ -282,10 +741,229 @@ impl DofusDeserialize for ExchangeObjectMoveKamaMessage {
 }
 
 impl DofusMessage for ExchangeObjectMoveKamaMessage {
-    const MESSAGE_ID: u16 = 5520;
+    const MESSAGE_ID: u16 = 1621;
 }
 
-/// Protocol message — ID: 5522
+/// Protocol message — ID: 1752
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountsStableAddMessage {
+    pub mount_description: Vec<MountClientData>,
+}
+
+impl DofusSerialize for ExchangeMountsStableAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.mount_description.len() as _);
+        for item in &self.mount_description {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeMountsStableAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountsStableAddMessage {
+    const MESSAGE_ID: u16 = 1752;
+}
+
+/// Protocol message — ID: 1843
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkMountMessage {
+    pub stabled_mounts_description: Vec<MountClientData>,
+    pub paddocked_mounts_description: Vec<MountClientData>,
+}
+
+impl DofusSerialize for ExchangeStartOkMountMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.stabled_mounts_description.len() as _);
+        for item in &self.stabled_mounts_description {
+            item.serialize(writer);
+        }
+        writer.write_short(self.paddocked_mounts_description.len() as _);
+        for item in &self.paddocked_mounts_description {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkMountMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            stabled_mounts_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+            paddocked_mounts_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkMountMessage {
+    const MESSAGE_ID: u16 = 1843;
+}
+
+/// Protocol message — ID: 1845
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftResultMessage {
+    pub craft_result: u8,
+}
+
+impl DofusSerialize for ExchangeCraftResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.craft_result);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            craft_result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftResultMessage {
+    const MESSAGE_ID: u16 = 1845;
+}
+
+/// Protocol message — ID: 1855
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftCountRequestMessage {
+    pub count: i32,
+}
+
+impl DofusSerialize for ExchangeCraftCountRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.count);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftCountRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            count: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftCountRequestMessage {
+    const MESSAGE_ID: u16 = 1855;
+}
+
+/// Protocol message — ID: 1872
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeRequestOnShopStockMessage {
+}
+
+impl DofusSerialize for ExchangeRequestOnShopStockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeRequestOnShopStockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeRequestOnShopStockMessage {
+    const MESSAGE_ID: u16 = 1872;
+}
+
+/// Protocol message — ID: 1951
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftResultWithObjectIdMessage {
+    pub craft_result: u8,
+    pub object_generic_id: i16,
+}
+
+impl DofusSerialize for ExchangeCraftResultWithObjectIdMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.craft_result);
+        writer.write_var_short(self.object_generic_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftResultWithObjectIdMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            craft_result: reader.read_byte()?,
+            object_generic_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftResultWithObjectIdMessage {
+    const MESSAGE_ID: u16 = 1951;
+}
+
+/// Protocol message — ID: 1967
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeRequestOnMountStockMessage {
+}
+
+impl DofusSerialize for ExchangeRequestOnMountStockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeRequestOnMountStockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeRequestOnMountStockMessage {
+    const MESSAGE_ID: u16 = 1967;
+}
+
+/// Protocol message — ID: 2113
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShowVendorTaxMessage {
+}
+
+impl DofusSerialize for ExchangeShowVendorTaxMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeShowVendorTaxMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeShowVendorTaxMessage {
+    const MESSAGE_ID: u16 = 2113;
+}
+
+/// Protocol message — ID: 2157
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeRequestedMessage {
     pub exchange_type: u8,
@@ -306,213 +984,31 @@ impl DofusDeserialize for ExchangeRequestedMessage {
 }
 
 impl DofusMessage for ExchangeRequestedMessage {
-    const MESSAGE_ID: u16 = 5522;
+    const MESSAGE_ID: u16 = 2157;
 }
 
-/// Protocol message — ID: 5523
+/// Protocol message — ID: 2208
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeRequestedTradeMessage {
-    pub exchange_type: u8,
-    pub source: i64,
-    pub target: i64,
+pub struct ExchangeMountStableErrorMessage {
 }
 
-impl DofusSerialize for ExchangeRequestedTradeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-        writer.write_var_long(self.source);
-        writer.write_var_long(self.target);
-    }
-}
-
-impl DofusDeserialize for ExchangeRequestedTradeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-            source: reader.read_var_long()?,
-            target: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeRequestedTradeMessage {
-    const MESSAGE_ID: u16 = 5523;
-}
-
-/// Protocol message — ID: 5628
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeLeaveMessage {
-    pub dialog_type: u8,
-    pub success: bool,
-}
-
-impl DofusSerialize for ExchangeLeaveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.dialog_type);
-        writer.write_boolean(self.success);
-    }
-}
-
-impl DofusDeserialize for ExchangeLeaveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dialog_type: reader.read_byte()?,
-            success: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeLeaveMessage {
-    const MESSAGE_ID: u16 = 5628;
-}
-
-/// Protocol message — ID: 5752
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeTypesItemsExchangerDescriptionForUserMessage {
-    pub object_type: i32,
-    pub item_type_descriptions: Vec<BidExchangerObjectInfo>,
-}
-
-impl DofusSerialize for ExchangeTypesItemsExchangerDescriptionForUserMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.object_type);
-        writer.write_short(self.item_type_descriptions.len() as _);
-        for item in &self.item_type_descriptions {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeTypesItemsExchangerDescriptionForUserMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_type: reader.read_int()?,
-            item_type_descriptions: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(BidExchangerObjectInfo::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeTypesItemsExchangerDescriptionForUserMessage {
-    const MESSAGE_ID: u16 = 5752;
-}
-
-/// Protocol message — ID: 5753
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeRequestOnShopStockMessage {
-}
-
-impl DofusSerialize for ExchangeRequestOnShopStockMessage {
+impl DofusSerialize for ExchangeMountStableErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
     }
 }
 
-impl DofusDeserialize for ExchangeRequestOnShopStockMessage {
+impl DofusDeserialize for ExchangeMountStableErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
         })
     }
 }
 
-impl DofusMessage for ExchangeRequestOnShopStockMessage {
-    const MESSAGE_ID: u16 = 5753;
+impl DofusMessage for ExchangeMountStableErrorMessage {
+    const MESSAGE_ID: u16 = 2208;
 }
 
-/// Protocol message — ID: 5755
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidPriceMessage {
-    pub generic_id: i16,
-    pub average_price: i64,
-}
-
-impl DofusSerialize for ExchangeBidPriceMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.generic_id);
-        writer.write_var_long(self.average_price);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidPriceMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            generic_id: reader.read_var_short()?,
-            average_price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidPriceMessage {
-    const MESSAGE_ID: u16 = 5755;
-}
-
-/// Protocol message — ID: 5759
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBuyOkMessage {
-}
-
-impl DofusSerialize for ExchangeBuyOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeBuyOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBuyOkMessage {
-    const MESSAGE_ID: u16 = 5759;
-}
-
-/// Protocol message — ID: 5761
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkNpcShopMessage {
-    pub npc_seller_id: f64,
-    pub token_id: i16,
-    pub objects_infos: Vec<ObjectItemToSellInNpcShop>,
-}
-
-impl DofusSerialize for ExchangeStartOkNpcShopMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.npc_seller_id);
-        writer.write_var_short(self.token_id);
-        writer.write_short(self.objects_infos.len() as _);
-        for item in &self.objects_infos {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkNpcShopMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            npc_seller_id: reader.read_double()?,
-            token_id: reader.read_var_short()?,
-            objects_infos: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItemToSellInNpcShop::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkNpcShopMessage {
-    const MESSAGE_ID: u16 = 5761;
-}
-
-/// Protocol message — ID: 5762
+/// Protocol message — ID: 2268
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeGuildTaxCollectorGetMessage {
     pub collector_name: String,
@@ -573,384 +1069,98 @@ impl DofusDeserialize for ExchangeGuildTaxCollectorGetMessage {
 }
 
 impl DofusMessage for ExchangeGuildTaxCollectorGetMessage {
-    const MESSAGE_ID: u16 = 5762;
+    const MESSAGE_ID: u16 = 2268;
 }
 
-/// Protocol message — ID: 5765
+/// Protocol message — ID: 2334
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeTypesExchangerDescriptionForUserMessage {
-    pub object_type: i32,
-    pub type_description: Vec<i32>,
+pub struct ExchangeRequestMessage {
+    pub exchange_type: u8,
 }
 
-impl DofusSerialize for ExchangeTypesExchangerDescriptionForUserMessage {
+impl DofusSerialize for ExchangeRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.object_type);
-        writer.write_short(self.type_description.len() as _);
-        for item in &self.type_description {
-            writer.write_var_int(*item);
-        }
+        writer.write_byte(self.exchange_type);
     }
 }
 
-impl DofusDeserialize for ExchangeTypesExchangerDescriptionForUserMessage {
+impl DofusDeserialize for ExchangeRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            object_type: reader.read_int()?,
-            type_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
+            exchange_type: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeTypesExchangerDescriptionForUserMessage {
-    const MESSAGE_ID: u16 = 5765;
+impl DofusMessage for ExchangeRequestMessage {
+    const MESSAGE_ID: u16 = 2334;
 }
 
-/// Protocol message — ID: 5767
+/// Protocol message — ID: 2403
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkHumanVendorMessage {
-    pub seller_id: f64,
-    pub objects_infos: Vec<ObjectItemToSellInHumanVendorShop>,
+pub struct RecycleResultMessage {
+    pub nuggets_for_prism: i32,
+    pub nuggets_for_player: i32,
 }
 
-impl DofusSerialize for ExchangeStartOkHumanVendorMessage {
+impl DofusSerialize for RecycleResultMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.seller_id);
-        writer.write_short(self.objects_infos.len() as _);
-        for item in &self.objects_infos {
+        writer.write_var_int(self.nuggets_for_prism);
+        writer.write_var_int(self.nuggets_for_player);
+    }
+}
+
+impl DofusDeserialize for RecycleResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            nuggets_for_prism: reader.read_var_int()?,
+            nuggets_for_player: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for RecycleResultMessage {
+    const MESSAGE_ID: u16 = 2403;
+}
+
+/// Protocol message — ID: 2431
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedTaxCollectorShopMessage {
+    pub objects: Vec<ObjectItem>,
+    pub kamas: i64,
+}
+
+impl DofusSerialize for ExchangeStartedTaxCollectorShopMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.objects.len() as _);
+        for item in &self.objects {
             item.serialize(writer);
         }
+        writer.write_var_long(self.kamas);
     }
 }
 
-impl DofusDeserialize for ExchangeStartOkHumanVendorMessage {
+impl DofusDeserialize for ExchangeStartedTaxCollectorShopMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            seller_id: reader.read_double()?,
-            objects_infos: {
+            objects: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
-                    v.push(ObjectItemToSellInHumanVendorShop::deserialize(reader)?);
+                    v.push(ObjectItem::deserialize(reader)?);
                 }
                 v
             },
+            kamas: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeStartOkHumanVendorMessage {
-    const MESSAGE_ID: u16 = 5767;
+impl DofusMessage for ExchangeStartedTaxCollectorShopMessage {
+    const MESSAGE_ID: u16 = 2431;
 }
 
-/// Protocol message — ID: 5768
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeOkMultiCraftMessage {
-    pub initiator_id: i64,
-    pub other_id: i64,
-    pub role: u8,
-}
-
-impl DofusSerialize for ExchangeOkMultiCraftMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.initiator_id);
-        writer.write_var_long(self.other_id);
-        writer.write_byte(self.role);
-    }
-}
-
-impl DofusDeserialize for ExchangeOkMultiCraftMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            initiator_id: reader.read_var_long()?,
-            other_id: reader.read_var_long()?,
-            role: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeOkMultiCraftMessage {
-    const MESSAGE_ID: u16 = 5768;
-}
-
-/// Protocol message — ID: 5769
-#[derive(Debug, Clone, Default)]
-pub struct ItemNoMoreAvailableMessage {
-}
-
-impl DofusSerialize for ItemNoMoreAvailableMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ItemNoMoreAvailableMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ItemNoMoreAvailableMessage {
-    const MESSAGE_ID: u16 = 5769;
-}
-
-/// Protocol message — ID: 5772
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeOnHumanVendorRequestMessage {
-    pub human_vendor_id: i64,
-    pub human_vendor_cell: i16,
-}
-
-impl DofusSerialize for ExchangeOnHumanVendorRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.human_vendor_id);
-        writer.write_var_short(self.human_vendor_cell);
-    }
-}
-
-impl DofusDeserialize for ExchangeOnHumanVendorRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            human_vendor_id: reader.read_var_long()?,
-            human_vendor_cell: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeOnHumanVendorRequestMessage {
-    const MESSAGE_ID: u16 = 5772;
-}
-
-/// Protocol message — ID: 5773
-#[derive(Debug, Clone, Default)]
-pub struct ExchangePlayerRequestMessage {
-    pub exchange_type: u8,
-    pub target: i64,
-}
-
-impl DofusSerialize for ExchangePlayerRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-        writer.write_var_long(self.target);
-    }
-}
-
-impl DofusDeserialize for ExchangePlayerRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-            target: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangePlayerRequestMessage {
-    const MESSAGE_ID: u16 = 5773;
-}
-
-/// Protocol message — ID: 5774
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBuyMessage {
-    pub object_to_buy_id: i32,
-    pub quantity: i32,
-}
-
-impl DofusSerialize for ExchangeBuyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_to_buy_id);
-        writer.write_var_int(self.quantity);
-    }
-}
-
-impl DofusDeserialize for ExchangeBuyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_to_buy_id: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBuyMessage {
-    const MESSAGE_ID: u16 = 5774;
-}
-
-/// Protocol message — ID: 5775
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartAsVendorMessage {
-}
-
-impl DofusSerialize for ExchangeStartAsVendorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeStartAsVendorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartAsVendorMessage {
-    const MESSAGE_ID: u16 = 5775;
-}
-
-/// Protocol message — ID: 5778
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeSellMessage {
-    pub object_to_sell_id: i32,
-    pub quantity: i32,
-}
-
-impl DofusSerialize for ExchangeSellMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_to_sell_id);
-        writer.write_var_int(self.quantity);
-    }
-}
-
-impl DofusDeserialize for ExchangeSellMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_to_sell_id: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeSellMessage {
-    const MESSAGE_ID: u16 = 5778;
-}
-
-/// Protocol message — ID: 5779
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeRequestOnTaxCollectorMessage {
-}
-
-impl DofusSerialize for ExchangeRequestOnTaxCollectorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeRequestOnTaxCollectorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeRequestOnTaxCollectorMessage {
-    const MESSAGE_ID: u16 = 5779;
-}
-
-/// Protocol message — ID: 5783
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShowVendorTaxMessage {
-}
-
-impl DofusSerialize for ExchangeShowVendorTaxMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeShowVendorTaxMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShowVendorTaxMessage {
-    const MESSAGE_ID: u16 = 5783;
-}
-
-/// Protocol message — ID: 5784
-#[derive(Debug, Clone, Default)]
-pub struct ExchangePlayerMultiCraftRequestMessage {
-    pub exchange_type: u8,
-    pub target: i64,
-    pub skill_id: i32,
-}
-
-impl DofusSerialize for ExchangePlayerMultiCraftRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-        writer.write_var_long(self.target);
-        writer.write_var_int(self.skill_id);
-    }
-}
-
-impl DofusDeserialize for ExchangePlayerMultiCraftRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-            target: reader.read_var_long()?,
-            skill_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangePlayerMultiCraftRequestMessage {
-    const MESSAGE_ID: u16 = 5784;
-}
-
-/// Protocol message — ID: 5785
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkNpcTradeMessage {
-    pub npc_id: f64,
-}
-
-impl DofusSerialize for ExchangeStartOkNpcTradeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.npc_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkNpcTradeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            npc_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkNpcTradeMessage {
-    const MESSAGE_ID: u16 = 5785;
-}
-
-/// Protocol message — ID: 5786
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeWaitingResultMessage {
-    pub bwait: bool,
-}
-
-impl DofusSerialize for ExchangeWaitingResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.bwait);
-    }
-}
-
-impl DofusDeserialize for ExchangeWaitingResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bwait: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeWaitingResultMessage {
-    const MESSAGE_ID: u16 = 5786;
-}
-
-/// Protocol message — ID: 5787
+/// Protocol message — ID: 2545
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeReplyTaxVendorMessage {
     pub object_value: i64,
@@ -974,382 +1184,28 @@ impl DofusDeserialize for ExchangeReplyTaxVendorMessage {
 }
 
 impl DofusMessage for ExchangeReplyTaxVendorMessage {
-    const MESSAGE_ID: u16 = 5787;
+    const MESSAGE_ID: u16 = 2545;
 }
 
-/// Protocol message — ID: 5790
+/// Protocol message — ID: 2552
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftResultMessage {
-    pub craft_result: u8,
+pub struct ExchangeMountsStableRemoveMessage {
+    pub mounts_id: Vec<i32>,
 }
 
-impl DofusSerialize for ExchangeCraftResultMessage {
+impl DofusSerialize for ExchangeMountsStableRemoveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.craft_result);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            craft_result: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftResultMessage {
-    const MESSAGE_ID: u16 = 5790;
-}
-
-/// Protocol message — ID: 5792
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeSellOkMessage {
-}
-
-impl DofusSerialize for ExchangeSellOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeSellOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeSellOkMessage {
-    const MESSAGE_ID: u16 = 5792;
-}
-
-/// Protocol message — ID: 5793
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeWeightMessage {
-    pub current_weight: i32,
-    pub max_weight: i32,
-}
-
-impl DofusSerialize for ExchangeWeightMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.current_weight);
-        writer.write_var_int(self.max_weight);
-    }
-}
-
-impl DofusDeserialize for ExchangeWeightMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            current_weight: reader.read_var_int()?,
-            max_weight: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeWeightMessage {
-    const MESSAGE_ID: u16 = 5793;
-}
-
-/// Protocol message — ID: 5794
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftInformationObjectMessage {
-    pub craft_result: u8,
-    pub object_generic_id: i16,
-    pub player_id: i64,
-}
-
-impl DofusSerialize for ExchangeCraftInformationObjectMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.craft_result);
-        writer.write_var_short(self.object_generic_id);
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftInformationObjectMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            craft_result: reader.read_byte()?,
-            object_generic_id: reader.read_var_short()?,
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftInformationObjectMessage {
-    const MESSAGE_ID: u16 = 5794;
-}
-
-/// Protocol message — ID: 5802
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidSearchOkMessage {
-}
-
-impl DofusSerialize for ExchangeBidSearchOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeBidSearchOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidSearchOkMessage {
-    const MESSAGE_ID: u16 = 5802;
-}
-
-/// Protocol message — ID: 5803
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseTypeMessage {
-    pub r#type: i32,
-    pub follow: bool,
-}
-
-impl DofusSerialize for ExchangeBidHouseTypeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.r#type);
-        writer.write_boolean(self.follow);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseTypeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            r#type: reader.read_var_int()?,
-            follow: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseTypeMessage {
-    const MESSAGE_ID: u16 = 5803;
-}
-
-/// Protocol message — ID: 5804
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseBuyMessage {
-    pub uid: i32,
-    pub qty: i32,
-    pub price: i64,
-}
-
-impl DofusSerialize for ExchangeBidHouseBuyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.uid);
-        writer.write_var_int(self.qty);
-        writer.write_var_long(self.price);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseBuyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            uid: reader.read_var_int()?,
-            qty: reader.read_var_int()?,
-            price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseBuyMessage {
-    const MESSAGE_ID: u16 = 5804;
-}
-
-/// Protocol message — ID: 5805
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHousePriceMessage {
-    pub gen_id: i16,
-}
-
-impl DofusSerialize for ExchangeBidHousePriceMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.gen_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHousePriceMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            gen_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHousePriceMessage {
-    const MESSAGE_ID: u16 = 5805;
-}
-
-/// Protocol message — ID: 5806
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseSearchMessage {
-    pub gen_id: i16,
-    pub follow: bool,
-}
-
-impl DofusSerialize for ExchangeBidHouseSearchMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.gen_id);
-        writer.write_boolean(self.follow);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseSearchMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            gen_id: reader.read_var_short()?,
-            follow: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseSearchMessage {
-    const MESSAGE_ID: u16 = 5806;
-}
-
-/// Protocol message — ID: 5807
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseListMessage {
-    pub id: i16,
-    pub follow: bool,
-}
-
-impl DofusSerialize for ExchangeBidHouseListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.id);
-        writer.write_boolean(self.follow);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_short()?,
-            follow: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseListMessage {
-    const MESSAGE_ID: u16 = 5807;
-}
-
-/// Protocol message — ID: 5810
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeItemAutoCraftStopedMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for ExchangeItemAutoCraftStopedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for ExchangeItemAutoCraftStopedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeItemAutoCraftStopedMessage {
-    const MESSAGE_ID: u16 = 5810;
-}
-
-/// Protocol message — ID: 5813
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkCraftMessage {
-}
-
-impl DofusSerialize for ExchangeStartOkCraftMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkCraftMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkCraftMessage {
-    const MESSAGE_ID: u16 = 5813;
-}
-
-/// Protocol message — ID: 5817
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkMulticraftCustomerMessage {
-    pub skill_id: i32,
-    pub crafter_job_level: u8,
-}
-
-impl DofusSerialize for ExchangeStartOkMulticraftCustomerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.skill_id);
-        writer.write_byte(self.crafter_job_level);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkMulticraftCustomerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            skill_id: reader.read_var_int()?,
-            crafter_job_level: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkMulticraftCustomerMessage {
-    const MESSAGE_ID: u16 = 5817;
-}
-
-/// Protocol message — ID: 5818
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkMulticraftCrafterMessage {
-    pub skill_id: i32,
-}
-
-impl DofusSerialize for ExchangeStartOkMulticraftCrafterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.skill_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkMulticraftCrafterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            skill_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkMulticraftCrafterMessage {
-    const MESSAGE_ID: u16 = 5818;
-}
-
-/// Protocol message — ID: 5819
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkJobIndexMessage {
-    pub jobs: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeStartOkJobIndexMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.jobs.len() as _);
-        for item in &self.jobs {
+        writer.write_short(self.mounts_id.len() as _);
+        for item in &self.mounts_id {
             writer.write_var_int(*item);
         }
     }
 }
 
-impl DofusDeserialize for ExchangeStartOkJobIndexMessage {
+impl DofusDeserialize for ExchangeMountsStableRemoveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            jobs: {
+            mounts_id: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -1361,1059 +1217,44 @@ impl DofusDeserialize for ExchangeStartOkJobIndexMessage {
     }
 }
 
-impl DofusMessage for ExchangeStartOkJobIndexMessage {
-    const MESSAGE_ID: u16 = 5819;
+impl DofusMessage for ExchangeMountsStableRemoveMessage {
+    const MESSAGE_ID: u16 = 2552;
 }
 
-/// Protocol message — ID: 5904
+/// Protocol message — ID: 2583
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedBidBuyerMessage {
-    pub buyer_descriptor: SellerBuyerDescriptor,
-}
-
-impl DofusSerialize for ExchangeStartedBidBuyerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.buyer_descriptor.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedBidBuyerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            buyer_descriptor: SellerBuyerDescriptor::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedBidBuyerMessage {
-    const MESSAGE_ID: u16 = 5904;
-}
-
-/// Protocol message — ID: 5905
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedBidSellerMessage {
-    pub seller_descriptor: SellerBuyerDescriptor,
-    pub objects_infos: Vec<ObjectItemToSellInBid>,
-}
-
-impl DofusSerialize for ExchangeStartedBidSellerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.seller_descriptor.serialize(writer);
-        writer.write_short(self.objects_infos.len() as _);
-        for item in &self.objects_infos {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedBidSellerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            seller_descriptor: SellerBuyerDescriptor::deserialize(reader)?,
-            objects_infos: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItemToSellInBid::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedBidSellerMessage {
-    const MESSAGE_ID: u16 = 5905;
-}
-
-/// Protocol message — ID: 5907
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShopStockMovementRemovedMessage {
-    pub object_id: i32,
-}
-
-impl DofusSerialize for ExchangeShopStockMovementRemovedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeShopStockMovementRemovedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShopStockMovementRemovedMessage {
-    const MESSAGE_ID: u16 = 5907;
-}
-
-/// Protocol message — ID: 5909
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShopStockMovementUpdatedMessage {
-    pub object_info: ObjectItemToSell,
-}
-
-impl DofusSerialize for ExchangeShopStockMovementUpdatedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.object_info.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ExchangeShopStockMovementUpdatedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_info: ObjectItemToSell::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShopStockMovementUpdatedMessage {
-    const MESSAGE_ID: u16 = 5909;
-}
-
-/// Protocol message — ID: 5910
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShopStockStartedMessage {
-    pub objects_infos: Vec<ObjectItemToSell>,
-}
-
-impl DofusSerialize for ExchangeShopStockStartedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.objects_infos.len() as _);
-        for item in &self.objects_infos {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeShopStockStartedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            objects_infos: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItemToSell::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShopStockStartedMessage {
-    const MESSAGE_ID: u16 = 5910;
-}
-
-/// Protocol message — ID: 5941
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkCraftWithInformationMessage {
-    pub skill_id: i32,
-}
-
-impl DofusSerialize for ExchangeStartOkCraftWithInformationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.skill_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkCraftWithInformationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            skill_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkCraftWithInformationMessage {
-    const MESSAGE_ID: u16 = 5941;
-}
-
-/// Protocol message — ID: 5945
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseItemAddOkMessage {
-    pub item_info: ObjectItemToSellInBid,
-}
-
-impl DofusSerialize for ExchangeBidHouseItemAddOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.item_info.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseItemAddOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            item_info: ObjectItemToSellInBid::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseItemAddOkMessage {
-    const MESSAGE_ID: u16 = 5945;
-}
-
-/// Protocol message — ID: 5946
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseItemRemoveOkMessage {
-    pub seller_id: i32,
-}
-
-impl DofusSerialize for ExchangeBidHouseItemRemoveOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.seller_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseItemRemoveOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            seller_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseItemRemoveOkMessage {
-    const MESSAGE_ID: u16 = 5946;
-}
-
-/// Protocol message — ID: 5947
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseGenericItemAddedMessage {
-    pub obj_generic_id: i16,
-}
-
-impl DofusSerialize for ExchangeBidHouseGenericItemAddedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.obj_generic_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseGenericItemAddedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            obj_generic_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseGenericItemAddedMessage {
-    const MESSAGE_ID: u16 = 5947;
-}
-
-/// Protocol message — ID: 5948
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseGenericItemRemovedMessage {
-    pub obj_generic_id: i16,
-}
-
-impl DofusSerialize for ExchangeBidHouseGenericItemRemovedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.obj_generic_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseGenericItemRemovedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            obj_generic_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseGenericItemRemovedMessage {
-    const MESSAGE_ID: u16 = 5948;
-}
-
-/// Protocol message — ID: 5949
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseInListAddedMessage {
-    pub item_u_i_d: i32,
-    pub object_g_i_d: i16,
-    pub object_type: i32,
-    pub effects: Vec<Vec<u8>>,
-    pub prices: Vec<i64>,
-}
-
-impl DofusSerialize for ExchangeBidHouseInListAddedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.item_u_i_d);
-        writer.write_var_short(self.object_g_i_d);
-        writer.write_int(self.object_type);
-        writer.write_short(self.effects.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.prices.len() as _);
-        for item in &self.prices {
-            writer.write_var_long(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseInListAddedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            item_u_i_d: reader.read_int()?,
-            object_g_i_d: reader.read_var_short()?,
-            object_type: reader.read_int()?,
-            effects: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            prices: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_long()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseInListAddedMessage {
-    const MESSAGE_ID: u16 = 5949;
-}
-
-/// Protocol message — ID: 5950
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseInListRemovedMessage {
-    pub item_u_i_d: i32,
-    pub object_g_i_d: i16,
-    pub object_type: i32,
-}
-
-impl DofusSerialize for ExchangeBidHouseInListRemovedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.item_u_i_d);
-        writer.write_var_short(self.object_g_i_d);
-        writer.write_int(self.object_type);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseInListRemovedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            item_u_i_d: reader.read_int()?,
-            object_g_i_d: reader.read_var_short()?,
-            object_type: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseInListRemovedMessage {
-    const MESSAGE_ID: u16 = 5950;
-}
-
-/// Protocol message — ID: 5979
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkMountMessage {
-    pub stabled_mounts_description: Vec<MountClientData>,
-    pub paddocked_mounts_description: Vec<MountClientData>,
-}
-
-impl DofusSerialize for ExchangeStartOkMountMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.stabled_mounts_description.len() as _);
-        for item in &self.stabled_mounts_description {
-            item.serialize(writer);
-        }
-        writer.write_short(self.paddocked_mounts_description.len() as _);
-        for item in &self.paddocked_mounts_description {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkMountMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            stabled_mounts_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-            paddocked_mounts_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkMountMessage {
-    const MESSAGE_ID: u16 = 5979;
-}
-
-/// Protocol message — ID: 5981
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountStableErrorMessage {
-}
-
-impl DofusSerialize for ExchangeMountStableErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeMountStableErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountStableErrorMessage {
-    const MESSAGE_ID: u16 = 5981;
-}
-
-/// Protocol message — ID: 5984
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedMountStockMessage {
-    pub objects_infos: Vec<ObjectItem>,
-}
-
-impl DofusSerialize for ExchangeStartedMountStockMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.objects_infos.len() as _);
-        for item in &self.objects_infos {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedMountStockMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            objects_infos: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItem::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedMountStockMessage {
-    const MESSAGE_ID: u16 = 5984;
-}
-
-/// Protocol message — ID: 5986
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeRequestOnMountStockMessage {
-}
-
-impl DofusSerialize for ExchangeRequestOnMountStockMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeRequestOnMountStockMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeRequestOnMountStockMessage {
-    const MESSAGE_ID: u16 = 5986;
-}
-
-/// Protocol message — ID: 5991
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkMountWithOutPaddockMessage {
-    pub stabled_mounts_description: Vec<MountClientData>,
-}
-
-impl DofusSerialize for ExchangeStartOkMountWithOutPaddockMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.stabled_mounts_description.len() as _);
-        for item in &self.stabled_mounts_description {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkMountWithOutPaddockMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            stabled_mounts_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkMountWithOutPaddockMessage {
-    const MESSAGE_ID: u16 = 5991;
-}
-
-/// Protocol message — ID: 5999
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftResultWithObjectDescMessage {
-    pub craft_result: u8,
-    pub object_info: ObjectItemNotInContainer,
-}
-
-impl DofusSerialize for ExchangeCraftResultWithObjectDescMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.craft_result);
-        self.object_info.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftResultWithObjectDescMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            craft_result: reader.read_byte()?,
-            object_info: ObjectItemNotInContainer::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftResultWithObjectDescMessage {
-    const MESSAGE_ID: u16 = 5999;
-}
-
-/// Protocol message — ID: 6000
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftResultWithObjectIdMessage {
-    pub craft_result: u8,
-    pub object_generic_id: i16,
-}
-
-impl DofusSerialize for ExchangeCraftResultWithObjectIdMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.craft_result);
-        writer.write_var_short(self.object_generic_id);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftResultWithObjectIdMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            craft_result: reader.read_byte()?,
-            object_generic_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftResultWithObjectIdMessage {
-    const MESSAGE_ID: u16 = 6000;
-}
-
-/// Protocol message — ID: 6001
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeReplayStopMessage {
-}
-
-impl DofusSerialize for ExchangeReplayStopMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeReplayStopMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeReplayStopMessage {
-    const MESSAGE_ID: u16 = 6001;
-}
-
-/// Protocol message — ID: 6004
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectUseInWorkshopMessage {
-    pub object_u_i_d: i32,
-    pub quantity: i32,
-}
-
-impl DofusSerialize for ExchangeObjectUseInWorkshopMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_u_i_d);
-        writer.write_var_int(self.quantity);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectUseInWorkshopMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectUseInWorkshopMessage {
-    const MESSAGE_ID: u16 = 6004;
-}
-
-/// Protocol message — ID: 6032
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertAllToInvMessage {
-}
-
-impl DofusSerialize for ExchangeObjectTransfertAllToInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertAllToInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertAllToInvMessage {
-    const MESSAGE_ID: u16 = 6032;
-}
-
-/// Protocol message — ID: 6037
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShopStockMultiMovementRemovedMessage {
-    pub object_id_list: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeShopStockMultiMovementRemovedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.object_id_list.len() as _);
-        for item in &self.object_id_list {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeShopStockMultiMovementRemovedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_id_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShopStockMultiMovementRemovedMessage {
-    const MESSAGE_ID: u16 = 6037;
-}
-
-/// Protocol message — ID: 6038
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeShopStockMultiMovementUpdatedMessage {
-    pub object_info_list: Vec<ObjectItemToSell>,
-}
-
-impl DofusSerialize for ExchangeShopStockMultiMovementUpdatedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.object_info_list.len() as _);
-        for item in &self.object_info_list {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeShopStockMultiMovementUpdatedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_info_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItemToSell::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeShopStockMultiMovementUpdatedMessage {
-    const MESSAGE_ID: u16 = 6038;
-}
-
-/// Protocol message — ID: 6039
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertListToInvMessage {
-    pub ids: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeObjectTransfertListToInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.ids.len() as _);
-        for item in &self.ids {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertListToInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertListToInvMessage {
-    const MESSAGE_ID: u16 = 6039;
-}
-
-/// Protocol message — ID: 6055
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountFreeFromPaddockMessage {
+pub struct ExchangeMountsTakenFromPaddockMessage {
     pub name: String,
     pub world_x: i16,
     pub world_y: i16,
-    pub liberator: String,
+    pub ownername: String,
 }
 
-impl DofusSerialize for ExchangeMountFreeFromPaddockMessage {
+impl DofusSerialize for ExchangeMountsTakenFromPaddockMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_utf(&self.name);
         writer.write_short(self.world_x);
         writer.write_short(self.world_y);
-        writer.write_utf(&self.liberator);
+        writer.write_utf(&self.ownername);
     }
 }
 
-impl DofusDeserialize for ExchangeMountFreeFromPaddockMessage {
+impl DofusDeserialize for ExchangeMountsTakenFromPaddockMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             name: reader.read_utf()?,
             world_x: reader.read_short()?,
             world_y: reader.read_short()?,
-            liberator: reader.read_utf()?,
+            ownername: reader.read_utf()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeMountFreeFromPaddockMessage {
-    const MESSAGE_ID: u16 = 6055;
+impl DofusMessage for ExchangeMountsTakenFromPaddockMessage {
+    const MESSAGE_ID: u16 = 2583;
 }
 
-/// Protocol message — ID: 6056
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountSterilizeFromPaddockMessage {
-    pub name: String,
-    pub world_x: i16,
-    pub world_y: i16,
-    pub sterilizator: String,
-}
-
-impl DofusSerialize for ExchangeMountSterilizeFromPaddockMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.name);
-        writer.write_short(self.world_x);
-        writer.write_short(self.world_y);
-        writer.write_utf(&self.sterilizator);
-    }
-}
-
-impl DofusDeserialize for ExchangeMountSterilizeFromPaddockMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            name: reader.read_utf()?,
-            world_x: reader.read_short()?,
-            world_y: reader.read_short()?,
-            sterilizator: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountSterilizeFromPaddockMessage {
-    const MESSAGE_ID: u16 = 6056;
-}
-
-/// Protocol message — ID: 6129
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedWithPodsMessage {
-    pub exchange_type: u8,
-    pub first_character_id: f64,
-    pub first_character_current_weight: i32,
-    pub first_character_max_weight: i32,
-    pub second_character_id: f64,
-    pub second_character_current_weight: i32,
-    pub second_character_max_weight: i32,
-}
-
-impl DofusSerialize for ExchangeStartedWithPodsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-        writer.write_double(self.first_character_id);
-        writer.write_var_int(self.first_character_current_weight);
-        writer.write_var_int(self.first_character_max_weight);
-        writer.write_double(self.second_character_id);
-        writer.write_var_int(self.second_character_current_weight);
-        writer.write_var_int(self.second_character_max_weight);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedWithPodsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-            first_character_id: reader.read_double()?,
-            first_character_current_weight: reader.read_var_int()?,
-            first_character_max_weight: reader.read_var_int()?,
-            second_character_id: reader.read_double()?,
-            second_character_current_weight: reader.read_var_int()?,
-            second_character_max_weight: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedWithPodsMessage {
-    const MESSAGE_ID: u16 = 6129;
-}
-
-/// Protocol message — ID: 6183
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertListFromInvMessage {
-    pub ids: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeObjectTransfertListFromInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.ids.len() as _);
-        for item in &self.ids {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertListFromInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertListFromInvMessage {
-    const MESSAGE_ID: u16 = 6183;
-}
-
-/// Protocol message — ID: 6184
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertAllFromInvMessage {
-}
-
-impl DofusSerialize for ExchangeObjectTransfertAllFromInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertAllFromInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertAllFromInvMessage {
-    const MESSAGE_ID: u16 = 6184;
-}
-
-/// Protocol message — ID: 6188
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftResultMagicWithObjectDescMessage {
-    pub craft_result: u8,
-    pub object_info: ObjectItemNotInContainer,
-    pub magic_pool_status: u8,
-}
-
-impl DofusSerialize for ExchangeCraftResultMagicWithObjectDescMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.craft_result);
-        self.object_info.serialize(writer);
-        writer.write_byte(self.magic_pool_status);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftResultMagicWithObjectDescMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            craft_result: reader.read_byte()?,
-            object_info: ObjectItemNotInContainer::deserialize(reader)?,
-            magic_pool_status: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftResultMagicWithObjectDescMessage {
-    const MESSAGE_ID: u16 = 6188;
-}
-
-/// Protocol message — ID: 6236
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedWithStorageMessage {
-    pub exchange_type: u8,
-    pub storage_max_slot: i32,
-}
-
-impl DofusSerialize for ExchangeStartedWithStorageMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.exchange_type);
-        writer.write_var_int(self.storage_max_slot);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedWithStorageMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            exchange_type: reader.read_byte()?,
-            storage_max_slot: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedWithStorageMessage {
-    const MESSAGE_ID: u16 = 6236;
-}
-
-/// Protocol message — ID: 6238
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectModifyPricedMessage {
-    pub object_u_i_d: i32,
-    pub quantity: i32,
-    pub price: i64,
-}
-
-impl DofusSerialize for ExchangeObjectModifyPricedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_u_i_d);
-        writer.write_var_int(self.quantity);
-        writer.write_var_long(self.price);
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectModifyPricedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d: reader.read_var_int()?,
-            quantity: reader.read_var_int()?,
-            price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectModifyPricedMessage {
-    const MESSAGE_ID: u16 = 6238;
-}
-
-/// Protocol message — ID: 6272
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseBuyResultMessage {
-    pub uid: i32,
-    pub bought: bool,
-}
-
-impl DofusSerialize for ExchangeBidHouseBuyResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.uid);
-        writer.write_boolean(self.bought);
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseBuyResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            uid: reader.read_var_int()?,
-            bought: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseBuyResultMessage {
-    const MESSAGE_ID: u16 = 6272;
-}
-
-/// Protocol message — ID: 6325
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertExistingFromInvMessage {
-}
-
-impl DofusSerialize for ExchangeObjectTransfertExistingFromInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertExistingFromInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertExistingFromInvMessage {
-    const MESSAGE_ID: u16 = 6325;
-}
-
-/// Protocol message — ID: 6326
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectTransfertExistingToInvMessage {
-}
-
-impl DofusSerialize for ExchangeObjectTransfertExistingToInvMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeObjectTransfertExistingToInvMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeObjectTransfertExistingToInvMessage {
-    const MESSAGE_ID: u16 = 6326;
-}
-
-/// Protocol message — ID: 6337
+/// Protocol message — ID: 2741
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeBidHouseInListUpdatedMessage {
     pub item_u_i_d: i32,
@@ -2464,34 +1305,439 @@ impl DofusDeserialize for ExchangeBidHouseInListUpdatedMessage {
 }
 
 impl DofusMessage for ExchangeBidHouseInListUpdatedMessage {
-    const MESSAGE_ID: u16 = 6337;
+    const MESSAGE_ID: u16 = 2741;
 }
 
-/// Protocol message — ID: 6389
+/// Protocol message — ID: 2868
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeSetCraftRecipeMessage {
-    pub object_g_i_d: i16,
+pub struct ExchangeTypesExchangerDescriptionForUserMessage {
+    pub object_type: i32,
+    pub type_description: Vec<i32>,
 }
 
-impl DofusSerialize for ExchangeSetCraftRecipeMessage {
+impl DofusSerialize for ExchangeTypesExchangerDescriptionForUserMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.object_g_i_d);
+        writer.write_int(self.object_type);
+        writer.write_short(self.type_description.len() as _);
+        for item in &self.type_description {
+            writer.write_var_int(*item);
+        }
     }
 }
 
-impl DofusDeserialize for ExchangeSetCraftRecipeMessage {
+impl DofusDeserialize for ExchangeTypesExchangerDescriptionForUserMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            object_g_i_d: reader.read_var_short()?,
+            object_type: reader.read_int()?,
+            type_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for ExchangeSetCraftRecipeMessage {
-    const MESSAGE_ID: u16 = 6389;
+impl DofusMessage for ExchangeTypesExchangerDescriptionForUserMessage {
+    const MESSAGE_ID: u16 = 2868;
 }
 
-/// Protocol message — ID: 6464
+/// Protocol message — ID: 2914
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkMountWithOutPaddockMessage {
+    pub stabled_mounts_description: Vec<MountClientData>,
+}
+
+impl DofusSerialize for ExchangeStartOkMountWithOutPaddockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.stabled_mounts_description.len() as _);
+        for item in &self.stabled_mounts_description {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkMountWithOutPaddockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            stabled_mounts_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkMountWithOutPaddockMessage {
+    const MESSAGE_ID: u16 = 2914;
+}
+
+/// Protocol message — ID: 3123
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectUseInWorkshopMessage {
+    pub object_u_i_d: i32,
+    pub quantity: i32,
+}
+
+impl DofusSerialize for ExchangeObjectUseInWorkshopMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_u_i_d);
+        writer.write_var_int(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectUseInWorkshopMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_u_i_d: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectUseInWorkshopMessage {
+    const MESSAGE_ID: u16 = 3123;
+}
+
+/// Protocol message — ID: 3137
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftCountModifiedMessage {
+    pub count: i32,
+}
+
+impl DofusSerialize for ExchangeCraftCountModifiedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.count);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftCountModifiedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            count: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftCountModifiedMessage {
+    const MESSAGE_ID: u16 = 3137;
+}
+
+/// Protocol message — ID: 3234
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHousePriceMessage {
+    pub gen_id: i16,
+}
+
+impl DofusSerialize for ExchangeBidHousePriceMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.gen_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHousePriceMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            gen_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHousePriceMessage {
+    const MESSAGE_ID: u16 = 3234;
+}
+
+/// Protocol message — ID: 3308
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseSearchMessage {
+    pub gen_id: i16,
+    pub follow: bool,
+}
+
+impl DofusSerialize for ExchangeBidHouseSearchMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.gen_id);
+        writer.write_boolean(self.follow);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseSearchMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            gen_id: reader.read_var_short()?,
+            follow: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseSearchMessage {
+    const MESSAGE_ID: u16 = 3308;
+}
+
+/// Protocol message — ID: 3439
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartAsVendorMessage {
+}
+
+impl DofusSerialize for ExchangeStartAsVendorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeStartAsVendorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartAsVendorMessage {
+    const MESSAGE_ID: u16 = 3439;
+}
+
+/// Protocol message — ID: 3594
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectMovePricedMessage {
+    pub object_u_i_d: i32,
+    pub quantity: i32,
+    pub price: i64,
+}
+
+impl DofusSerialize for ExchangeObjectMovePricedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_u_i_d);
+        writer.write_var_int(self.quantity);
+        writer.write_var_long(self.price);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectMovePricedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_u_i_d: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+            price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectMovePricedMessage {
+    const MESSAGE_ID: u16 = 3594;
+}
+
+/// Protocol message — ID: 3691
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectMessage {
+    pub remote: bool,
+}
+
+impl DofusSerialize for ExchangeObjectMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.remote);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            remote: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectMessage {
+    const MESSAGE_ID: u16 = 3691;
+}
+
+/// Protocol message — ID: 3774
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidPriceMessage {
+    pub generic_id: i16,
+    pub average_price: i64,
+}
+
+impl DofusSerialize for ExchangeBidPriceMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.generic_id);
+        writer.write_var_long(self.average_price);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidPriceMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            generic_id: reader.read_var_short()?,
+            average_price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidPriceMessage {
+    const MESSAGE_ID: u16 = 3774;
+}
+
+/// Protocol message — ID: 4040
+#[derive(Debug, Clone, Default)]
+pub struct ExchangePlayerRequestMessage {
+    pub exchange_type: u8,
+    pub target: i64,
+}
+
+impl DofusSerialize for ExchangePlayerRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+        writer.write_var_long(self.target);
+    }
+}
+
+impl DofusDeserialize for ExchangePlayerRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            exchange_type: reader.read_byte()?,
+            target: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangePlayerRequestMessage {
+    const MESSAGE_ID: u16 = 4040;
+}
+
+/// Protocol message — ID: 4206
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkRunesTradeMessage {
+}
+
+impl DofusSerialize for ExchangeStartOkRunesTradeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkRunesTradeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkRunesTradeMessage {
+    const MESSAGE_ID: u16 = 4206;
+}
+
+/// Protocol message — ID: 4230
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedWithStorageMessage {
+    pub exchange_type: u8,
+    pub storage_max_slot: i32,
+}
+
+impl DofusSerialize for ExchangeStartedWithStorageMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+        writer.write_var_int(self.storage_max_slot);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedWithStorageMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            exchange_type: reader.read_byte()?,
+            storage_max_slot: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartedWithStorageMessage {
+    const MESSAGE_ID: u16 = 4230;
+}
+
+/// Protocol message — ID: 4402
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMoneyMovementInformationMessage {
+    pub limit: i64,
+}
+
+impl DofusSerialize for ExchangeMoneyMovementInformationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.limit);
+    }
+}
+
+impl DofusDeserialize for ExchangeMoneyMovementInformationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            limit: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMoneyMovementInformationMessage {
+    const MESSAGE_ID: u16 = 4402;
+}
+
+/// Protocol message — ID: 4688
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseUnsoldItemsMessage {
+    pub items: Vec<ObjectItemGenericQuantity>,
+}
+
+impl DofusSerialize for ExchangeBidHouseUnsoldItemsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.items.len() as _);
+        for item in &self.items {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseUnsoldItemsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            items: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItemGenericQuantity::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseUnsoldItemsMessage {
+    const MESSAGE_ID: u16 = 4688;
+}
+
+/// Protocol message — ID: 4712
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeReplayStopMessage {
+}
+
+impl DofusSerialize for ExchangeReplayStopMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeReplayStopMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeReplayStopMessage {
+    const MESSAGE_ID: u16 = 4712;
+}
+
+/// Protocol message — ID: 4716
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeBidPriceForSellerMessage {
     pub generic_id: i16,
@@ -2531,10 +1777,1170 @@ impl DofusDeserialize for ExchangeBidPriceForSellerMessage {
 }
 
 impl DofusMessage for ExchangeBidPriceForSellerMessage {
-    const MESSAGE_ID: u16 = 6464;
+    const MESSAGE_ID: u16 = 4716;
 }
 
-/// Protocol message — ID: 6470
+/// Protocol message — ID: 4754
+#[derive(Debug, Clone, Default)]
+pub struct JobBookSubscribeRequestMessage {
+    pub job_ids: Vec<u8>,
+}
+
+impl DofusSerialize for JobBookSubscribeRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.job_ids.len() as _);
+        for item in &self.job_ids {
+            writer.write_byte(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for JobBookSubscribeRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            job_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for JobBookSubscribeRequestMessage {
+    const MESSAGE_ID: u16 = 4754;
+}
+
+/// Protocol message — ID: 4871
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountsPaddockRemoveMessage {
+    pub mounts_id: Vec<i32>,
+}
+
+impl DofusSerialize for ExchangeMountsPaddockRemoveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.mounts_id.len() as _);
+        for item in &self.mounts_id {
+            writer.write_var_int(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeMountsPaddockRemoveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mounts_id: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountsPaddockRemoveMessage {
+    const MESSAGE_ID: u16 = 4871;
+}
+
+/// Protocol message — ID: 4882
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftResultMagicWithObjectDescMessage {
+    pub craft_result: u8,
+    pub object_info: ObjectItemNotInContainer,
+    pub magic_pool_status: u8,
+}
+
+impl DofusSerialize for ExchangeCraftResultMagicWithObjectDescMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.craft_result);
+        self.object_info.serialize(writer);
+        writer.write_byte(self.magic_pool_status);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftResultMagicWithObjectDescMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            craft_result: reader.read_byte()?,
+            object_info: ObjectItemNotInContainer::deserialize(reader)?,
+            magic_pool_status: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftResultMagicWithObjectDescMessage {
+    const MESSAGE_ID: u16 = 4882;
+}
+
+/// Protocol message — ID: 4929
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeRequestedTradeMessage {
+    pub exchange_type: u8,
+    pub source: i64,
+    pub target: i64,
+}
+
+impl DofusSerialize for ExchangeRequestedTradeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+        writer.write_var_long(self.source);
+        writer.write_var_long(self.target);
+    }
+}
+
+impl DofusDeserialize for ExchangeRequestedTradeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            exchange_type: reader.read_byte()?,
+            source: reader.read_var_long()?,
+            target: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeRequestedTradeMessage {
+    const MESSAGE_ID: u16 = 4929;
+}
+
+/// Protocol message — ID: 4993
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountSterilizeFromPaddockMessage {
+    pub name: String,
+    pub world_x: i16,
+    pub world_y: i16,
+    pub sterilizator: String,
+}
+
+impl DofusSerialize for ExchangeMountSterilizeFromPaddockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.name);
+        writer.write_short(self.world_x);
+        writer.write_short(self.world_y);
+        writer.write_utf(&self.sterilizator);
+    }
+}
+
+impl DofusDeserialize for ExchangeMountSterilizeFromPaddockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            name: reader.read_utf()?,
+            world_x: reader.read_short()?,
+            world_y: reader.read_short()?,
+            sterilizator: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountSterilizeFromPaddockMessage {
+    const MESSAGE_ID: u16 = 4993;
+}
+
+/// Protocol message — ID: 5183
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeOkMultiCraftMessage {
+    pub initiator_id: i64,
+    pub other_id: i64,
+    pub role: u8,
+}
+
+impl DofusSerialize for ExchangeOkMultiCraftMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.initiator_id);
+        writer.write_var_long(self.other_id);
+        writer.write_byte(self.role);
+    }
+}
+
+impl DofusDeserialize for ExchangeOkMultiCraftMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            initiator_id: reader.read_var_long()?,
+            other_id: reader.read_var_long()?,
+            role: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeOkMultiCraftMessage {
+    const MESSAGE_ID: u16 = 5183;
+}
+
+/// Protocol message — ID: 5468
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStoppedMessage {
+    pub id: i64,
+}
+
+impl DofusSerialize for ExchangeStoppedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
+    }
+}
+
+impl DofusDeserialize for ExchangeStoppedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStoppedMessage {
+    const MESSAGE_ID: u16 = 5468;
+}
+
+/// Protocol message — ID: 5660
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkMulticraftCustomerMessage {
+    pub skill_id: i32,
+    pub crafter_job_level: u8,
+}
+
+impl DofusSerialize for ExchangeStartOkMulticraftCustomerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.skill_id);
+        writer.write_byte(self.crafter_job_level);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkMulticraftCustomerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            skill_id: reader.read_var_int()?,
+            crafter_job_level: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkMulticraftCustomerMessage {
+    const MESSAGE_ID: u16 = 5660;
+}
+
+/// Protocol message — ID: 5687
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeOnHumanVendorRequestMessage {
+    pub human_vendor_id: i64,
+    pub human_vendor_cell: i16,
+}
+
+impl DofusSerialize for ExchangeOnHumanVendorRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.human_vendor_id);
+        writer.write_var_short(self.human_vendor_cell);
+    }
+}
+
+impl DofusDeserialize for ExchangeOnHumanVendorRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            human_vendor_id: reader.read_var_long()?,
+            human_vendor_cell: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeOnHumanVendorRequestMessage {
+    const MESSAGE_ID: u16 = 5687;
+}
+
+/// Protocol message — ID: 5713
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShopStockMovementUpdatedMessage {
+    pub object_info: ObjectItemToSell,
+}
+
+impl DofusSerialize for ExchangeShopStockMovementUpdatedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.object_info.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ExchangeShopStockMovementUpdatedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_info: ObjectItemToSell::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeShopStockMovementUpdatedMessage {
+    const MESSAGE_ID: u16 = 5713;
+}
+
+/// Protocol message — ID: 5780
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftResultWithObjectDescMessage {
+    pub craft_result: u8,
+    pub object_info: ObjectItemNotInContainer,
+}
+
+impl DofusSerialize for ExchangeCraftResultWithObjectDescMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.craft_result);
+        self.object_info.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftResultWithObjectDescMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            craft_result: reader.read_byte()?,
+            object_info: ObjectItemNotInContainer::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftResultWithObjectDescMessage {
+    const MESSAGE_ID: u16 = 5780;
+}
+
+/// Protocol message — ID: 5796
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectTransfertExistingFromInvMessage {
+}
+
+impl DofusSerialize for ExchangeObjectTransfertExistingFromInvMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectTransfertExistingFromInvMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectTransfertExistingFromInvMessage {
+    const MESSAGE_ID: u16 = 5796;
+}
+
+/// Protocol message — ID: 5814
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkHumanVendorMessage {
+    pub seller_id: f64,
+    pub objects_infos: Vec<ObjectItemToSellInHumanVendorShop>,
+}
+
+impl DofusSerialize for ExchangeStartOkHumanVendorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.seller_id);
+        writer.write_short(self.objects_infos.len() as _);
+        for item in &self.objects_infos {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkHumanVendorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            seller_id: reader.read_double()?,
+            objects_infos: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItemToSellInHumanVendorShop::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkHumanVendorMessage {
+    const MESSAGE_ID: u16 = 5814;
+}
+
+/// Protocol message — ID: 5909
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeWaitingResultMessage {
+    pub bwait: bool,
+}
+
+impl DofusSerialize for ExchangeWaitingResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.bwait);
+    }
+}
+
+impl DofusDeserialize for ExchangeWaitingResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bwait: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeWaitingResultMessage {
+    const MESSAGE_ID: u16 = 5909;
+}
+
+/// Protocol message — ID: 6110
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkNpcShopMessage {
+    pub npc_seller_id: f64,
+    pub token_id: i16,
+    pub objects_infos: Vec<ObjectItemToSellInNpcShop>,
+}
+
+impl DofusSerialize for ExchangeStartOkNpcShopMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.npc_seller_id);
+        writer.write_var_short(self.token_id);
+        writer.write_short(self.objects_infos.len() as _);
+        for item in &self.objects_infos {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkNpcShopMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            npc_seller_id: reader.read_double()?,
+            token_id: reader.read_var_short()?,
+            objects_infos: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItemToSellInNpcShop::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkNpcShopMessage {
+    const MESSAGE_ID: u16 = 6110;
+}
+
+/// Protocol message — ID: 6165
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedMessage {
+    pub exchange_type: u8,
+}
+
+impl DofusSerialize for ExchangeStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            exchange_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartedMessage {
+    const MESSAGE_ID: u16 = 6165;
+}
+
+/// Protocol message — ID: 6225
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectTransfertAllToInvMessage {
+}
+
+impl DofusSerialize for ExchangeObjectTransfertAllToInvMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectTransfertAllToInvMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectTransfertAllToInvMessage {
+    const MESSAGE_ID: u16 = 6225;
+}
+
+/// Protocol message — ID: 6306
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeSellMessage {
+    pub object_to_sell_id: i32,
+    pub quantity: i32,
+}
+
+impl DofusSerialize for ExchangeSellMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_to_sell_id);
+        writer.write_var_int(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ExchangeSellMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_to_sell_id: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeSellMessage {
+    const MESSAGE_ID: u16 = 6306;
+}
+
+/// Protocol message — ID: 6444
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectTransfertExistingToInvMessage {
+}
+
+impl DofusSerialize for ExchangeObjectTransfertExistingToInvMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectTransfertExistingToInvMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectTransfertExistingToInvMessage {
+    const MESSAGE_ID: u16 = 6444;
+}
+
+/// Protocol message — ID: 6676
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseBuyMessage {
+    pub uid: i32,
+    pub qty: i32,
+    pub price: i64,
+}
+
+impl DofusSerialize for ExchangeBidHouseBuyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.uid);
+        writer.write_var_int(self.qty);
+        writer.write_var_long(self.price);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseBuyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            uid: reader.read_var_int()?,
+            qty: reader.read_var_int()?,
+            price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseBuyMessage {
+    const MESSAGE_ID: u16 = 6676;
+}
+
+/// Protocol message — ID: 6701
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkMulticraftCrafterMessage {
+    pub skill_id: i32,
+}
+
+impl DofusSerialize for ExchangeStartOkMulticraftCrafterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.skill_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkMulticraftCrafterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            skill_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkMulticraftCrafterMessage {
+    const MESSAGE_ID: u16 = 6701;
+}
+
+/// Protocol message — ID: 6788
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCrafterJobLevelupMessage {
+    pub crafter_job_level: u8,
+}
+
+impl DofusSerialize for ExchangeCrafterJobLevelupMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.crafter_job_level);
+    }
+}
+
+impl DofusDeserialize for ExchangeCrafterJobLevelupMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            crafter_job_level: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCrafterJobLevelupMessage {
+    const MESSAGE_ID: u16 = 6788;
+}
+
+/// Protocol message — ID: 6872
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkNpcTradeMessage {
+    pub npc_id: f64,
+}
+
+impl DofusSerialize for ExchangeStartOkNpcTradeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.npc_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkNpcTradeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            npc_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkNpcTradeMessage {
+    const MESSAGE_ID: u16 = 6872;
+}
+
+/// Protocol message — ID: 6940
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedBidBuyerMessage {
+    pub buyer_descriptor: SellerBuyerDescriptor,
+}
+
+impl DofusSerialize for ExchangeStartedBidBuyerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.buyer_descriptor.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedBidBuyerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            buyer_descriptor: SellerBuyerDescriptor::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartedBidBuyerMessage {
+    const MESSAGE_ID: u16 = 6940;
+}
+
+/// Protocol message — ID: 7079
+#[derive(Debug, Clone, Default)]
+pub struct UpdateMountCharacteristicsMessage {
+    pub ride_id: i32,
+    pub boost_to_update_list: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for UpdateMountCharacteristicsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.ride_id);
+        writer.write_short(self.boost_to_update_list.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for UpdateMountCharacteristicsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ride_id: reader.read_var_int()?,
+            boost_to_update_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for UpdateMountCharacteristicsMessage {
+    const MESSAGE_ID: u16 = 7079;
+}
+
+/// Protocol message — ID: 7377
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeTypesItemsExchangerDescriptionForUserMessage {
+    pub object_type: i32,
+    pub item_type_descriptions: Vec<BidExchangerObjectInfo>,
+}
+
+impl DofusSerialize for ExchangeTypesItemsExchangerDescriptionForUserMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.object_type);
+        writer.write_short(self.item_type_descriptions.len() as _);
+        for item in &self.item_type_descriptions {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeTypesItemsExchangerDescriptionForUserMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_type: reader.read_int()?,
+            item_type_descriptions: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(BidExchangerObjectInfo::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeTypesItemsExchangerDescriptionForUserMessage {
+    const MESSAGE_ID: u16 = 7377;
+}
+
+/// Protocol message — ID: 7465
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectModifyPricedMessage {
+    pub object_u_i_d: i32,
+    pub quantity: i32,
+    pub price: i64,
+}
+
+impl DofusSerialize for ExchangeObjectModifyPricedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_u_i_d);
+        writer.write_var_int(self.quantity);
+        writer.write_var_long(self.price);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectModifyPricedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_u_i_d: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+            price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectModifyPricedMessage {
+    const MESSAGE_ID: u16 = 7465;
+}
+
+/// Protocol message — ID: 7527
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkCraftMessage {
+}
+
+impl DofusSerialize for ExchangeStartOkCraftMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkCraftMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkCraftMessage {
+    const MESSAGE_ID: u16 = 7527;
+}
+
+/// Protocol message — ID: 7611
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountsPaddockAddMessage {
+    pub mount_description: Vec<MountClientData>,
+}
+
+impl DofusSerialize for ExchangeMountsPaddockAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.mount_description.len() as _);
+        for item in &self.mount_description {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeMountsPaddockAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_description: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(MountClientData::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountsPaddockAddMessage {
+    const MESSAGE_ID: u16 = 7611;
+}
+
+/// Protocol message — ID: 7801
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartOkCraftWithInformationMessage {
+    pub skill_id: i32,
+}
+
+impl DofusSerialize for ExchangeStartOkCraftWithInformationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.skill_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeStartOkCraftWithInformationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            skill_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartOkCraftWithInformationMessage {
+    const MESSAGE_ID: u16 = 7801;
+}
+
+/// Protocol message — ID: 7963
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectMoveMessage {
+    pub object_u_i_d: i32,
+    pub quantity: i32,
+}
+
+impl DofusSerialize for ExchangeObjectMoveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_u_i_d);
+        writer.write_var_int(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectMoveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_u_i_d: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectMoveMessage {
+    const MESSAGE_ID: u16 = 7963;
+}
+
+/// Protocol message — ID: 8074
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeStartedMountStockMessage {
+    pub objects_infos: Vec<ObjectItem>,
+}
+
+impl DofusSerialize for ExchangeStartedMountStockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.objects_infos.len() as _);
+        for item in &self.objects_infos {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeStartedMountStockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            objects_infos: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItem::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeStartedMountStockMessage {
+    const MESSAGE_ID: u16 = 8074;
+}
+
+/// Protocol message — ID: 8187
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectAddedMessage {
+    pub remote: bool,
+    pub object: ObjectItem,
+}
+
+impl DofusSerialize for ExchangeObjectAddedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.remote);
+        self.object.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectAddedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            remote: reader.read_boolean()?,
+            object: ObjectItem::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectAddedMessage {
+    const MESSAGE_ID: u16 = 8187;
+}
+
+/// Protocol message — ID: 8258
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeObjectTransfertListToInvMessage {
+    pub ids: Vec<i32>,
+}
+
+impl DofusSerialize for ExchangeObjectTransfertListToInvMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.ids.len() as _);
+        for item in &self.ids {
+            writer.write_var_int(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for ExchangeObjectTransfertListToInvMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for ExchangeObjectTransfertListToInvMessage {
+    const MESSAGE_ID: u16 = 8258;
+}
+
+/// Protocol message — ID: 8459
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidHouseItemRemoveOkMessage {
+    pub seller_id: i32,
+}
+
+impl DofusSerialize for ExchangeBidHouseItemRemoveOkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.seller_id);
+    }
+}
+
+impl DofusDeserialize for ExchangeBidHouseItemRemoveOkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            seller_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidHouseItemRemoveOkMessage {
+    const MESSAGE_ID: u16 = 8459;
+}
+
+/// Protocol message — ID: 8527
+#[derive(Debug, Clone, Default)]
+pub struct ExchangePlayerMultiCraftRequestMessage {
+    pub exchange_type: u8,
+    pub target: i64,
+    pub skill_id: i32,
+}
+
+impl DofusSerialize for ExchangePlayerMultiCraftRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.exchange_type);
+        writer.write_var_long(self.target);
+        writer.write_var_int(self.skill_id);
+    }
+}
+
+impl DofusDeserialize for ExchangePlayerMultiCraftRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            exchange_type: reader.read_byte()?,
+            target: reader.read_var_long()?,
+            skill_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangePlayerMultiCraftRequestMessage {
+    const MESSAGE_ID: u16 = 8527;
+}
+
+/// Protocol message — ID: 8531
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBuyMessage {
+    pub object_to_buy_id: i32,
+    pub quantity: i32,
+}
+
+impl DofusSerialize for ExchangeBuyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_to_buy_id);
+        writer.write_var_int(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ExchangeBuyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_to_buy_id: reader.read_var_int()?,
+            quantity: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBuyMessage {
+    const MESSAGE_ID: u16 = 8531;
+}
+
+/// Protocol message — ID: 8600
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeBidSearchOkMessage {
+}
+
+impl DofusSerialize for ExchangeBidSearchOkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeBidSearchOkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeBidSearchOkMessage {
+    const MESSAGE_ID: u16 = 8600;
+}
+
+/// Protocol message — ID: 8622
+#[derive(Debug, Clone, Default)]
+pub struct EvolutiveObjectRecycleResultMessage {
+    pub recycled_items: Vec<RecycledItem>,
+}
+
+impl DofusSerialize for EvolutiveObjectRecycleResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.recycled_items.len() as _);
+        for item in &self.recycled_items {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for EvolutiveObjectRecycleResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            recycled_items: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(RecycledItem::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for EvolutiveObjectRecycleResultMessage {
+    const MESSAGE_ID: u16 = 8622;
+}
+
+/// Protocol message — ID: 8720
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeMountFreeFromPaddockMessage {
+    pub name: String,
+    pub world_x: i16,
+    pub world_y: i16,
+    pub liberator: String,
+}
+
+impl DofusSerialize for ExchangeMountFreeFromPaddockMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.name);
+        writer.write_short(self.world_x);
+        writer.write_short(self.world_y);
+        writer.write_utf(&self.liberator);
+    }
+}
+
+impl DofusDeserialize for ExchangeMountFreeFromPaddockMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            name: reader.read_utf()?,
+            world_x: reader.read_short()?,
+            world_y: reader.read_short()?,
+            liberator: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeMountFreeFromPaddockMessage {
+    const MESSAGE_ID: u16 = 8720;
+}
+
+/// Protocol message — ID: 8789
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeIsReadyMessage {
+    pub id: f64,
+    pub ready: bool,
+}
+
+impl DofusSerialize for ExchangeIsReadyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+        writer.write_boolean(self.ready);
+    }
+}
+
+impl DofusDeserialize for ExchangeIsReadyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+            ready: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeIsReadyMessage {
+    const MESSAGE_ID: u16 = 8789;
+}
+
+/// Protocol message — ID: 8847
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeObjectTransfertListWithQuantityToInvMessage {
     pub ids: Vec<i32>,
@@ -2578,35 +2984,173 @@ impl DofusDeserialize for ExchangeObjectTransfertListWithQuantityToInvMessage {
 }
 
 impl DofusMessage for ExchangeObjectTransfertListWithQuantityToInvMessage {
-    const MESSAGE_ID: u16 = 6470;
+    const MESSAGE_ID: u16 = 8847;
 }
 
-/// Protocol message — ID: 6535
+/// Protocol message — ID: 8962
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeObjectsAddedMessage {
-    pub remote: bool,
-    pub object: Vec<ObjectItem>,
+pub struct ItemNoMoreAvailableMessage {
 }
 
-impl DofusSerialize for ExchangeObjectsAddedMessage {
+impl DofusSerialize for ItemNoMoreAvailableMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.remote);
-        writer.write_short(self.object.len() as _);
-        for item in &self.object {
+    }
+}
+
+impl DofusDeserialize for ItemNoMoreAvailableMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ItemNoMoreAvailableMessage {
+    const MESSAGE_ID: u16 = 8962;
+}
+
+/// Protocol message — ID: 8994
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftPaymentModifiedMessage {
+    pub gold_sum: i64,
+}
+
+impl DofusSerialize for ExchangeCraftPaymentModifiedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.gold_sum);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftPaymentModifiedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            gold_sum: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftPaymentModifiedMessage {
+    const MESSAGE_ID: u16 = 8994;
+}
+
+/// Protocol message — ID: 9003
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeErrorMessage {
+    pub error_type: u8,
+}
+
+impl DofusSerialize for ExchangeErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.error_type);
+    }
+}
+
+impl DofusDeserialize for ExchangeErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            error_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeErrorMessage {
+    const MESSAGE_ID: u16 = 9003;
+}
+
+/// Protocol message — ID: 9042
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeAcceptMessage {
+}
+
+impl DofusSerialize for ExchangeAcceptMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExchangeAcceptMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExchangeAcceptMessage {
+    const MESSAGE_ID: u16 = 9042;
+}
+
+/// Protocol message — ID: 9053
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeLeaveMessage {
+    pub dialog_type: u8,
+    pub success: bool,
+}
+
+impl DofusSerialize for ExchangeLeaveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.dialog_type);
+        writer.write_boolean(self.success);
+    }
+}
+
+impl DofusDeserialize for ExchangeLeaveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dialog_type: reader.read_byte()?,
+            success: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeLeaveMessage {
+    const MESSAGE_ID: u16 = 9053;
+}
+
+/// Protocol message — ID: 9081
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeCraftPaymentModificationRequestMessage {
+    pub quantity: i64,
+}
+
+impl DofusSerialize for ExchangeCraftPaymentModificationRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ExchangeCraftPaymentModificationRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quantity: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for ExchangeCraftPaymentModificationRequestMessage {
+    const MESSAGE_ID: u16 = 9081;
+}
+
+/// Protocol message — ID: 9089
+#[derive(Debug, Clone, Default)]
+pub struct ExchangeShopStockStartedMessage {
+    pub objects_infos: Vec<ObjectItemToSell>,
+}
+
+impl DofusSerialize for ExchangeShopStockStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.objects_infos.len() as _);
+        for item in &self.objects_infos {
             item.serialize(writer);
         }
     }
 }
 
-impl DofusDeserialize for ExchangeObjectsAddedMessage {
+impl DofusDeserialize for ExchangeShopStockStartedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            remote: reader.read_boolean()?,
-            object: {
+            objects_infos: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
-                    v.push(ObjectItem::deserialize(reader)?);
+                    v.push(ObjectItemToSell::deserialize(reader)?);
                 }
                 v
             },
@@ -2614,96 +3158,29 @@ impl DofusDeserialize for ExchangeObjectsAddedMessage {
     }
 }
 
-impl DofusMessage for ExchangeObjectsAddedMessage {
-    const MESSAGE_ID: u16 = 6535;
+impl DofusMessage for ExchangeShopStockStartedMessage {
+    const MESSAGE_ID: u16 = 9089;
 }
 
-/// Protocol message — ID: 6554
+/// Protocol message — ID: 9384
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsTakenFromPaddockMessage {
-    pub name: String,
-    pub world_x: i16,
-    pub world_y: i16,
-    pub ownername: String,
+pub struct ExchangeObjectTransfertListFromInvMessage {
+    pub ids: Vec<i32>,
 }
 
-impl DofusSerialize for ExchangeMountsTakenFromPaddockMessage {
+impl DofusSerialize for ExchangeObjectTransfertListFromInvMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.name);
-        writer.write_short(self.world_x);
-        writer.write_short(self.world_y);
-        writer.write_utf(&self.ownername);
-    }
-}
-
-impl DofusDeserialize for ExchangeMountsTakenFromPaddockMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            name: reader.read_utf()?,
-            world_x: reader.read_short()?,
-            world_y: reader.read_short()?,
-            ownername: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountsTakenFromPaddockMessage {
-    const MESSAGE_ID: u16 = 6554;
-}
-
-/// Protocol message — ID: 6555
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsStableAddMessage {
-    pub mount_description: Vec<MountClientData>,
-}
-
-impl DofusSerialize for ExchangeMountsStableAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.mount_description.len() as _);
-        for item in &self.mount_description {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeMountsStableAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountsStableAddMessage {
-    const MESSAGE_ID: u16 = 6555;
-}
-
-/// Protocol message — ID: 6556
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsStableRemoveMessage {
-    pub mounts_id: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeMountsStableRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.mounts_id.len() as _);
-        for item in &self.mounts_id {
+        writer.write_short(self.ids.len() as _);
+        for item in &self.ids {
             writer.write_var_int(*item);
         }
     }
 }
 
-impl DofusDeserialize for ExchangeMountsStableRemoveMessage {
+impl DofusDeserialize for ExchangeObjectTransfertListFromInvMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            mounts_id: {
+            ids: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -2715,134 +3192,11 @@ impl DofusDeserialize for ExchangeMountsStableRemoveMessage {
     }
 }
 
-impl DofusMessage for ExchangeMountsStableRemoveMessage {
-    const MESSAGE_ID: u16 = 6556;
+impl DofusMessage for ExchangeObjectTransfertListFromInvMessage {
+    const MESSAGE_ID: u16 = 9384;
 }
 
-/// Protocol message — ID: 6557
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsStableBornAddMessage {
-    pub mount_description: Vec<MountClientData>,
-}
-
-impl DofusSerialize for ExchangeMountsStableBornAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.mount_description.len() as _);
-        for item in &self.mount_description {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeMountsStableBornAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountsStableBornAddMessage {
-    const MESSAGE_ID: u16 = 6557;
-}
-
-/// Protocol message — ID: 6559
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsPaddockRemoveMessage {
-    pub mounts_id: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeMountsPaddockRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.mounts_id.len() as _);
-        for item in &self.mounts_id {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeMountsPaddockRemoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mounts_id: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountsPaddockRemoveMessage {
-    const MESSAGE_ID: u16 = 6559;
-}
-
-/// Protocol message — ID: 6561
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMountsPaddockAddMessage {
-    pub mount_description: Vec<MountClientData>,
-}
-
-impl DofusSerialize for ExchangeMountsPaddockAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.mount_description.len() as _);
-        for item in &self.mount_description {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeMountsPaddockAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(MountClientData::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMountsPaddockAddMessage {
-    const MESSAGE_ID: u16 = 6561;
-}
-
-/// Protocol message — ID: 6567
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkRunesTradeMessage {
-}
-
-impl DofusSerialize for ExchangeStartOkRunesTradeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkRunesTradeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkRunesTradeMessage {
-    const MESSAGE_ID: u16 = 6567;
-}
-
-/// Protocol message — ID: 6569
+/// Protocol message — ID: 9469
 #[derive(Debug, Clone, Default)]
 pub struct DecraftResultMessage {
     pub results: Vec<DecraftedItemStackInfo>,
@@ -2873,276 +3227,61 @@ impl DofusDeserialize for DecraftResultMessage {
 }
 
 impl DofusMessage for DecraftResultMessage {
-    const MESSAGE_ID: u16 = 6569;
+    const MESSAGE_ID: u16 = 9469;
 }
 
-/// Protocol message — ID: 6578
+/// Protocol message — ID: 9696
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftPaymentModifiedMessage {
-    pub gold_sum: i64,
+pub struct ExchangeBidHouseBuyResultMessage {
+    pub uid: i32,
+    pub bought: bool,
 }
 
-impl DofusSerialize for ExchangeCraftPaymentModifiedMessage {
+impl DofusSerialize for ExchangeBidHouseBuyResultMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.gold_sum);
+        writer.write_var_int(self.uid);
+        writer.write_boolean(self.bought);
     }
 }
 
-impl DofusDeserialize for ExchangeCraftPaymentModifiedMessage {
+impl DofusDeserialize for ExchangeBidHouseBuyResultMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            gold_sum: reader.read_var_long()?,
+            uid: reader.read_var_int()?,
+            bought: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeCraftPaymentModifiedMessage {
-    const MESSAGE_ID: u16 = 6578;
+impl DofusMessage for ExchangeBidHouseBuyResultMessage {
+    const MESSAGE_ID: u16 = 9696;
 }
 
-/// Protocol message — ID: 6579
+/// Protocol message — ID: 9722
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftPaymentModificationRequestMessage {
-    pub quantity: i64,
+pub struct ExchangeBidHouseGenericItemAddedMessage {
+    pub obj_generic_id: i16,
 }
 
-impl DofusSerialize for ExchangeCraftPaymentModificationRequestMessage {
+impl DofusSerialize for ExchangeBidHouseGenericItemAddedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.quantity);
+        writer.write_var_short(self.obj_generic_id);
     }
 }
 
-impl DofusDeserialize for ExchangeCraftPaymentModificationRequestMessage {
+impl DofusDeserialize for ExchangeBidHouseGenericItemAddedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            quantity: reader.read_var_long()?,
+            obj_generic_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for ExchangeCraftPaymentModificationRequestMessage {
-    const MESSAGE_ID: u16 = 6579;
+impl DofusMessage for ExchangeBidHouseGenericItemAddedMessage {
+    const MESSAGE_ID: u16 = 9722;
 }
 
-/// Protocol message — ID: 6589
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStoppedMessage {
-    pub id: i64,
-}
-
-impl DofusSerialize for ExchangeStoppedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.id);
-    }
-}
-
-impl DofusDeserialize for ExchangeStoppedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStoppedMessage {
-    const MESSAGE_ID: u16 = 6589;
-}
-
-/// Protocol message — ID: 6592
-#[derive(Debug, Clone, Default)]
-pub struct JobBookSubscribeRequestMessage {
-    pub job_ids: Vec<u8>,
-}
-
-impl DofusSerialize for JobBookSubscribeRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.job_ids.len() as _);
-        for item in &self.job_ids {
-            writer.write_byte(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for JobBookSubscribeRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            job_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for JobBookSubscribeRequestMessage {
-    const MESSAGE_ID: u16 = 6592;
-}
-
-/// Protocol message — ID: 6595
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftCountModifiedMessage {
-    pub count: i32,
-}
-
-impl DofusSerialize for ExchangeCraftCountModifiedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.count);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftCountModifiedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            count: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftCountModifiedMessage {
-    const MESSAGE_ID: u16 = 6595;
-}
-
-/// Protocol message — ID: 6597
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCraftCountRequestMessage {
-    pub count: i32,
-}
-
-impl DofusSerialize for ExchangeCraftCountRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.count);
-    }
-}
-
-impl DofusDeserialize for ExchangeCraftCountRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            count: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCraftCountRequestMessage {
-    const MESSAGE_ID: u16 = 6597;
-}
-
-/// Protocol message — ID: 6598
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeCrafterJobLevelupMessage {
-    pub crafter_job_level: u8,
-}
-
-impl DofusSerialize for ExchangeCrafterJobLevelupMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.crafter_job_level);
-    }
-}
-
-impl DofusDeserialize for ExchangeCrafterJobLevelupMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            crafter_job_level: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeCrafterJobLevelupMessage {
-    const MESSAGE_ID: u16 = 6598;
-}
-
-/// Protocol message — ID: 6600
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeStartOkRecycleTradeMessage {
-    pub percent_to_prism: i16,
-    pub percent_to_player: i16,
-}
-
-impl DofusSerialize for ExchangeStartOkRecycleTradeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.percent_to_prism);
-        writer.write_short(self.percent_to_player);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartOkRecycleTradeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            percent_to_prism: reader.read_short()?,
-            percent_to_player: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartOkRecycleTradeMessage {
-    const MESSAGE_ID: u16 = 6600;
-}
-
-/// Protocol message — ID: 6601
-#[derive(Debug, Clone, Default)]
-pub struct RecycleResultMessage {
-    pub nuggets_for_prism: i32,
-    pub nuggets_for_player: i32,
-}
-
-impl DofusSerialize for RecycleResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.nuggets_for_prism);
-        writer.write_var_int(self.nuggets_for_player);
-    }
-}
-
-impl DofusDeserialize for RecycleResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            nuggets_for_prism: reader.read_var_int()?,
-            nuggets_for_player: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for RecycleResultMessage {
-    const MESSAGE_ID: u16 = 6601;
-}
-
-/// Protocol message — ID: 6612
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeBidHouseUnsoldItemsMessage {
-    pub items: Vec<ObjectItemGenericQuantity>,
-}
-
-impl DofusSerialize for ExchangeBidHouseUnsoldItemsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.items.len() as _);
-        for item in &self.items {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for ExchangeBidHouseUnsoldItemsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            items: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItemGenericQuantity::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for ExchangeBidHouseUnsoldItemsMessage {
-    const MESSAGE_ID: u16 = 6612;
-}
-
-/// Protocol message — ID: 6613
+/// Protocol message — ID: 9786
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeOfflineSoldItemsMessage {
     pub bid_house_items: Vec<ObjectItemQuantityPriceDateEffects>,
@@ -3186,98 +3325,28 @@ impl DofusDeserialize for ExchangeOfflineSoldItemsMessage {
 }
 
 impl DofusMessage for ExchangeOfflineSoldItemsMessage {
-    const MESSAGE_ID: u16 = 6613;
+    const MESSAGE_ID: u16 = 9786;
 }
 
-/// Protocol message — ID: 6664
+/// Protocol message — ID: 9846
 #[derive(Debug, Clone, Default)]
-pub struct ExchangeStartedTaxCollectorShopMessage {
-    pub objects: Vec<ObjectItem>,
-    pub kamas: i64,
+pub struct ExchangeStartOkJobIndexMessage {
+    pub jobs: Vec<i32>,
 }
 
-impl DofusSerialize for ExchangeStartedTaxCollectorShopMessage {
+impl DofusSerialize for ExchangeStartOkJobIndexMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.objects.len() as _);
-        for item in &self.objects {
-            item.serialize(writer);
-        }
-        writer.write_var_long(self.kamas);
-    }
-}
-
-impl DofusDeserialize for ExchangeStartedTaxCollectorShopMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            objects: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItem::deserialize(reader)?);
-                }
-                v
-            },
-            kamas: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeStartedTaxCollectorShopMessage {
-    const MESSAGE_ID: u16 = 6664;
-}
-
-/// Protocol message — ID: 6701
-#[derive(Debug, Clone, Default)]
-pub struct FocusedExchangeReadyMessage {
-    pub ready: bool,
-    pub step: i16,
-    pub focus_action_id: i32,
-}
-
-impl DofusSerialize for FocusedExchangeReadyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.ready);
-        writer.write_var_short(self.step);
-        writer.write_var_int(self.focus_action_id);
-    }
-}
-
-impl DofusDeserialize for FocusedExchangeReadyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ready: reader.read_boolean()?,
-            step: reader.read_var_short()?,
-            focus_action_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for FocusedExchangeReadyMessage {
-    const MESSAGE_ID: u16 = 6701;
-}
-
-/// Protocol message — ID: 6752
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeHandleMountsMessage {
-    pub action_type: u8,
-    pub rides_id: Vec<i32>,
-}
-
-impl DofusSerialize for ExchangeHandleMountsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.action_type);
-        writer.write_short(self.rides_id.len() as _);
-        for item in &self.rides_id {
+        writer.write_short(self.jobs.len() as _);
+        for item in &self.jobs {
             writer.write_var_int(*item);
         }
     }
 }
 
-impl DofusDeserialize for ExchangeHandleMountsMessage {
+impl DofusDeserialize for ExchangeStartOkJobIndexMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            action_type: reader.read_byte()?,
-            rides_id: {
+            jobs: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -3289,46 +3358,35 @@ impl DofusDeserialize for ExchangeHandleMountsMessage {
     }
 }
 
-impl DofusMessage for ExchangeHandleMountsMessage {
-    const MESSAGE_ID: u16 = 6752;
+impl DofusMessage for ExchangeStartOkJobIndexMessage {
+    const MESSAGE_ID: u16 = 9846;
 }
 
-/// Protocol message — ID: 6753
+/// Protocol message — ID: 9959
 #[derive(Debug, Clone, Default)]
-pub struct UpdateMountCharacteristicsMessage {
-    pub ride_id: i32,
-    pub boost_to_update_list: Vec<Vec<u8>>,
+pub struct ExchangeSetCraftRecipeMessage {
+    pub object_g_i_d: i16,
 }
 
-impl DofusSerialize for UpdateMountCharacteristicsMessage {
+impl DofusSerialize for ExchangeSetCraftRecipeMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.ride_id);
-        writer.write_short(self.boost_to_update_list.len() as _);
-        // polymorphic vector (unresolved base type)
+        writer.write_var_short(self.object_g_i_d);
     }
 }
 
-impl DofusDeserialize for UpdateMountCharacteristicsMessage {
+impl DofusDeserialize for ExchangeSetCraftRecipeMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            ride_id: reader.read_var_int()?,
-            boost_to_update_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
+            object_g_i_d: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for UpdateMountCharacteristicsMessage {
-    const MESSAGE_ID: u16 = 6753;
+impl DofusMessage for ExchangeSetCraftRecipeMessage {
+    const MESSAGE_ID: u16 = 9959;
 }
 
-/// Protocol message — ID: 6778
+/// Protocol message — ID: 9997
 #[derive(Debug, Clone, Default)]
 pub struct ExchangeStartOkEvolutiveObjectRecycleTradeMessage {
 }
@@ -3346,64 +3404,6 @@ impl DofusDeserialize for ExchangeStartOkEvolutiveObjectRecycleTradeMessage {
 }
 
 impl DofusMessage for ExchangeStartOkEvolutiveObjectRecycleTradeMessage {
-    const MESSAGE_ID: u16 = 6778;
-}
-
-/// Protocol message — ID: 6779
-#[derive(Debug, Clone, Default)]
-pub struct EvolutiveObjectRecycleResultMessage {
-    pub recycled_items: Vec<RecycledItem>,
-}
-
-impl DofusSerialize for EvolutiveObjectRecycleResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.recycled_items.len() as _);
-        for item in &self.recycled_items {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for EvolutiveObjectRecycleResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            recycled_items: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(RecycledItem::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for EvolutiveObjectRecycleResultMessage {
-    const MESSAGE_ID: u16 = 6779;
-}
-
-/// Protocol message — ID: 6834
-#[derive(Debug, Clone, Default)]
-pub struct ExchangeMoneyMovementInformationMessage {
-    pub limit: i64,
-}
-
-impl DofusSerialize for ExchangeMoneyMovementInformationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.limit);
-    }
-}
-
-impl DofusDeserialize for ExchangeMoneyMovementInformationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            limit: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for ExchangeMoneyMovementInformationMessage {
-    const MESSAGE_ID: u16 = 6834;
+    const MESSAGE_ID: u16 = 9997;
 }
 

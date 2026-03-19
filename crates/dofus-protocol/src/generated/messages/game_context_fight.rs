@@ -6,67 +6,52 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 700
+/// Protocol message — ID: 139
 #[derive(Debug, Clone, Default)]
-pub struct GameFightStartingMessage {
-    pub fight_type: u8,
-    pub fight_id: i16,
-    pub attacker_id: f64,
-    pub defender_id: f64,
+pub struct GameFightPlacementSwapPositionsErrorMessage {
 }
 
-impl DofusSerialize for GameFightStartingMessage {
+impl DofusSerialize for GameFightPlacementSwapPositionsErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.fight_type);
-        writer.write_var_short(self.fight_id);
-        writer.write_double(self.attacker_id);
-        writer.write_double(self.defender_id);
     }
 }
 
-impl DofusDeserialize for GameFightStartingMessage {
+impl DofusDeserialize for GameFightPlacementSwapPositionsErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            fight_type: reader.read_byte()?,
-            fight_id: reader.read_var_short()?,
-            attacker_id: reader.read_double()?,
-            defender_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameFightStartingMessage {
-    const MESSAGE_ID: u16 = 700;
+impl DofusMessage for GameFightPlacementSwapPositionsErrorMessage {
+    const MESSAGE_ID: u16 = 139;
 }
 
-/// Protocol message — ID: 701
+/// Protocol message — ID: 266
 #[derive(Debug, Clone, Default)]
-pub struct GameFightJoinRequestMessage {
-    pub fighter_id: f64,
-    pub fight_id: i16,
+pub struct GameFightReadyMessage {
+    pub is_ready: bool,
 }
 
-impl DofusSerialize for GameFightJoinRequestMessage {
+impl DofusSerialize for GameFightReadyMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.fighter_id);
-        writer.write_var_short(self.fight_id);
+        writer.write_boolean(self.is_ready);
     }
 }
 
-impl DofusDeserialize for GameFightJoinRequestMessage {
+impl DofusDeserialize for GameFightReadyMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            fighter_id: reader.read_double()?,
-            fight_id: reader.read_var_short()?,
+            is_ready: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for GameFightJoinRequestMessage {
-    const MESSAGE_ID: u16 = 701;
+impl DofusMessage for GameFightReadyMessage {
+    const MESSAGE_ID: u16 = 266;
 }
 
-/// Protocol message — ID: 702
+/// Protocol message — ID: 685
 #[derive(Debug, Clone, Default)]
 pub struct GameFightJoinMessage {
     pub is_team_phase: bool,
@@ -105,294 +90,46 @@ impl DofusDeserialize for GameFightJoinMessage {
 }
 
 impl DofusMessage for GameFightJoinMessage {
-    const MESSAGE_ID: u16 = 702;
+    const MESSAGE_ID: u16 = 685;
 }
 
-/// Protocol message — ID: 703
+/// Protocol message — ID: 725
 #[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementPossiblePositionsMessage {
-    pub positions_for_challengers: Vec<i16>,
-    pub positions_for_defenders: Vec<i16>,
-    pub team_number: u8,
+pub struct GameFightPlacementSwapPositionsOfferMessage {
+    pub request_id: i32,
+    pub requester_id: f64,
+    pub requester_cell_id: i16,
+    pub requested_id: f64,
+    pub requested_cell_id: i16,
 }
 
-impl DofusSerialize for GameFightPlacementPossiblePositionsMessage {
+impl DofusSerialize for GameFightPlacementSwapPositionsOfferMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.positions_for_challengers.len() as _);
-        for item in &self.positions_for_challengers {
-            writer.write_var_short(*item);
-        }
-        writer.write_short(self.positions_for_defenders.len() as _);
-        for item in &self.positions_for_defenders {
-            writer.write_var_short(*item);
-        }
-        writer.write_byte(self.team_number);
+        writer.write_int(self.request_id);
+        writer.write_double(self.requester_id);
+        writer.write_var_short(self.requester_cell_id);
+        writer.write_double(self.requested_id);
+        writer.write_var_short(self.requested_cell_id);
     }
 }
 
-impl DofusDeserialize for GameFightPlacementPossiblePositionsMessage {
+impl DofusDeserialize for GameFightPlacementSwapPositionsOfferMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            positions_for_challengers: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-            positions_for_defenders: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-            team_number: reader.read_byte()?,
+            request_id: reader.read_int()?,
+            requester_id: reader.read_double()?,
+            requester_cell_id: reader.read_var_short()?,
+            requested_id: reader.read_double()?,
+            requested_cell_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for GameFightPlacementPossiblePositionsMessage {
-    const MESSAGE_ID: u16 = 703;
+impl DofusMessage for GameFightPlacementSwapPositionsOfferMessage {
+    const MESSAGE_ID: u16 = 725;
 }
 
-/// Protocol message — ID: 704
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementPositionRequestMessage {
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameFightPlacementPositionRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameFightPlacementPositionRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightPlacementPositionRequestMessage {
-    const MESSAGE_ID: u16 = 704;
-}
-
-/// Protocol message — ID: 707
-#[derive(Debug, Clone, Default)]
-pub struct GameFightOptionToggleMessage {
-    pub option: u8,
-}
-
-impl DofusSerialize for GameFightOptionToggleMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.option);
-    }
-}
-
-impl DofusDeserialize for GameFightOptionToggleMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            option: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightOptionToggleMessage {
-    const MESSAGE_ID: u16 = 707;
-}
-
-/// Protocol message — ID: 708
-#[derive(Debug, Clone, Default)]
-pub struct GameFightReadyMessage {
-    pub is_ready: bool,
-}
-
-impl DofusSerialize for GameFightReadyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.is_ready);
-    }
-}
-
-impl DofusDeserialize for GameFightReadyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            is_ready: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightReadyMessage {
-    const MESSAGE_ID: u16 = 708;
-}
-
-/// Protocol message — ID: 711
-#[derive(Debug, Clone, Default)]
-pub struct GameFightRemoveTeamMemberMessage {
-    pub fight_id: i16,
-    pub team_id: u8,
-    pub char_id: f64,
-}
-
-impl DofusSerialize for GameFightRemoveTeamMemberMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        writer.write_byte(self.team_id);
-        writer.write_double(self.char_id);
-    }
-}
-
-impl DofusDeserialize for GameFightRemoveTeamMemberMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            team_id: reader.read_byte()?,
-            char_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightRemoveTeamMemberMessage {
-    const MESSAGE_ID: u16 = 711;
-}
-
-/// Protocol message — ID: 712
-#[derive(Debug, Clone, Default)]
-pub struct GameFightStartMessage {
-    pub idols: Vec<Idol>,
-}
-
-impl DofusSerialize for GameFightStartMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.idols.len() as _);
-        for item in &self.idols {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightStartMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            idols: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Idol::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightStartMessage {
-    const MESSAGE_ID: u16 = 712;
-}
-
-/// Protocol message — ID: 713
-#[derive(Debug, Clone, Default)]
-pub struct GameFightTurnListMessage {
-    pub ids: Vec<f64>,
-    pub deads_ids: Vec<f64>,
-}
-
-impl DofusSerialize for GameFightTurnListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.ids.len() as _);
-        for item in &self.ids {
-            writer.write_double(*item);
-        }
-        writer.write_short(self.deads_ids.len() as _);
-        for item in &self.deads_ids {
-            writer.write_double(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightTurnListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_double()?);
-                }
-                v
-            },
-            deads_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_double()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightTurnListMessage {
-    const MESSAGE_ID: u16 = 713;
-}
-
-/// Protocol message — ID: 714
-#[derive(Debug, Clone, Default)]
-pub struct GameFightTurnStartMessage {
-    pub id: f64,
-    pub wait_time: i32,
-}
-
-impl DofusSerialize for GameFightTurnStartMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        writer.write_var_int(self.wait_time);
-    }
-}
-
-impl DofusDeserialize for GameFightTurnStartMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-            wait_time: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightTurnStartMessage {
-    const MESSAGE_ID: u16 = 714;
-}
-
-/// Protocol message — ID: 715
-#[derive(Debug, Clone, Default)]
-pub struct GameFightTurnReadyRequestMessage {
-    pub id: f64,
-}
-
-impl DofusSerialize for GameFightTurnReadyRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-    }
-}
-
-impl DofusDeserialize for GameFightTurnReadyRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightTurnReadyRequestMessage {
-    const MESSAGE_ID: u16 = 715;
-}
-
-/// Protocol message — ID: 716
+/// Protocol message — ID: 765
 #[derive(Debug, Clone, Default)]
 pub struct GameFightTurnReadyMessage {
     pub is_ready: bool,
@@ -413,10 +150,85 @@ impl DofusDeserialize for GameFightTurnReadyMessage {
 }
 
 impl DofusMessage for GameFightTurnReadyMessage {
-    const MESSAGE_ID: u16 = 716;
+    const MESSAGE_ID: u16 = 765;
 }
 
-/// Protocol message — ID: 718
+/// Protocol message — ID: 866
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPlacementSwapPositionsMessage {
+}
+
+impl DofusSerialize for GameFightPlacementSwapPositionsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameFightPlacementSwapPositionsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameFightPlacementSwapPositionsMessage {
+    const MESSAGE_ID: u16 = 866;
+}
+
+/// Protocol message — ID: 1380
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPlacementSwapPositionsRequestMessage {
+    pub cell_id: i16,
+    pub requested_id: f64,
+}
+
+impl DofusSerialize for GameFightPlacementSwapPositionsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell_id);
+        writer.write_double(self.requested_id);
+    }
+}
+
+impl DofusDeserialize for GameFightPlacementSwapPositionsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_id: reader.read_var_short()?,
+            requested_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightPlacementSwapPositionsRequestMessage {
+    const MESSAGE_ID: u16 = 1380;
+}
+
+/// Protocol message — ID: 1497
+#[derive(Debug, Clone, Default)]
+pub struct RefreshCharacterStatsMessage {
+    pub fighter_id: f64,
+    pub stats: GameFightMinimalStats,
+}
+
+impl DofusSerialize for RefreshCharacterStatsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.fighter_id);
+        self.stats.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for RefreshCharacterStatsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fighter_id: reader.read_double()?,
+            stats: GameFightMinimalStats::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for RefreshCharacterStatsMessage {
+    const MESSAGE_ID: u16 = 1497;
+}
+
+/// Protocol message — ID: 1536
 #[derive(Debug, Clone, Default)]
 pub struct GameFightTurnFinishMessage {
     pub is_afk: bool,
@@ -437,198 +249,40 @@ impl DofusDeserialize for GameFightTurnFinishMessage {
 }
 
 impl DofusMessage for GameFightTurnFinishMessage {
-    const MESSAGE_ID: u16 = 718;
+    const MESSAGE_ID: u16 = 1536;
 }
 
-/// Protocol message — ID: 719
+/// Protocol message — ID: 2330
 #[derive(Debug, Clone, Default)]
-pub struct GameFightTurnEndMessage {
+pub struct GameFightTurnResumeMessage {
     pub id: f64,
+    pub wait_time: i32,
+    pub remaining_time: i32,
 }
 
-impl DofusSerialize for GameFightTurnEndMessage {
+impl DofusSerialize for GameFightTurnResumeMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_double(self.id);
+        writer.write_var_int(self.wait_time);
+        writer.write_var_int(self.remaining_time);
     }
 }
 
-impl DofusDeserialize for GameFightTurnEndMessage {
+impl DofusDeserialize for GameFightTurnResumeMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             id: reader.read_double()?,
+            wait_time: reader.read_var_int()?,
+            remaining_time: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for GameFightTurnEndMessage {
-    const MESSAGE_ID: u16 = 719;
+impl DofusMessage for GameFightTurnResumeMessage {
+    const MESSAGE_ID: u16 = 2330;
 }
 
-/// Protocol message — ID: 720
-#[derive(Debug, Clone, Default)]
-pub struct GameFightEndMessage {
-    pub duration: i32,
-    pub reward_rate: i16,
-    pub loot_share_limit_malus: i16,
-    pub results: Vec<Vec<u8>>,
-    pub named_party_teams_outcomes: Vec<NamedPartyTeamWithOutcome>,
-}
-
-impl DofusSerialize for GameFightEndMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.duration);
-        writer.write_var_short(self.reward_rate);
-        writer.write_short(self.loot_share_limit_malus);
-        writer.write_short(self.results.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_short(self.named_party_teams_outcomes.len() as _);
-        for item in &self.named_party_teams_outcomes {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightEndMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            duration: reader.read_int()?,
-            reward_rate: reader.read_var_short()?,
-            loot_share_limit_malus: reader.read_short()?,
-            results: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            named_party_teams_outcomes: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(NamedPartyTeamWithOutcome::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightEndMessage {
-    const MESSAGE_ID: u16 = 720;
-}
-
-/// Protocol message — ID: 721
-#[derive(Debug, Clone, Default)]
-pub struct GameFightLeaveMessage {
-    pub char_id: f64,
-}
-
-impl DofusSerialize for GameFightLeaveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.char_id);
-    }
-}
-
-impl DofusDeserialize for GameFightLeaveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            char_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightLeaveMessage {
-    const MESSAGE_ID: u16 = 721;
-}
-
-/// Protocol message — ID: 740
-#[derive(Debug, Clone, Default)]
-pub struct GameFightHumanReadyStateMessage {
-    pub character_id: i64,
-    pub is_ready: bool,
-}
-
-impl DofusSerialize for GameFightHumanReadyStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.character_id);
-        writer.write_boolean(self.is_ready);
-    }
-}
-
-impl DofusDeserialize for GameFightHumanReadyStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            character_id: reader.read_var_long()?,
-            is_ready: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightHumanReadyStateMessage {
-    const MESSAGE_ID: u16 = 740;
-}
-
-/// Protocol message — ID: 5572
-#[derive(Debug, Clone, Default)]
-pub struct GameFightUpdateTeamMessage {
-    pub fight_id: i16,
-    pub team: FightTeamInformations,
-}
-
-impl DofusSerialize for GameFightUpdateTeamMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        self.team.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameFightUpdateTeamMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            team: FightTeamInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightUpdateTeamMessage {
-    const MESSAGE_ID: u16 = 5572;
-}
-
-/// Protocol message — ID: 5921
-#[derive(Debug, Clone, Default)]
-pub struct GameFightSynchronizeMessage {
-    pub fighters: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for GameFightSynchronizeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.fighters.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for GameFightSynchronizeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fighters: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightSynchronizeMessage {
-    const MESSAGE_ID: u16 = 5921;
-}
-
-/// Protocol message — ID: 5927
+/// Protocol message — ID: 3750
 #[derive(Debug, Clone, Default)]
 pub struct GameFightOptionStateUpdateMessage {
     pub fight_id: i16,
@@ -658,241 +312,34 @@ impl DofusDeserialize for GameFightOptionStateUpdateMessage {
 }
 
 impl DofusMessage for GameFightOptionStateUpdateMessage {
-    const MESSAGE_ID: u16 = 5927;
+    const MESSAGE_ID: u16 = 3750;
 }
 
-/// Protocol message — ID: 6067
+/// Protocol message — ID: 3893
 #[derive(Debug, Clone, Default)]
-pub struct GameFightResumeMessage {
-    pub effects: Vec<FightDispellableEffectExtendedInformations>,
-    pub marks: Vec<GameActionMark>,
-    pub game_turn: i16,
-    pub fight_start: i32,
-    pub idols: Vec<Idol>,
-    pub fx_trigger_counts: Vec<GameFightEffectTriggerCount>,
-    pub spell_cooldowns: Vec<GameFightSpellCooldown>,
-    pub summon_count: u8,
-    pub bomb_count: u8,
+pub struct GameFightPlacementSwapPositionsAcceptMessage {
+    pub request_id: i32,
 }
 
-impl DofusSerialize for GameFightResumeMessage {
+impl DofusSerialize for GameFightPlacementSwapPositionsAcceptMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.effects.len() as _);
-        for item in &self.effects {
-            item.serialize(writer);
-        }
-        writer.write_short(self.marks.len() as _);
-        for item in &self.marks {
-            item.serialize(writer);
-        }
-        writer.write_var_short(self.game_turn);
-        writer.write_int(self.fight_start);
-        writer.write_short(self.idols.len() as _);
-        for item in &self.idols {
-            item.serialize(writer);
-        }
-        writer.write_short(self.fx_trigger_counts.len() as _);
-        for item in &self.fx_trigger_counts {
-            item.serialize(writer);
-        }
-        writer.write_short(self.spell_cooldowns.len() as _);
-        for item in &self.spell_cooldowns {
-            item.serialize(writer);
-        }
-        writer.write_byte(self.summon_count);
-        writer.write_byte(self.bomb_count);
+        writer.write_int(self.request_id);
     }
 }
 
-impl DofusDeserialize for GameFightResumeMessage {
+impl DofusDeserialize for GameFightPlacementSwapPositionsAcceptMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            effects: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(FightDispellableEffectExtendedInformations::deserialize(reader)?);
-                }
-                v
-            },
-            marks: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameActionMark::deserialize(reader)?);
-                }
-                v
-            },
-            game_turn: reader.read_var_short()?,
-            fight_start: reader.read_int()?,
-            idols: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Idol::deserialize(reader)?);
-                }
-                v
-            },
-            fx_trigger_counts: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
-                }
-                v
-            },
-            spell_cooldowns: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameFightSpellCooldown::deserialize(reader)?);
-                }
-                v
-            },
-            summon_count: reader.read_byte()?,
-            bomb_count: reader.read_byte()?,
+            request_id: reader.read_int()?,
         })
     }
 }
 
-impl DofusMessage for GameFightResumeMessage {
-    const MESSAGE_ID: u16 = 6067;
+impl DofusMessage for GameFightPlacementSwapPositionsAcceptMessage {
+    const MESSAGE_ID: u16 = 3893;
 }
 
-/// Protocol message — ID: 6069
-#[derive(Debug, Clone, Default)]
-pub struct GameFightSpectateMessage {
-    pub effects: Vec<FightDispellableEffectExtendedInformations>,
-    pub marks: Vec<GameActionMark>,
-    pub game_turn: i16,
-    pub fight_start: i32,
-    pub idols: Vec<Idol>,
-    pub fx_trigger_counts: Vec<GameFightEffectTriggerCount>,
-}
-
-impl DofusSerialize for GameFightSpectateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.effects.len() as _);
-        for item in &self.effects {
-            item.serialize(writer);
-        }
-        writer.write_short(self.marks.len() as _);
-        for item in &self.marks {
-            item.serialize(writer);
-        }
-        writer.write_var_short(self.game_turn);
-        writer.write_int(self.fight_start);
-        writer.write_short(self.idols.len() as _);
-        for item in &self.idols {
-            item.serialize(writer);
-        }
-        writer.write_short(self.fx_trigger_counts.len() as _);
-        for item in &self.fx_trigger_counts {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameFightSpectateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            effects: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(FightDispellableEffectExtendedInformations::deserialize(reader)?);
-                }
-                v
-            },
-            marks: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameActionMark::deserialize(reader)?);
-                }
-                v
-            },
-            game_turn: reader.read_var_short()?,
-            fight_start: reader.read_int()?,
-            idols: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Idol::deserialize(reader)?);
-                }
-                v
-            },
-            fx_trigger_counts: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameFightSpectateMessage {
-    const MESSAGE_ID: u16 = 6069;
-}
-
-/// Protocol message — ID: 6214
-#[derive(Debug, Clone, Default)]
-pub struct SlaveSwitchContextMessage {
-    pub master_id: f64,
-    pub slave_id: f64,
-    pub slave_spells: Vec<SpellItem>,
-    pub slave_stats: CharacterCharacteristicsInformations,
-    pub shortcuts: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for SlaveSwitchContextMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.master_id);
-        writer.write_double(self.slave_id);
-        writer.write_short(self.slave_spells.len() as _);
-        for item in &self.slave_spells {
-            item.serialize(writer);
-        }
-        self.slave_stats.serialize(writer);
-        writer.write_short(self.shortcuts.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for SlaveSwitchContextMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            master_id: reader.read_double()?,
-            slave_id: reader.read_double()?,
-            slave_spells: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(SpellItem::deserialize(reader)?);
-                }
-                v
-            },
-            slave_stats: CharacterCharacteristicsInformations::deserialize(reader)?,
-            shortcuts: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for SlaveSwitchContextMessage {
-    const MESSAGE_ID: u16 = 6214;
-}
-
-/// Protocol message — ID: 6215
+/// Protocol message — ID: 3940
 #[derive(Debug, Clone, Default)]
 pub struct GameFightResumeWithSlavesMessage {
     pub effects: Vec<FightDispellableEffectExtendedInformations>,
@@ -1000,10 +447,120 @@ impl DofusDeserialize for GameFightResumeWithSlavesMessage {
 }
 
 impl DofusMessage for GameFightResumeWithSlavesMessage {
-    const MESSAGE_ID: u16 = 6215;
+    const MESSAGE_ID: u16 = 3940;
 }
 
-/// Protocol message — ID: 6239
+/// Protocol message — ID: 3960
+#[derive(Debug, Clone, Default)]
+pub struct GameFightStartingMessage {
+    pub fight_type: u8,
+    pub fight_id: i16,
+    pub attacker_id: f64,
+    pub defender_id: f64,
+    pub contains_boss: bool,
+}
+
+impl DofusSerialize for GameFightStartingMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.fight_type);
+        writer.write_var_short(self.fight_id);
+        writer.write_double(self.attacker_id);
+        writer.write_double(self.defender_id);
+        writer.write_boolean(self.contains_boss);
+    }
+}
+
+impl DofusDeserialize for GameFightStartingMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_type: reader.read_byte()?,
+            fight_id: reader.read_var_short()?,
+            attacker_id: reader.read_double()?,
+            defender_id: reader.read_double()?,
+            contains_boss: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightStartingMessage {
+    const MESSAGE_ID: u16 = 3960;
+}
+
+/// Protocol message — ID: 4098
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPlacementPossiblePositionsMessage {
+    pub positions_for_challengers: Vec<i16>,
+    pub positions_for_defenders: Vec<i16>,
+    pub team_number: u8,
+}
+
+impl DofusSerialize for GameFightPlacementPossiblePositionsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.positions_for_challengers.len() as _);
+        for item in &self.positions_for_challengers {
+            writer.write_var_short(*item);
+        }
+        writer.write_short(self.positions_for_defenders.len() as _);
+        for item in &self.positions_for_defenders {
+            writer.write_var_short(*item);
+        }
+        writer.write_byte(self.team_number);
+    }
+}
+
+impl DofusDeserialize for GameFightPlacementPossiblePositionsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            positions_for_challengers: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+            positions_for_defenders: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+            team_number: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightPlacementPossiblePositionsMessage {
+    const MESSAGE_ID: u16 = 4098;
+}
+
+/// Protocol message — ID: 4491
+#[derive(Debug, Clone, Default)]
+pub struct GameFightLeaveMessage {
+    pub char_id: f64,
+}
+
+impl DofusSerialize for GameFightLeaveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.char_id);
+    }
+}
+
+impl DofusDeserialize for GameFightLeaveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            char_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightLeaveMessage {
+    const MESSAGE_ID: u16 = 4491;
+}
+
+/// Protocol message — ID: 4660
 #[derive(Debug, Clone, Default)]
 pub struct GameFightNewRoundMessage {
     pub round_number: i32,
@@ -1024,61 +581,42 @@ impl DofusDeserialize for GameFightNewRoundMessage {
 }
 
 impl DofusMessage for GameFightNewRoundMessage {
-    const MESSAGE_ID: u16 = 6239;
+    const MESSAGE_ID: u16 = 4660;
 }
 
-/// Protocol message — ID: 6307
+/// Protocol message — ID: 4824
 #[derive(Debug, Clone, Default)]
-pub struct GameFightTurnResumeMessage {
-    pub id: f64,
-    pub wait_time: i32,
-    pub remaining_time: i32,
+pub struct GameFightSynchronizeMessage {
+    pub fighters: Vec<Vec<u8>>,
 }
 
-impl DofusSerialize for GameFightTurnResumeMessage {
+impl DofusSerialize for GameFightSynchronizeMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        writer.write_var_int(self.wait_time);
-        writer.write_var_int(self.remaining_time);
+        writer.write_short(self.fighters.len() as _);
+        // polymorphic vector (unresolved base type)
     }
 }
 
-impl DofusDeserialize for GameFightTurnResumeMessage {
+impl DofusDeserialize for GameFightSynchronizeMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            id: reader.read_double()?,
-            wait_time: reader.read_var_int()?,
-            remaining_time: reader.read_var_int()?,
+            fighters: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for GameFightTurnResumeMessage {
-    const MESSAGE_ID: u16 = 6307;
+impl DofusMessage for GameFightSynchronizeMessage {
+    const MESSAGE_ID: u16 = 4824;
 }
 
-/// Protocol message — ID: 6465
-#[derive(Debug, Clone, Default)]
-pub struct GameFightTurnStartPlayingMessage {
-}
-
-impl DofusSerialize for GameFightTurnStartPlayingMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameFightTurnStartPlayingMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameFightTurnStartPlayingMessage {
-    const MESSAGE_ID: u16 = 6465;
-}
-
-/// Protocol message — ID: 6474
+/// Protocol message — ID: 5035
 #[derive(Debug, Clone, Default)]
 pub struct GameFightSpectatePlayerRequestMessage {
     pub player_id: i64,
@@ -1099,10 +637,265 @@ impl DofusDeserialize for GameFightSpectatePlayerRequestMessage {
 }
 
 impl DofusMessage for GameFightSpectatePlayerRequestMessage {
-    const MESSAGE_ID: u16 = 6474;
+    const MESSAGE_ID: u16 = 5035;
 }
 
-/// Protocol message — ID: 6490
+/// Protocol message — ID: 5295
+#[derive(Debug, Clone, Default)]
+pub struct SlaveSwitchContextMessage {
+    pub master_id: f64,
+    pub slave_id: f64,
+    pub slave_spells: Vec<SpellItem>,
+    pub slave_stats: CharacterCharacteristicsInformations,
+    pub shortcuts: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for SlaveSwitchContextMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.master_id);
+        writer.write_double(self.slave_id);
+        writer.write_short(self.slave_spells.len() as _);
+        for item in &self.slave_spells {
+            item.serialize(writer);
+        }
+        self.slave_stats.serialize(writer);
+        writer.write_short(self.shortcuts.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for SlaveSwitchContextMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            master_id: reader.read_double()?,
+            slave_id: reader.read_double()?,
+            slave_spells: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(SpellItem::deserialize(reader)?);
+                }
+                v
+            },
+            slave_stats: CharacterCharacteristicsInformations::deserialize(reader)?,
+            shortcuts: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for SlaveSwitchContextMessage {
+    const MESSAGE_ID: u16 = 5295;
+}
+
+/// Protocol message — ID: 5330
+#[derive(Debug, Clone, Default)]
+pub struct GameFightTurnStartPlayingMessage {
+}
+
+impl DofusSerialize for GameFightTurnStartPlayingMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameFightTurnStartPlayingMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameFightTurnStartPlayingMessage {
+    const MESSAGE_ID: u16 = 5330;
+}
+
+/// Protocol message — ID: 5444
+#[derive(Debug, Clone, Default)]
+pub struct GameFightOptionToggleMessage {
+    pub option: u8,
+}
+
+impl DofusSerialize for GameFightOptionToggleMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.option);
+    }
+}
+
+impl DofusDeserialize for GameFightOptionToggleMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            option: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightOptionToggleMessage {
+    const MESSAGE_ID: u16 = 5444;
+}
+
+/// Protocol message — ID: 5500
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPlacementSwapPositionsCancelledMessage {
+    pub request_id: i32,
+    pub canceller_id: f64,
+}
+
+impl DofusSerialize for GameFightPlacementSwapPositionsCancelledMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.request_id);
+        writer.write_double(self.canceller_id);
+    }
+}
+
+impl DofusDeserialize for GameFightPlacementSwapPositionsCancelledMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            request_id: reader.read_int()?,
+            canceller_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightPlacementSwapPositionsCancelledMessage {
+    const MESSAGE_ID: u16 = 5500;
+}
+
+/// Protocol message — ID: 5755
+#[derive(Debug, Clone, Default)]
+pub struct GameFightHumanReadyStateMessage {
+    pub character_id: i64,
+    pub is_ready: bool,
+}
+
+impl DofusSerialize for GameFightHumanReadyStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.character_id);
+        writer.write_boolean(self.is_ready);
+    }
+}
+
+impl DofusDeserialize for GameFightHumanReadyStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            character_id: reader.read_var_long()?,
+            is_ready: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightHumanReadyStateMessage {
+    const MESSAGE_ID: u16 = 5755;
+}
+
+/// Protocol message — ID: 6112
+#[derive(Debug, Clone, Default)]
+pub struct SlaveNoLongerControledMessage {
+    pub master_id: f64,
+    pub slave_id: f64,
+}
+
+impl DofusSerialize for SlaveNoLongerControledMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.master_id);
+        writer.write_double(self.slave_id);
+    }
+}
+
+impl DofusDeserialize for SlaveNoLongerControledMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            master_id: reader.read_double()?,
+            slave_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for SlaveNoLongerControledMessage {
+    const MESSAGE_ID: u16 = 6112;
+}
+
+/// Protocol message — ID: 6133
+#[derive(Debug, Clone, Default)]
+pub struct GameFightJoinRequestMessage {
+    pub fighter_id: f64,
+    pub fight_id: i16,
+}
+
+impl DofusSerialize for GameFightJoinRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.fighter_id);
+        writer.write_var_short(self.fight_id);
+    }
+}
+
+impl DofusDeserialize for GameFightJoinRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fighter_id: reader.read_double()?,
+            fight_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightJoinRequestMessage {
+    const MESSAGE_ID: u16 = 6133;
+}
+
+/// Protocol message — ID: 6293
+#[derive(Debug, Clone, Default)]
+pub struct GameFightTurnReadyRequestMessage {
+    pub id: f64,
+}
+
+impl DofusSerialize for GameFightTurnReadyRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+    }
+}
+
+impl DofusDeserialize for GameFightTurnReadyRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightTurnReadyRequestMessage {
+    const MESSAGE_ID: u16 = 6293;
+}
+
+/// Protocol message — ID: 6427
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPauseMessage {
+    pub is_paused: bool,
+}
+
+impl DofusSerialize for GameFightPauseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.is_paused);
+    }
+}
+
+impl DofusDeserialize for GameFightPauseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            is_paused: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightPauseMessage {
+    const MESSAGE_ID: u16 = 6427;
+}
+
+/// Protocol message — ID: 6575
 #[derive(Debug, Clone, Default)]
 pub struct GameFightNewWaveMessage {
     pub id: u8,
@@ -1129,10 +922,64 @@ impl DofusDeserialize for GameFightNewWaveMessage {
 }
 
 impl DofusMessage for GameFightNewWaveMessage {
-    const MESSAGE_ID: u16 = 6490;
+    const MESSAGE_ID: u16 = 6575;
 }
 
-/// Protocol message — ID: 6504
+/// Protocol message — ID: 6612
+#[derive(Debug, Clone, Default)]
+pub struct GameFightEndMessage {
+    pub duration: i32,
+    pub reward_rate: i16,
+    pub loot_share_limit_malus: i16,
+    pub results: Vec<Vec<u8>>,
+    pub named_party_teams_outcomes: Vec<NamedPartyTeamWithOutcome>,
+}
+
+impl DofusSerialize for GameFightEndMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.duration);
+        writer.write_var_short(self.reward_rate);
+        writer.write_short(self.loot_share_limit_malus);
+        writer.write_short(self.results.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_short(self.named_party_teams_outcomes.len() as _);
+        for item in &self.named_party_teams_outcomes {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightEndMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            duration: reader.read_int()?,
+            reward_rate: reader.read_var_short()?,
+            loot_share_limit_malus: reader.read_short()?,
+            results: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            named_party_teams_outcomes: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(NamedPartyTeamWithOutcome::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightEndMessage {
+    const MESSAGE_ID: u16 = 6612;
+}
+
+/// Protocol message — ID: 6930
 #[derive(Debug, Clone, Default)]
 pub struct GameFightSpectatorJoinMessage {
     pub is_team_phase: bool,
@@ -1184,73 +1031,400 @@ impl DofusDeserialize for GameFightSpectatorJoinMessage {
 }
 
 impl DofusMessage for GameFightSpectatorJoinMessage {
-    const MESSAGE_ID: u16 = 6504;
+    const MESSAGE_ID: u16 = 6930;
 }
 
-/// Protocol message — ID: 6541
+/// Protocol message — ID: 7110
 #[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsRequestMessage {
-    pub cell_id: i16,
-    pub requested_id: f64,
+pub struct GameFightTurnStartMessage {
+    pub id: f64,
+    pub wait_time: i32,
 }
 
-impl DofusSerialize for GameFightPlacementSwapPositionsRequestMessage {
+impl DofusSerialize for GameFightTurnStartMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
-        writer.write_double(self.requested_id);
+        writer.write_double(self.id);
+        writer.write_var_int(self.wait_time);
     }
 }
 
-impl DofusDeserialize for GameFightPlacementSwapPositionsRequestMessage {
+impl DofusDeserialize for GameFightTurnStartMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+            wait_time: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightTurnStartMessage {
+    const MESSAGE_ID: u16 = 7110;
+}
+
+/// Protocol message — ID: 7439
+#[derive(Debug, Clone, Default)]
+pub struct GameFightStartMessage {
+    pub idols: Vec<Idol>,
+}
+
+impl DofusSerialize for GameFightStartMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.idols.len() as _);
+        for item in &self.idols {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightStartMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            idols: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Idol::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightStartMessage {
+    const MESSAGE_ID: u16 = 7439;
+}
+
+/// Protocol message — ID: 8007
+#[derive(Debug, Clone, Default)]
+pub struct GameFightResumeMessage {
+    pub effects: Vec<FightDispellableEffectExtendedInformations>,
+    pub marks: Vec<GameActionMark>,
+    pub game_turn: i16,
+    pub fight_start: i32,
+    pub idols: Vec<Idol>,
+    pub fx_trigger_counts: Vec<GameFightEffectTriggerCount>,
+    pub spell_cooldowns: Vec<GameFightSpellCooldown>,
+    pub summon_count: u8,
+    pub bomb_count: u8,
+}
+
+impl DofusSerialize for GameFightResumeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.effects.len() as _);
+        for item in &self.effects {
+            item.serialize(writer);
+        }
+        writer.write_short(self.marks.len() as _);
+        for item in &self.marks {
+            item.serialize(writer);
+        }
+        writer.write_var_short(self.game_turn);
+        writer.write_int(self.fight_start);
+        writer.write_short(self.idols.len() as _);
+        for item in &self.idols {
+            item.serialize(writer);
+        }
+        writer.write_short(self.fx_trigger_counts.len() as _);
+        for item in &self.fx_trigger_counts {
+            item.serialize(writer);
+        }
+        writer.write_short(self.spell_cooldowns.len() as _);
+        for item in &self.spell_cooldowns {
+            item.serialize(writer);
+        }
+        writer.write_byte(self.summon_count);
+        writer.write_byte(self.bomb_count);
+    }
+}
+
+impl DofusDeserialize for GameFightResumeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            effects: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(FightDispellableEffectExtendedInformations::deserialize(reader)?);
+                }
+                v
+            },
+            marks: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameActionMark::deserialize(reader)?);
+                }
+                v
+            },
+            game_turn: reader.read_var_short()?,
+            fight_start: reader.read_int()?,
+            idols: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Idol::deserialize(reader)?);
+                }
+                v
+            },
+            fx_trigger_counts: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
+                }
+                v
+            },
+            spell_cooldowns: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameFightSpellCooldown::deserialize(reader)?);
+                }
+                v
+            },
+            summon_count: reader.read_byte()?,
+            bomb_count: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightResumeMessage {
+    const MESSAGE_ID: u16 = 8007;
+}
+
+/// Protocol message — ID: 8856
+#[derive(Debug, Clone, Default)]
+pub struct GameFightTurnEndMessage {
+    pub id: f64,
+}
+
+impl DofusSerialize for GameFightTurnEndMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+    }
+}
+
+impl DofusDeserialize for GameFightTurnEndMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightTurnEndMessage {
+    const MESSAGE_ID: u16 = 8856;
+}
+
+/// Protocol message — ID: 8878
+#[derive(Debug, Clone, Default)]
+pub struct GameFightPlacementPositionRequestMessage {
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameFightPlacementPositionRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameFightPlacementPositionRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             cell_id: reader.read_var_short()?,
-            requested_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameFightPlacementSwapPositionsRequestMessage {
-    const MESSAGE_ID: u16 = 6541;
+impl DofusMessage for GameFightPlacementPositionRequestMessage {
+    const MESSAGE_ID: u16 = 8878;
 }
 
-/// Protocol message — ID: 6542
+/// Protocol message — ID: 8993
 #[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsOfferMessage {
-    pub request_id: i32,
-    pub requester_id: f64,
-    pub requester_cell_id: i16,
-    pub requested_id: f64,
-    pub requested_cell_id: i16,
+pub struct GameFightRemoveTeamMemberMessage {
+    pub fight_id: i16,
+    pub team_id: u8,
+    pub char_id: f64,
 }
 
-impl DofusSerialize for GameFightPlacementSwapPositionsOfferMessage {
+impl DofusSerialize for GameFightRemoveTeamMemberMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.request_id);
-        writer.write_double(self.requester_id);
-        writer.write_var_short(self.requester_cell_id);
-        writer.write_double(self.requested_id);
-        writer.write_var_short(self.requested_cell_id);
+        writer.write_var_short(self.fight_id);
+        writer.write_byte(self.team_id);
+        writer.write_double(self.char_id);
     }
 }
 
-impl DofusDeserialize for GameFightPlacementSwapPositionsOfferMessage {
+impl DofusDeserialize for GameFightRemoveTeamMemberMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            request_id: reader.read_int()?,
-            requester_id: reader.read_double()?,
-            requester_cell_id: reader.read_var_short()?,
-            requested_id: reader.read_double()?,
-            requested_cell_id: reader.read_var_short()?,
+            fight_id: reader.read_var_short()?,
+            team_id: reader.read_byte()?,
+            char_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameFightPlacementSwapPositionsOfferMessage {
-    const MESSAGE_ID: u16 = 6542;
+impl DofusMessage for GameFightRemoveTeamMemberMessage {
+    const MESSAGE_ID: u16 = 8993;
 }
 
-/// Protocol message — ID: 6543
+/// Protocol message — ID: 9365
+#[derive(Debug, Clone, Default)]
+pub struct GameFightTurnListMessage {
+    pub ids: Vec<f64>,
+    pub deads_ids: Vec<f64>,
+}
+
+impl DofusSerialize for GameFightTurnListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.ids.len() as _);
+        for item in &self.ids {
+            writer.write_double(*item);
+        }
+        writer.write_short(self.deads_ids.len() as _);
+        for item in &self.deads_ids {
+            writer.write_double(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightTurnListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_double()?);
+                }
+                v
+            },
+            deads_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_double()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightTurnListMessage {
+    const MESSAGE_ID: u16 = 9365;
+}
+
+/// Protocol message — ID: 9624
+#[derive(Debug, Clone, Default)]
+pub struct GameFightSpectateMessage {
+    pub effects: Vec<FightDispellableEffectExtendedInformations>,
+    pub marks: Vec<GameActionMark>,
+    pub game_turn: i16,
+    pub fight_start: i32,
+    pub idols: Vec<Idol>,
+    pub fx_trigger_counts: Vec<GameFightEffectTriggerCount>,
+}
+
+impl DofusSerialize for GameFightSpectateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.effects.len() as _);
+        for item in &self.effects {
+            item.serialize(writer);
+        }
+        writer.write_short(self.marks.len() as _);
+        for item in &self.marks {
+            item.serialize(writer);
+        }
+        writer.write_var_short(self.game_turn);
+        writer.write_int(self.fight_start);
+        writer.write_short(self.idols.len() as _);
+        for item in &self.idols {
+            item.serialize(writer);
+        }
+        writer.write_short(self.fx_trigger_counts.len() as _);
+        for item in &self.fx_trigger_counts {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameFightSpectateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            effects: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(FightDispellableEffectExtendedInformations::deserialize(reader)?);
+                }
+                v
+            },
+            marks: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameActionMark::deserialize(reader)?);
+                }
+                v
+            },
+            game_turn: reader.read_var_short()?,
+            fight_start: reader.read_int()?,
+            idols: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Idol::deserialize(reader)?);
+                }
+                v
+            },
+            fx_trigger_counts: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GameFightEffectTriggerCount::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameFightSpectateMessage {
+    const MESSAGE_ID: u16 = 9624;
+}
+
+/// Protocol message — ID: 9746
+#[derive(Debug, Clone, Default)]
+pub struct GameFightUpdateTeamMessage {
+    pub fight_id: i16,
+    pub team: FightTeamInformations,
+}
+
+impl DofusSerialize for GameFightUpdateTeamMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+        self.team.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameFightUpdateTeamMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+            team: FightTeamInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameFightUpdateTeamMessage {
+    const MESSAGE_ID: u16 = 9746;
+}
+
+/// Protocol message — ID: 9929
 #[derive(Debug, Clone, Default)]
 pub struct GameFightPlacementSwapPositionsCancelMessage {
     pub request_id: i32,
@@ -1271,177 +1445,6 @@ impl DofusDeserialize for GameFightPlacementSwapPositionsCancelMessage {
 }
 
 impl DofusMessage for GameFightPlacementSwapPositionsCancelMessage {
-    const MESSAGE_ID: u16 = 6543;
-}
-
-/// Protocol message — ID: 6544
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsMessage {
-}
-
-impl DofusSerialize for GameFightPlacementSwapPositionsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameFightPlacementSwapPositionsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameFightPlacementSwapPositionsMessage {
-    const MESSAGE_ID: u16 = 6544;
-}
-
-/// Protocol message — ID: 6546
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsCancelledMessage {
-    pub request_id: i32,
-    pub canceller_id: f64,
-}
-
-impl DofusSerialize for GameFightPlacementSwapPositionsCancelledMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.request_id);
-        writer.write_double(self.canceller_id);
-    }
-}
-
-impl DofusDeserialize for GameFightPlacementSwapPositionsCancelledMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_int()?,
-            canceller_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightPlacementSwapPositionsCancelledMessage {
-    const MESSAGE_ID: u16 = 6546;
-}
-
-/// Protocol message — ID: 6547
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsAcceptMessage {
-    pub request_id: i32,
-}
-
-impl DofusSerialize for GameFightPlacementSwapPositionsAcceptMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.request_id);
-    }
-}
-
-impl DofusDeserialize for GameFightPlacementSwapPositionsAcceptMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            request_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightPlacementSwapPositionsAcceptMessage {
-    const MESSAGE_ID: u16 = 6547;
-}
-
-/// Protocol message — ID: 6548
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPlacementSwapPositionsErrorMessage {
-}
-
-impl DofusSerialize for GameFightPlacementSwapPositionsErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameFightPlacementSwapPositionsErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameFightPlacementSwapPositionsErrorMessage {
-    const MESSAGE_ID: u16 = 6548;
-}
-
-/// Protocol message — ID: 6699
-#[derive(Debug, Clone, Default)]
-pub struct RefreshCharacterStatsMessage {
-    pub fighter_id: f64,
-    pub stats: GameFightMinimalStats,
-}
-
-impl DofusSerialize for RefreshCharacterStatsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.fighter_id);
-        self.stats.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for RefreshCharacterStatsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fighter_id: reader.read_double()?,
-            stats: GameFightMinimalStats::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for RefreshCharacterStatsMessage {
-    const MESSAGE_ID: u16 = 6699;
-}
-
-/// Protocol message — ID: 6754
-#[derive(Debug, Clone, Default)]
-pub struct GameFightPauseMessage {
-    pub is_paused: bool,
-}
-
-impl DofusSerialize for GameFightPauseMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.is_paused);
-    }
-}
-
-impl DofusDeserialize for GameFightPauseMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            is_paused: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameFightPauseMessage {
-    const MESSAGE_ID: u16 = 6754;
-}
-
-/// Protocol message — ID: 6807
-#[derive(Debug, Clone, Default)]
-pub struct SlaveNoLongerControledMessage {
-    pub master_id: f64,
-    pub slave_id: f64,
-}
-
-impl DofusSerialize for SlaveNoLongerControledMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.master_id);
-        writer.write_double(self.slave_id);
-    }
-}
-
-impl DofusDeserialize for SlaveNoLongerControledMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            master_id: reader.read_double()?,
-            slave_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for SlaveNoLongerControledMessage {
-    const MESSAGE_ID: u16 = 6807;
+    const MESSAGE_ID: u16 = 9929;
 }
 

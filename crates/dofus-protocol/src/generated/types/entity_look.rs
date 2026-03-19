@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 55
+/// Protocol type — ID: 2892
 #[derive(Debug, Clone, Default)]
 pub struct EntityLook {
     pub bones_id: i16,
@@ -79,6 +79,6 @@ impl DofusDeserialize for EntityLook {
 }
 
 impl DofusType for EntityLook {
-    const TYPE_ID: u16 = 55;
+    const TYPE_ID: u16 = 2892;
 }
 

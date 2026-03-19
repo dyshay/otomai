@@ -6,7 +6,31 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6867
+/// Protocol message — ID: 1271
+#[derive(Debug, Clone, Default)]
+pub struct ForgettableSpellEquipmentSlotsMessage {
+    pub quantity: i16,
+}
+
+impl DofusSerialize for ForgettableSpellEquipmentSlotsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quantity);
+    }
+}
+
+impl DofusDeserialize for ForgettableSpellEquipmentSlotsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quantity: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ForgettableSpellEquipmentSlotsMessage {
+    const MESSAGE_ID: u16 = 1271;
+}
+
+/// Protocol message — ID: 1920
 #[derive(Debug, Clone, Default)]
 pub struct ForgettableSpellDeleteMessage {
     pub reason: u8,
@@ -40,10 +64,10 @@ impl DofusDeserialize for ForgettableSpellDeleteMessage {
 }
 
 impl DofusMessage for ForgettableSpellDeleteMessage {
-    const MESSAGE_ID: u16 = 6867;
+    const MESSAGE_ID: u16 = 1920;
 }
 
-/// Protocol message — ID: 6868
+/// Protocol message — ID: 3230
 #[derive(Debug, Clone, Default)]
 pub struct ForgettableSpellListUpdateMessage {
     pub action: u8,
@@ -77,10 +101,10 @@ impl DofusDeserialize for ForgettableSpellListUpdateMessage {
 }
 
 impl DofusMessage for ForgettableSpellListUpdateMessage {
-    const MESSAGE_ID: u16 = 6868;
+    const MESSAGE_ID: u16 = 3230;
 }
 
-/// Protocol message — ID: 6869
+/// Protocol message — ID: 8669
 #[derive(Debug, Clone, Default)]
 pub struct ForgettableSpellClientActionMessage {
     pub spell_id: i32,
@@ -104,30 +128,6 @@ impl DofusDeserialize for ForgettableSpellClientActionMessage {
 }
 
 impl DofusMessage for ForgettableSpellClientActionMessage {
-    const MESSAGE_ID: u16 = 6869;
-}
-
-/// Protocol message — ID: 6870
-#[derive(Debug, Clone, Default)]
-pub struct ForgettableSpellEquipmentSlotsMessage {
-    pub quantity: i16,
-}
-
-impl DofusSerialize for ForgettableSpellEquipmentSlotsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quantity);
-    }
-}
-
-impl DofusDeserialize for ForgettableSpellEquipmentSlotsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quantity: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ForgettableSpellEquipmentSlotsMessage {
-    const MESSAGE_ID: u16 = 6870;
+    const MESSAGE_ID: u16 = 8669;
 }
 

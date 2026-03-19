@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6771
+/// Protocol message — ID: 325
 #[derive(Debug, Clone, Default)]
 pub struct EntityInformationMessage {
     pub entity: EntityInformation,
@@ -27,10 +27,10 @@ impl DofusDeserialize for EntityInformationMessage {
 }
 
 impl DofusMessage for EntityInformationMessage {
-    const MESSAGE_ID: u16 = 6771;
+    const MESSAGE_ID: u16 = 325;
 }
 
-/// Protocol message — ID: 6775
+/// Protocol message — ID: 9744
 #[derive(Debug, Clone, Default)]
 pub struct EntitiesInformationMessage {
     pub entities: Vec<EntityInformation>,
@@ -61,6 +61,6 @@ impl DofusDeserialize for EntitiesInformationMessage {
 }
 
 impl DofusMessage for EntitiesInformationMessage {
-    const MESSAGE_ID: u16 = 6775;
+    const MESSAGE_ID: u16 = 9744;
 }
 

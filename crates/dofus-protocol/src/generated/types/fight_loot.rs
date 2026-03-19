@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 41
+/// Protocol type — ID: 7757
 #[derive(Debug, Clone, Default)]
 pub struct FightLoot {
     pub objects: Vec<i32>,
@@ -40,6 +40,6 @@ impl DofusDeserialize for FightLoot {
 }
 
 impl DofusType for FightLoot {
-    const TYPE_ID: u16 = 41;
+    const TYPE_ID: u16 = 7757;
 }
 

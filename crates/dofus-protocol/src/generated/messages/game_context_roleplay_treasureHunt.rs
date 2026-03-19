@@ -6,31 +6,61 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6483
+/// Protocol message — ID: 692
 #[derive(Debug, Clone, Default)]
-pub struct TreasureHuntFinishedMessage {
+pub struct TreasureHuntFlagRequestMessage {
     pub quest_type: u8,
+    pub index: u8,
 }
 
-impl DofusSerialize for TreasureHuntFinishedMessage {
+impl DofusSerialize for TreasureHuntFlagRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_byte(self.quest_type);
+        writer.write_byte(self.index);
     }
 }
 
-impl DofusDeserialize for TreasureHuntFinishedMessage {
+impl DofusDeserialize for TreasureHuntFlagRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             quest_type: reader.read_byte()?,
+            index: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for TreasureHuntFinishedMessage {
-    const MESSAGE_ID: u16 = 6483;
+impl DofusMessage for TreasureHuntFlagRequestMessage {
+    const MESSAGE_ID: u16 = 692;
 }
 
-/// Protocol message — ID: 6484
+/// Protocol message — ID: 1216
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntAvailableRetryCountUpdateMessage {
+    pub quest_type: u8,
+    pub available_retry_count: i32,
+}
+
+impl DofusSerialize for TreasureHuntAvailableRetryCountUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+        writer.write_int(self.available_retry_count);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntAvailableRetryCountUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+            available_retry_count: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntAvailableRetryCountUpdateMessage {
+    const MESSAGE_ID: u16 = 1216;
+}
+
+/// Protocol message — ID: 1475
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntDigRequestAnswerMessage {
     pub quest_type: u8,
@@ -54,10 +84,34 @@ impl DofusDeserialize for TreasureHuntDigRequestAnswerMessage {
 }
 
 impl DofusMessage for TreasureHuntDigRequestAnswerMessage {
-    const MESSAGE_ID: u16 = 6484;
+    const MESSAGE_ID: u16 = 1475;
 }
 
-/// Protocol message — ID: 6485
+/// Protocol message — ID: 1622
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntGiveUpRequestMessage {
+    pub quest_type: u8,
+}
+
+impl DofusSerialize for TreasureHuntGiveUpRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntGiveUpRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntGiveUpRequestMessage {
+    const MESSAGE_ID: u16 = 1622;
+}
+
+/// Protocol message — ID: 2632
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntDigRequestMessage {
     pub quest_type: u8,
@@ -78,10 +132,166 @@ impl DofusDeserialize for TreasureHuntDigRequestMessage {
 }
 
 impl DofusMessage for TreasureHuntDigRequestMessage {
-    const MESSAGE_ID: u16 = 6485;
+    const MESSAGE_ID: u16 = 2632;
 }
 
-/// Protocol message — ID: 6486
+/// Protocol message — ID: 2759
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntFinishedMessage {
+    pub quest_type: u8,
+}
+
+impl DofusSerialize for TreasureHuntFinishedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntFinishedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntFinishedMessage {
+    const MESSAGE_ID: u16 = 2759;
+}
+
+/// Protocol message — ID: 4075
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntFlagRequestAnswerMessage {
+    pub quest_type: u8,
+    pub result: u8,
+    pub index: u8,
+}
+
+impl DofusSerialize for TreasureHuntFlagRequestAnswerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+        writer.write_byte(self.result);
+        writer.write_byte(self.index);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntFlagRequestAnswerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+            result: reader.read_byte()?,
+            index: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntFlagRequestAnswerMessage {
+    const MESSAGE_ID: u16 = 4075;
+}
+
+/// Protocol message — ID: 5673
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntRequestAnswerMessage {
+    pub quest_type: u8,
+    pub result: u8,
+}
+
+impl DofusSerialize for TreasureHuntRequestAnswerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+        writer.write_byte(self.result);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntRequestAnswerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+            result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntRequestAnswerMessage {
+    const MESSAGE_ID: u16 = 5673;
+}
+
+/// Protocol message — ID: 6789
+#[derive(Debug, Clone, Default)]
+pub struct PortalUseRequestMessage {
+    pub portal_id: i32,
+}
+
+impl DofusSerialize for PortalUseRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.portal_id);
+    }
+}
+
+impl DofusDeserialize for PortalUseRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            portal_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for PortalUseRequestMessage {
+    const MESSAGE_ID: u16 = 6789;
+}
+
+/// Protocol message — ID: 7565
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntFlagRemoveRequestMessage {
+    pub quest_type: u8,
+    pub index: u8,
+}
+
+impl DofusSerialize for TreasureHuntFlagRemoveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.quest_type);
+        writer.write_byte(self.index);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntFlagRemoveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_type: reader.read_byte()?,
+            index: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntFlagRemoveRequestMessage {
+    const MESSAGE_ID: u16 = 7565;
+}
+
+/// Protocol message — ID: 7662
+#[derive(Debug, Clone, Default)]
+pub struct TreasureHuntLegendaryRequestMessage {
+    pub legendary_id: i16,
+}
+
+impl DofusSerialize for TreasureHuntLegendaryRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.legendary_id);
+    }
+}
+
+impl DofusDeserialize for TreasureHuntLegendaryRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            legendary_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for TreasureHuntLegendaryRequestMessage {
+    const MESSAGE_ID: u16 = 7662;
+}
+
+/// Protocol message — ID: 7742
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntMessage {
     pub quest_type: u8,
@@ -141,112 +351,40 @@ impl DofusDeserialize for TreasureHuntMessage {
 }
 
 impl DofusMessage for TreasureHuntMessage {
-    const MESSAGE_ID: u16 = 6486;
+    const MESSAGE_ID: u16 = 7742;
 }
 
-/// Protocol message — ID: 6487
+/// Protocol message — ID: 9892
 #[derive(Debug, Clone, Default)]
-pub struct TreasureHuntGiveUpRequestMessage {
-    pub quest_type: u8,
-}
-
-impl DofusSerialize for TreasureHuntGiveUpRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntGiveUpRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntGiveUpRequestMessage {
-    const MESSAGE_ID: u16 = 6487;
-}
-
-/// Protocol message — ID: 6489
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntRequestAnswerMessage {
+pub struct TreasureHuntDigRequestAnswerFailedMessage {
     pub quest_type: u8,
     pub result: u8,
+    pub wrong_flag_count: u8,
 }
 
-impl DofusSerialize for TreasureHuntRequestAnswerMessage {
+impl DofusSerialize for TreasureHuntDigRequestAnswerFailedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_byte(self.quest_type);
         writer.write_byte(self.result);
+        writer.write_byte(self.wrong_flag_count);
     }
 }
 
-impl DofusDeserialize for TreasureHuntRequestAnswerMessage {
+impl DofusDeserialize for TreasureHuntDigRequestAnswerFailedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             quest_type: reader.read_byte()?,
             result: reader.read_byte()?,
+            wrong_flag_count: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for TreasureHuntRequestAnswerMessage {
-    const MESSAGE_ID: u16 = 6489;
+impl DofusMessage for TreasureHuntDigRequestAnswerFailedMessage {
+    const MESSAGE_ID: u16 = 9892;
 }
 
-/// Protocol message — ID: 6491
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntAvailableRetryCountUpdateMessage {
-    pub quest_type: u8,
-    pub available_retry_count: i32,
-}
-
-impl DofusSerialize for TreasureHuntAvailableRetryCountUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-        writer.write_int(self.available_retry_count);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntAvailableRetryCountUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-            available_retry_count: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntAvailableRetryCountUpdateMessage {
-    const MESSAGE_ID: u16 = 6491;
-}
-
-/// Protocol message — ID: 6492
-#[derive(Debug, Clone, Default)]
-pub struct PortalUseRequestMessage {
-    pub portal_id: i32,
-}
-
-impl DofusSerialize for PortalUseRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.portal_id);
-    }
-}
-
-impl DofusDeserialize for PortalUseRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            portal_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for PortalUseRequestMessage {
-    const MESSAGE_ID: u16 = 6492;
-}
-
-/// Protocol message — ID: 6498
+/// Protocol message — ID: 9952
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntShowLegendaryUIMessage {
     pub available_legendary_ids: Vec<i16>,
@@ -277,144 +415,6 @@ impl DofusDeserialize for TreasureHuntShowLegendaryUIMessage {
 }
 
 impl DofusMessage for TreasureHuntShowLegendaryUIMessage {
-    const MESSAGE_ID: u16 = 6498;
-}
-
-/// Protocol message — ID: 6499
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntLegendaryRequestMessage {
-    pub legendary_id: i16,
-}
-
-impl DofusSerialize for TreasureHuntLegendaryRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.legendary_id);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntLegendaryRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            legendary_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntLegendaryRequestMessage {
-    const MESSAGE_ID: u16 = 6499;
-}
-
-/// Protocol message — ID: 6507
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntFlagRequestAnswerMessage {
-    pub quest_type: u8,
-    pub result: u8,
-    pub index: u8,
-}
-
-impl DofusSerialize for TreasureHuntFlagRequestAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-        writer.write_byte(self.result);
-        writer.write_byte(self.index);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntFlagRequestAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-            result: reader.read_byte()?,
-            index: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntFlagRequestAnswerMessage {
-    const MESSAGE_ID: u16 = 6507;
-}
-
-/// Protocol message — ID: 6508
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntFlagRequestMessage {
-    pub quest_type: u8,
-    pub index: u8,
-}
-
-impl DofusSerialize for TreasureHuntFlagRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-        writer.write_byte(self.index);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntFlagRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-            index: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntFlagRequestMessage {
-    const MESSAGE_ID: u16 = 6508;
-}
-
-/// Protocol message — ID: 6509
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntDigRequestAnswerFailedMessage {
-    pub quest_type: u8,
-    pub result: u8,
-    pub wrong_flag_count: u8,
-}
-
-impl DofusSerialize for TreasureHuntDigRequestAnswerFailedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-        writer.write_byte(self.result);
-        writer.write_byte(self.wrong_flag_count);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntDigRequestAnswerFailedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-            result: reader.read_byte()?,
-            wrong_flag_count: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntDigRequestAnswerFailedMessage {
-    const MESSAGE_ID: u16 = 6509;
-}
-
-/// Protocol message — ID: 6510
-#[derive(Debug, Clone, Default)]
-pub struct TreasureHuntFlagRemoveRequestMessage {
-    pub quest_type: u8,
-    pub index: u8,
-}
-
-impl DofusSerialize for TreasureHuntFlagRemoveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.quest_type);
-        writer.write_byte(self.index);
-    }
-}
-
-impl DofusDeserialize for TreasureHuntFlagRemoveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_type: reader.read_byte()?,
-            index: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TreasureHuntFlagRemoveRequestMessage {
-    const MESSAGE_ID: u16 = 6510;
+    const MESSAGE_ID: u16 = 9952;
 }
 

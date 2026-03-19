@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 538
+/// Protocol type — ID: 4340
 #[derive(Debug, Clone, Default)]
 pub struct UpdateMountBooleanCharacteristic {
     pub r#type: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for UpdateMountBooleanCharacteristic {
 }
 
 impl DofusType for UpdateMountBooleanCharacteristic {
-    const TYPE_ID: u16 = 538;
+    const TYPE_ID: u16 = 4340;
 }
 

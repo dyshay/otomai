@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 449
+/// Protocol type — ID: 2440
 #[derive(Debug, Clone, Default)]
 pub struct HumanOptionObjectUse {
     pub delay_type_id: u8,
@@ -33,6 +33,6 @@ impl DofusDeserialize for HumanOptionObjectUse {
 }
 
 impl DofusType for HumanOptionObjectUse {
-    const TYPE_ID: u16 = 449;
+    const TYPE_ID: u16 = 2440;
 }
 

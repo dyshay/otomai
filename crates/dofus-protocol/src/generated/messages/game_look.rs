@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6517
+/// Protocol message — ID: 1972
 #[derive(Debug, Clone, Default)]
 pub struct AccessoryPreviewMessage {
     pub look: EntityLook,
@@ -27,10 +27,10 @@ impl DofusDeserialize for AccessoryPreviewMessage {
 }
 
 impl DofusMessage for AccessoryPreviewMessage {
-    const MESSAGE_ID: u16 = 6517;
+    const MESSAGE_ID: u16 = 1972;
 }
 
-/// Protocol message — ID: 6518
+/// Protocol message — ID: 4736
 #[derive(Debug, Clone, Default)]
 pub struct AccessoryPreviewRequestMessage {
     pub generic_id: Vec<i16>,
@@ -61,10 +61,10 @@ impl DofusDeserialize for AccessoryPreviewRequestMessage {
 }
 
 impl DofusMessage for AccessoryPreviewRequestMessage {
-    const MESSAGE_ID: u16 = 6518;
+    const MESSAGE_ID: u16 = 4736;
 }
 
-/// Protocol message — ID: 6521
+/// Protocol message — ID: 8715
 #[derive(Debug, Clone, Default)]
 pub struct AccessoryPreviewErrorMessage {
     pub error: u8,
@@ -85,6 +85,6 @@ impl DofusDeserialize for AccessoryPreviewErrorMessage {
 }
 
 impl DofusMessage for AccessoryPreviewErrorMessage {
-    const MESSAGE_ID: u16 = 6521;
+    const MESSAGE_ID: u16 = 8715;
 }
 

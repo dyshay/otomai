@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5613
+/// Protocol message — ID: 2009
 #[derive(Debug, Clone, Default)]
 pub struct ChallengeTargetsListMessage {
     pub target_ids: Vec<f64>,
@@ -50,34 +50,10 @@ impl DofusDeserialize for ChallengeTargetsListMessage {
 }
 
 impl DofusMessage for ChallengeTargetsListMessage {
-    const MESSAGE_ID: u16 = 5613;
+    const MESSAGE_ID: u16 = 2009;
 }
 
-/// Protocol message — ID: 5614
-#[derive(Debug, Clone, Default)]
-pub struct ChallengeTargetsListRequestMessage {
-    pub challenge_id: i16,
-}
-
-impl DofusSerialize for ChallengeTargetsListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.challenge_id);
-    }
-}
-
-impl DofusDeserialize for ChallengeTargetsListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            challenge_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ChallengeTargetsListRequestMessage {
-    const MESSAGE_ID: u16 = 5614;
-}
-
-/// Protocol message — ID: 6019
+/// Protocol message — ID: 2089
 #[derive(Debug, Clone, Default)]
 pub struct ChallengeResultMessage {
     pub challenge_id: i16,
@@ -101,10 +77,61 @@ impl DofusDeserialize for ChallengeResultMessage {
 }
 
 impl DofusMessage for ChallengeResultMessage {
-    const MESSAGE_ID: u16 = 6019;
+    const MESSAGE_ID: u16 = 2089;
 }
 
-/// Protocol message — ID: 6022
+/// Protocol message — ID: 2250
+#[derive(Debug, Clone, Default)]
+pub struct ChallengeTargetsListRequestMessage {
+    pub challenge_id: i16,
+}
+
+impl DofusSerialize for ChallengeTargetsListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.challenge_id);
+    }
+}
+
+impl DofusDeserialize for ChallengeTargetsListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            challenge_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ChallengeTargetsListRequestMessage {
+    const MESSAGE_ID: u16 = 2250;
+}
+
+/// Protocol message — ID: 4069
+#[derive(Debug, Clone, Default)]
+pub struct ChallengeTargetUpdateMessage {
+    pub challenge_id: i16,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for ChallengeTargetUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.challenge_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for ChallengeTargetUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            challenge_id: reader.read_var_short()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for ChallengeTargetUpdateMessage {
+    const MESSAGE_ID: u16 = 4069;
+}
+
+/// Protocol message — ID: 9675
 #[derive(Debug, Clone, Default)]
 pub struct ChallengeInfoMessage {
     pub challenge_id: i16,
@@ -134,33 +161,6 @@ impl DofusDeserialize for ChallengeInfoMessage {
 }
 
 impl DofusMessage for ChallengeInfoMessage {
-    const MESSAGE_ID: u16 = 6022;
-}
-
-/// Protocol message — ID: 6123
-#[derive(Debug, Clone, Default)]
-pub struct ChallengeTargetUpdateMessage {
-    pub challenge_id: i16,
-    pub target_id: f64,
-}
-
-impl DofusSerialize for ChallengeTargetUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.challenge_id);
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for ChallengeTargetUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            challenge_id: reader.read_var_short()?,
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for ChallengeTargetUpdateMessage {
-    const MESSAGE_ID: u16 = 6123;
+    const MESSAGE_ID: u16 = 9675;
 }
 

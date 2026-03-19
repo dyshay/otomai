@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 497
+/// Protocol type — ID: 4497
 #[derive(Debug, Clone, Default)]
 pub struct MonsterBoosts {
     pub id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for MonsterBoosts {
 }
 
 impl DofusType for MonsterBoosts {
-    const TYPE_ID: u16 = 497;
+    const TYPE_ID: u16 = 4497;
 }
 

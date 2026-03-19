@@ -6,225 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6222
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarRemoveErrorMessage {
-    pub error: u8,
-}
-
-impl DofusSerialize for ShortcutBarRemoveErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.error);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarRemoveErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            error: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarRemoveErrorMessage {
-    const MESSAGE_ID: u16 = 6222;
-}
-
-/// Protocol message — ID: 6224
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarRemovedMessage {
-    pub bar_type: u8,
-    pub slot: u8,
-}
-
-impl DofusSerialize for ShortcutBarRemovedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.bar_type);
-        writer.write_byte(self.slot);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarRemovedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bar_type: reader.read_byte()?,
-            slot: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarRemovedMessage {
-    const MESSAGE_ID: u16 = 6224;
-}
-
-/// Protocol message — ID: 6225
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarAddRequestMessage {
-    pub bar_type: u8,
-    pub shortcut: Box<ShortcutVariant>,
-}
-
-impl DofusSerialize for ShortcutBarAddRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.bar_type);
-        writer.write_ushort(self.shortcut.get_type_id());
-        (*self.shortcut).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarAddRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bar_type: reader.read_byte()?,
-            shortcut: {
-                let type_id = reader.read_ushort()?;
-                Box::new(ShortcutVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarAddRequestMessage {
-    const MESSAGE_ID: u16 = 6225;
-}
-
-/// Protocol message — ID: 6226
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarSwapErrorMessage {
-    pub error: u8,
-}
-
-impl DofusSerialize for ShortcutBarSwapErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.error);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarSwapErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            error: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarSwapErrorMessage {
-    const MESSAGE_ID: u16 = 6226;
-}
-
-/// Protocol message — ID: 6227
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarAddErrorMessage {
-    pub error: u8,
-}
-
-impl DofusSerialize for ShortcutBarAddErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.error);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarAddErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            error: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarAddErrorMessage {
-    const MESSAGE_ID: u16 = 6227;
-}
-
-/// Protocol message — ID: 6228
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarRemoveRequestMessage {
-    pub bar_type: u8,
-    pub slot: u8,
-}
-
-impl DofusSerialize for ShortcutBarRemoveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.bar_type);
-        writer.write_byte(self.slot);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarRemoveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bar_type: reader.read_byte()?,
-            slot: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarRemoveRequestMessage {
-    const MESSAGE_ID: u16 = 6228;
-}
-
-/// Protocol message — ID: 6229
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarRefreshMessage {
-    pub bar_type: u8,
-    pub shortcut: Box<ShortcutVariant>,
-}
-
-impl DofusSerialize for ShortcutBarRefreshMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.bar_type);
-        writer.write_ushort(self.shortcut.get_type_id());
-        (*self.shortcut).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarRefreshMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bar_type: reader.read_byte()?,
-            shortcut: {
-                let type_id = reader.read_ushort()?;
-                Box::new(ShortcutVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarRefreshMessage {
-    const MESSAGE_ID: u16 = 6229;
-}
-
-/// Protocol message — ID: 6230
-#[derive(Debug, Clone, Default)]
-pub struct ShortcutBarSwapRequestMessage {
-    pub bar_type: u8,
-    pub first_slot: u8,
-    pub second_slot: u8,
-}
-
-impl DofusSerialize for ShortcutBarSwapRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.bar_type);
-        writer.write_byte(self.first_slot);
-        writer.write_byte(self.second_slot);
-    }
-}
-
-impl DofusDeserialize for ShortcutBarSwapRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            bar_type: reader.read_byte()?,
-            first_slot: reader.read_byte()?,
-            second_slot: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ShortcutBarSwapRequestMessage {
-    const MESSAGE_ID: u16 = 6230;
-}
-
-/// Protocol message — ID: 6231
+/// Protocol message — ID: 276
 #[derive(Debug, Clone, Default)]
 pub struct ShortcutBarContentMessage {
     pub bar_type: u8,
@@ -256,10 +38,88 @@ impl DofusDeserialize for ShortcutBarContentMessage {
 }
 
 impl DofusMessage for ShortcutBarContentMessage {
-    const MESSAGE_ID: u16 = 6231;
+    const MESSAGE_ID: u16 = 276;
 }
 
-/// Protocol message — ID: 6706
+/// Protocol message — ID: 2776
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarRemoveErrorMessage {
+    pub error: u8,
+}
+
+impl DofusSerialize for ShortcutBarRemoveErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.error);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarRemoveErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            error: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarRemoveErrorMessage {
+    const MESSAGE_ID: u16 = 2776;
+}
+
+/// Protocol message — ID: 4225
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarSwapRequestMessage {
+    pub bar_type: u8,
+    pub first_slot: u8,
+    pub second_slot: u8,
+}
+
+impl DofusSerialize for ShortcutBarSwapRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.bar_type);
+        writer.write_byte(self.first_slot);
+        writer.write_byte(self.second_slot);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarSwapRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bar_type: reader.read_byte()?,
+            first_slot: reader.read_byte()?,
+            second_slot: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarSwapRequestMessage {
+    const MESSAGE_ID: u16 = 4225;
+}
+
+/// Protocol message — ID: 4478
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarSwapErrorMessage {
+    pub error: u8,
+}
+
+impl DofusSerialize for ShortcutBarSwapErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.error);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarSwapErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            error: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarSwapErrorMessage {
+    const MESSAGE_ID: u16 = 4478;
+}
+
+/// Protocol message — ID: 5098
 #[derive(Debug, Clone, Default)]
 pub struct ShortcutBarReplacedMessage {
     pub bar_type: u8,
@@ -287,6 +147,146 @@ impl DofusDeserialize for ShortcutBarReplacedMessage {
 }
 
 impl DofusMessage for ShortcutBarReplacedMessage {
-    const MESSAGE_ID: u16 = 6706;
+    const MESSAGE_ID: u16 = 5098;
+}
+
+/// Protocol message — ID: 6840
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarAddErrorMessage {
+    pub error: u8,
+}
+
+impl DofusSerialize for ShortcutBarAddErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.error);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarAddErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            error: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarAddErrorMessage {
+    const MESSAGE_ID: u16 = 6840;
+}
+
+/// Protocol message — ID: 7311
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarAddRequestMessage {
+    pub bar_type: u8,
+    pub shortcut: Box<ShortcutVariant>,
+}
+
+impl DofusSerialize for ShortcutBarAddRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.bar_type);
+        writer.write_ushort(self.shortcut.get_type_id());
+        (*self.shortcut).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarAddRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bar_type: reader.read_byte()?,
+            shortcut: {
+                let type_id = reader.read_ushort()?;
+                Box::new(ShortcutVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarAddRequestMessage {
+    const MESSAGE_ID: u16 = 7311;
+}
+
+/// Protocol message — ID: 7396
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarRemoveRequestMessage {
+    pub bar_type: u8,
+    pub slot: u8,
+}
+
+impl DofusSerialize for ShortcutBarRemoveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.bar_type);
+        writer.write_byte(self.slot);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarRemoveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bar_type: reader.read_byte()?,
+            slot: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarRemoveRequestMessage {
+    const MESSAGE_ID: u16 = 7396;
+}
+
+/// Protocol message — ID: 9619
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarRemovedMessage {
+    pub bar_type: u8,
+    pub slot: u8,
+}
+
+impl DofusSerialize for ShortcutBarRemovedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.bar_type);
+        writer.write_byte(self.slot);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarRemovedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bar_type: reader.read_byte()?,
+            slot: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarRemovedMessage {
+    const MESSAGE_ID: u16 = 9619;
+}
+
+/// Protocol message — ID: 9659
+#[derive(Debug, Clone, Default)]
+pub struct ShortcutBarRefreshMessage {
+    pub bar_type: u8,
+    pub shortcut: Box<ShortcutVariant>,
+}
+
+impl DofusSerialize for ShortcutBarRefreshMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.bar_type);
+        writer.write_ushort(self.shortcut.get_type_id());
+        (*self.shortcut).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ShortcutBarRefreshMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            bar_type: reader.read_byte()?,
+            shortcut: {
+                let type_id = reader.read_ushort()?;
+                Box::new(ShortcutVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for ShortcutBarRefreshMessage {
+    const MESSAGE_ID: u16 = 9659;
 }
 

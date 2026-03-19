@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 481
+/// Protocol type — ID: 3237
 #[derive(Debug, Clone, Default)]
 pub struct DecraftedItemStackInfo {
     pub object_u_i_d: i32,
@@ -59,6 +59,6 @@ impl DofusDeserialize for DecraftedItemStackInfo {
 }
 
 impl DofusType for DecraftedItemStackInfo {
-    const TYPE_ID: u16 = 481;
+    const TYPE_ID: u16 = 3237;
 }
 

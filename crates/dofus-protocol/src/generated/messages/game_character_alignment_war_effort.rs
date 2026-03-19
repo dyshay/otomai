@@ -6,7 +6,31 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6851
+/// Protocol message — ID: 3258
+#[derive(Debug, Clone, Default)]
+pub struct AlignmentWarEffortDonationResultMessage {
+    pub result: u8,
+}
+
+impl DofusSerialize for AlignmentWarEffortDonationResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.result);
+    }
+}
+
+impl DofusDeserialize for AlignmentWarEffortDonationResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AlignmentWarEffortDonationResultMessage {
+    const MESSAGE_ID: u16 = 3258;
+}
+
+/// Protocol message — ID: 4989
 #[derive(Debug, Clone, Default)]
 pub struct CharacterAlignmentWarEffortProgressionMessage {
     pub alignment_war_effort_daily_limit: i64,
@@ -33,10 +57,31 @@ impl DofusDeserialize for CharacterAlignmentWarEffortProgressionMessage {
 }
 
 impl DofusMessage for CharacterAlignmentWarEffortProgressionMessage {
-    const MESSAGE_ID: u16 = 6851;
+    const MESSAGE_ID: u16 = 4989;
 }
 
-/// Protocol message — ID: 6853
+/// Protocol message — ID: 6202
+#[derive(Debug, Clone, Default)]
+pub struct CharacterAlignmentWarEffortProgressionRequestMessage {
+}
+
+impl DofusSerialize for CharacterAlignmentWarEffortProgressionRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharacterAlignmentWarEffortProgressionRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharacterAlignmentWarEffortProgressionRequestMessage {
+    const MESSAGE_ID: u16 = 6202;
+}
+
+/// Protocol message — ID: 8421
 #[derive(Debug, Clone, Default)]
 pub struct AlignmentWarEffortDonatePreviewMessage {
     pub xp: f64,
@@ -57,55 +102,10 @@ impl DofusDeserialize for AlignmentWarEffortDonatePreviewMessage {
 }
 
 impl DofusMessage for AlignmentWarEffortDonatePreviewMessage {
-    const MESSAGE_ID: u16 = 6853;
+    const MESSAGE_ID: u16 = 8421;
 }
 
-/// Protocol message — ID: 6855
-#[derive(Debug, Clone, Default)]
-pub struct CharacterAlignmentWarEffortProgressionRequestMessage {
-}
-
-impl DofusSerialize for CharacterAlignmentWarEffortProgressionRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CharacterAlignmentWarEffortProgressionRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CharacterAlignmentWarEffortProgressionRequestMessage {
-    const MESSAGE_ID: u16 = 6855;
-}
-
-/// Protocol message — ID: 6856
-#[derive(Debug, Clone, Default)]
-pub struct AlignmentWarEffortDonationResultMessage {
-    pub result: u8,
-}
-
-impl DofusSerialize for AlignmentWarEffortDonationResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.result);
-    }
-}
-
-impl DofusDeserialize for AlignmentWarEffortDonationResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            result: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AlignmentWarEffortDonationResultMessage {
-    const MESSAGE_ID: u16 = 6856;
-}
-
-/// Protocol message — ID: 6857
+/// Protocol message — ID: 8514
 #[derive(Debug, Clone, Default)]
 pub struct AlignmentWarEffortDonateRequestMessage {
     pub donation: i64,
@@ -126,6 +126,6 @@ impl DofusDeserialize for AlignmentWarEffortDonateRequestMessage {
 }
 
 impl DofusMessage for AlignmentWarEffortDonateRequestMessage {
-    const MESSAGE_ID: u16 = 6857;
+    const MESSAGE_ID: u16 = 8514;
 }
 

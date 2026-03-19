@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 351
+/// Protocol type — ID: 8797
 #[derive(Debug, Clone, Default)]
 pub struct GameActionMark {
     pub mark_author_id: f64,
@@ -61,6 +61,6 @@ impl DofusDeserialize for GameActionMark {
 }
 
 impl DofusType for GameActionMark {
-    const TYPE_ID: u16 = 351;
+    const TYPE_ID: u16 = 8797;
 }
 

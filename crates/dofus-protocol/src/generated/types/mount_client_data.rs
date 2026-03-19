@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 178
+/// Protocol type — ID: 3510
 #[derive(Debug, Clone, Default)]
 pub struct MountClientData {
     pub sex: bool,
@@ -159,6 +159,6 @@ impl DofusDeserialize for MountClientData {
 }
 
 impl DofusType for MountClientData {
-    const TYPE_ID: u16 = 178;
+    const TYPE_ID: u16 = 3510;
 }
 

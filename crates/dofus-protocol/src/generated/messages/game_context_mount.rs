@@ -6,31 +6,49 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5951
+/// Protocol message — ID: 460
 #[derive(Debug, Clone, Default)]
-pub struct PaddockBuyRequestMessage {
-    pub proposed_price: i64,
+pub struct MountReleaseRequestMessage {
 }
 
-impl DofusSerialize for PaddockBuyRequestMessage {
+impl DofusSerialize for MountReleaseRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.proposed_price);
     }
 }
 
-impl DofusDeserialize for PaddockBuyRequestMessage {
+impl DofusDeserialize for MountReleaseRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            proposed_price: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for PaddockBuyRequestMessage {
-    const MESSAGE_ID: u16 = 5951;
+impl DofusMessage for MountReleaseRequestMessage {
+    const MESSAGE_ID: u16 = 460;
 }
 
-/// Protocol message — ID: 5953
+/// Protocol message — ID: 581
+#[derive(Debug, Clone, Default)]
+pub struct MountToggleRidingRequestMessage {
+}
+
+impl DofusSerialize for MountToggleRidingRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for MountToggleRidingRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for MountToggleRidingRequestMessage {
+    const MESSAGE_ID: u16 = 581;
+}
+
+/// Protocol message — ID: 663
 #[derive(Debug, Clone, Default)]
 pub struct PaddockSellRequestMessage {
     pub price: i64,
@@ -54,34 +72,202 @@ impl DofusDeserialize for PaddockSellRequestMessage {
 }
 
 impl DofusMessage for PaddockSellRequestMessage {
-    const MESSAGE_ID: u16 = 5953;
+    const MESSAGE_ID: u16 = 663;
 }
 
-/// Protocol message — ID: 5958
+/// Protocol message — ID: 1248
 #[derive(Debug, Clone, Default)]
-pub struct PaddockRemoveItemRequestMessage {
-    pub cell_id: i16,
+pub struct MountSterilizedMessage {
+    pub mount_id: i32,
 }
 
-impl DofusSerialize for PaddockRemoveItemRequestMessage {
+impl DofusSerialize for MountSterilizedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
+        writer.write_var_int(self.mount_id);
     }
 }
 
-impl DofusDeserialize for PaddockRemoveItemRequestMessage {
+impl DofusDeserialize for MountSterilizedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            cell_id: reader.read_var_short()?,
+            mount_id: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for PaddockRemoveItemRequestMessage {
-    const MESSAGE_ID: u16 = 5958;
+impl DofusMessage for MountSterilizedMessage {
+    const MESSAGE_ID: u16 = 1248;
 }
 
-/// Protocol message — ID: 5962
+/// Protocol message — ID: 1532
+#[derive(Debug, Clone, Default)]
+pub struct MountHarnessColorsUpdateRequestMessage {
+    pub use_harness_colors: bool,
+}
+
+impl DofusSerialize for MountHarnessColorsUpdateRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.use_harness_colors);
+    }
+}
+
+impl DofusDeserialize for MountHarnessColorsUpdateRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            use_harness_colors: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for MountHarnessColorsUpdateRequestMessage {
+    const MESSAGE_ID: u16 = 1532;
+}
+
+/// Protocol message — ID: 1968
+#[derive(Debug, Clone, Default)]
+pub struct MountUnSetMessage {
+}
+
+impl DofusSerialize for MountUnSetMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for MountUnSetMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for MountUnSetMessage {
+    const MESSAGE_ID: u16 = 1968;
+}
+
+/// Protocol message — ID: 2786
+#[derive(Debug, Clone, Default)]
+pub struct MountEmoteIconUsedOkMessage {
+    pub mount_id: i32,
+    pub reaction_type: u8,
+}
+
+impl DofusSerialize for MountEmoteIconUsedOkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.mount_id);
+        writer.write_byte(self.reaction_type);
+    }
+}
+
+impl DofusDeserialize for MountEmoteIconUsedOkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_id: reader.read_var_int()?,
+            reaction_type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for MountEmoteIconUsedOkMessage {
+    const MESSAGE_ID: u16 = 2786;
+}
+
+/// Protocol message — ID: 2798
+#[derive(Debug, Clone, Default)]
+pub struct MountRenamedMessage {
+    pub mount_id: i32,
+    pub name: String,
+}
+
+impl DofusSerialize for MountRenamedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.mount_id);
+        writer.write_utf(&self.name);
+    }
+}
+
+impl DofusDeserialize for MountRenamedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_id: reader.read_var_int()?,
+            name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for MountRenamedMessage {
+    const MESSAGE_ID: u16 = 2798;
+}
+
+/// Protocol message — ID: 3596
+#[derive(Debug, Clone, Default)]
+pub struct MountHarnessDissociateRequestMessage {
+}
+
+impl DofusSerialize for MountHarnessDissociateRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for MountHarnessDissociateRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for MountHarnessDissociateRequestMessage {
+    const MESSAGE_ID: u16 = 3596;
+}
+
+/// Protocol message — ID: 4796
+#[derive(Debug, Clone, Default)]
+pub struct MountSetXpRatioRequestMessage {
+    pub xp_ratio: u8,
+}
+
+impl DofusSerialize for MountSetXpRatioRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.xp_ratio);
+    }
+}
+
+impl DofusDeserialize for MountSetXpRatioRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            xp_ratio: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for MountSetXpRatioRequestMessage {
+    const MESSAGE_ID: u16 = 4796;
+}
+
+/// Protocol message — ID: 5404
+#[derive(Debug, Clone, Default)]
+pub struct MountXpRatioMessage {
+    pub ratio: u8,
+}
+
+impl DofusSerialize for MountXpRatioMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.ratio);
+    }
+}
+
+impl DofusDeserialize for MountXpRatioMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ratio: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for MountXpRatioMessage {
+    const MESSAGE_ID: u16 = 5404;
+}
+
+/// Protocol message — ID: 5528
 #[derive(Debug, Clone, Default)]
 pub struct MountSterilizeRequestMessage {
 }
@@ -99,34 +285,211 @@ impl DofusDeserialize for MountSterilizeRequestMessage {
 }
 
 impl DofusMessage for MountSterilizeRequestMessage {
-    const MESSAGE_ID: u16 = 5962;
+    const MESSAGE_ID: u16 = 5528;
 }
 
-/// Protocol message — ID: 5963
+/// Protocol message — ID: 5650
 #[derive(Debug, Clone, Default)]
-pub struct MountEquipedErrorMessage {
-    pub error_type: u8,
+pub struct GameDataPaddockObjectRemoveMessage {
+    pub cell_id: i16,
 }
 
-impl DofusSerialize for MountEquipedErrorMessage {
+impl DofusSerialize for GameDataPaddockObjectRemoveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.error_type);
+        writer.write_var_short(self.cell_id);
     }
 }
 
-impl DofusDeserialize for MountEquipedErrorMessage {
+impl DofusDeserialize for GameDataPaddockObjectRemoveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            error_type: reader.read_byte()?,
+            cell_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for MountEquipedErrorMessage {
-    const MESSAGE_ID: u16 = 5963;
+impl DofusMessage for GameDataPaddockObjectRemoveMessage {
+    const MESSAGE_ID: u16 = 5650;
 }
 
-/// Protocol message — ID: 5967
+/// Protocol message — ID: 5652
+#[derive(Debug, Clone, Default)]
+pub struct PaddockMoveItemRequestMessage {
+    pub old_cell_id: i16,
+    pub new_cell_id: i16,
+}
+
+impl DofusSerialize for PaddockMoveItemRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.old_cell_id);
+        writer.write_var_short(self.new_cell_id);
+    }
+}
+
+impl DofusDeserialize for PaddockMoveItemRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            old_cell_id: reader.read_var_short()?,
+            new_cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for PaddockMoveItemRequestMessage {
+    const MESSAGE_ID: u16 = 5652;
+}
+
+/// Protocol message — ID: 5783
+#[derive(Debug, Clone, Default)]
+pub struct MountDataErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for MountDataErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for MountDataErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for MountDataErrorMessage {
+    const MESSAGE_ID: u16 = 5783;
+}
+
+/// Protocol message — ID: 5993
+#[derive(Debug, Clone, Default)]
+pub struct GameDataPaddockObjectAddMessage {
+    pub paddock_item_description: PaddockItem,
+}
+
+impl DofusSerialize for GameDataPaddockObjectAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.paddock_item_description.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameDataPaddockObjectAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            paddock_item_description: PaddockItem::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameDataPaddockObjectAddMessage {
+    const MESSAGE_ID: u16 = 5993;
+}
+
+/// Protocol message — ID: 6105
+#[derive(Debug, Clone, Default)]
+pub struct MountReleasedMessage {
+    pub mount_id: i32,
+}
+
+impl DofusSerialize for MountReleasedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.mount_id);
+    }
+}
+
+impl DofusDeserialize for MountReleasedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for MountReleasedMessage {
+    const MESSAGE_ID: u16 = 6105;
+}
+
+/// Protocol message — ID: 6271
+#[derive(Debug, Clone, Default)]
+pub struct MountInformationInPaddockRequestMessage {
+    pub map_ride_id: i32,
+}
+
+impl DofusSerialize for MountInformationInPaddockRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.map_ride_id);
+    }
+}
+
+impl DofusDeserialize for MountInformationInPaddockRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_ride_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for MountInformationInPaddockRequestMessage {
+    const MESSAGE_ID: u16 = 6271;
+}
+
+/// Protocol message — ID: 6312
+#[derive(Debug, Clone, Default)]
+pub struct PaddockBuyResultMessage {
+    pub paddock_id: f64,
+    pub bought: bool,
+    pub real_price: i64,
+}
+
+impl DofusSerialize for PaddockBuyResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.paddock_id);
+        writer.write_boolean(self.bought);
+        writer.write_var_long(self.real_price);
+    }
+}
+
+impl DofusDeserialize for PaddockBuyResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            paddock_id: reader.read_double()?,
+            bought: reader.read_boolean()?,
+            real_price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for PaddockBuyResultMessage {
+    const MESSAGE_ID: u16 = 6312;
+}
+
+/// Protocol message — ID: 7426
+#[derive(Debug, Clone, Default)]
+pub struct MountDataMessage {
+    pub mount_data: MountClientData,
+}
+
+impl DofusSerialize for MountDataMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.mount_data.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for MountDataMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            mount_data: MountClientData::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for MountDataMessage {
+    const MESSAGE_ID: u16 = 7426;
+}
+
+/// Protocol message — ID: 7744
 #[derive(Debug, Clone, Default)]
 pub struct MountRidingMessage {
     pub is_riding: bool,
@@ -153,10 +516,10 @@ impl DofusDeserialize for MountRidingMessage {
 }
 
 impl DofusMessage for MountRidingMessage {
-    const MESSAGE_ID: u16 = 5967;
+    const MESSAGE_ID: u16 = 7744;
 }
 
-/// Protocol message — ID: 5968
+/// Protocol message — ID: 7836
 #[derive(Debug, Clone, Default)]
 pub struct MountSetMessage {
     pub mount_data: MountClientData,
@@ -177,325 +540,34 @@ impl DofusDeserialize for MountSetMessage {
 }
 
 impl DofusMessage for MountSetMessage {
-    const MESSAGE_ID: u16 = 5968;
+    const MESSAGE_ID: u16 = 7836;
 }
 
-/// Protocol message — ID: 5970
+/// Protocol message — ID: 7954
 #[derive(Debug, Clone, Default)]
-pub struct MountXpRatioMessage {
-    pub ratio: u8,
+pub struct PaddockRemoveItemRequestMessage {
+    pub cell_id: i16,
 }
 
-impl DofusSerialize for MountXpRatioMessage {
+impl DofusSerialize for PaddockRemoveItemRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.ratio);
+        writer.write_var_short(self.cell_id);
     }
 }
 
-impl DofusDeserialize for MountXpRatioMessage {
+impl DofusDeserialize for PaddockRemoveItemRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            ratio: reader.read_byte()?,
+            cell_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for MountXpRatioMessage {
-    const MESSAGE_ID: u16 = 5970;
+impl DofusMessage for PaddockRemoveItemRequestMessage {
+    const MESSAGE_ID: u16 = 7954;
 }
 
-/// Protocol message — ID: 5972
-#[derive(Debug, Clone, Default)]
-pub struct MountInformationRequestMessage {
-    pub id: f64,
-    pub time: f64,
-}
-
-impl DofusSerialize for MountInformationRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        writer.write_double(self.time);
-    }
-}
-
-impl DofusDeserialize for MountInformationRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-            time: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for MountInformationRequestMessage {
-    const MESSAGE_ID: u16 = 5972;
-}
-
-/// Protocol message — ID: 5973
-#[derive(Debug, Clone, Default)]
-pub struct MountDataMessage {
-    pub mount_data: MountClientData,
-}
-
-impl DofusSerialize for MountDataMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.mount_data.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for MountDataMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_data: MountClientData::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for MountDataMessage {
-    const MESSAGE_ID: u16 = 5973;
-}
-
-/// Protocol message — ID: 5975
-#[derive(Debug, Clone, Default)]
-pub struct MountInformationInPaddockRequestMessage {
-    pub map_ride_id: i32,
-}
-
-impl DofusSerialize for MountInformationInPaddockRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.map_ride_id);
-    }
-}
-
-impl DofusDeserialize for MountInformationInPaddockRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_ride_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for MountInformationInPaddockRequestMessage {
-    const MESSAGE_ID: u16 = 5975;
-}
-
-/// Protocol message — ID: 5976
-#[derive(Debug, Clone, Default)]
-pub struct MountToggleRidingRequestMessage {
-}
-
-impl DofusSerialize for MountToggleRidingRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for MountToggleRidingRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for MountToggleRidingRequestMessage {
-    const MESSAGE_ID: u16 = 5976;
-}
-
-/// Protocol message — ID: 5977
-#[derive(Debug, Clone, Default)]
-pub struct MountSterilizedMessage {
-    pub mount_id: i32,
-}
-
-impl DofusSerialize for MountSterilizedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.mount_id);
-    }
-}
-
-impl DofusDeserialize for MountSterilizedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for MountSterilizedMessage {
-    const MESSAGE_ID: u16 = 5977;
-}
-
-/// Protocol message — ID: 5978
-#[derive(Debug, Clone, Default)]
-pub struct MountEmoteIconUsedOkMessage {
-    pub mount_id: i32,
-    pub reaction_type: u8,
-}
-
-impl DofusSerialize for MountEmoteIconUsedOkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.mount_id);
-        writer.write_byte(self.reaction_type);
-    }
-}
-
-impl DofusDeserialize for MountEmoteIconUsedOkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_id: reader.read_var_int()?,
-            reaction_type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for MountEmoteIconUsedOkMessage {
-    const MESSAGE_ID: u16 = 5978;
-}
-
-/// Protocol message — ID: 5980
-#[derive(Debug, Clone, Default)]
-pub struct MountReleaseRequestMessage {
-}
-
-impl DofusSerialize for MountReleaseRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for MountReleaseRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for MountReleaseRequestMessage {
-    const MESSAGE_ID: u16 = 5980;
-}
-
-/// Protocol message — ID: 5982
-#[derive(Debug, Clone, Default)]
-pub struct MountUnSetMessage {
-}
-
-impl DofusSerialize for MountUnSetMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for MountUnSetMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for MountUnSetMessage {
-    const MESSAGE_ID: u16 = 5982;
-}
-
-/// Protocol message — ID: 5983
-#[derive(Debug, Clone, Default)]
-pub struct MountRenamedMessage {
-    pub mount_id: i32,
-    pub name: String,
-}
-
-impl DofusSerialize for MountRenamedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.mount_id);
-        writer.write_utf(&self.name);
-    }
-}
-
-impl DofusDeserialize for MountRenamedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            mount_id: reader.read_var_int()?,
-            name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for MountRenamedMessage {
-    const MESSAGE_ID: u16 = 5983;
-}
-
-/// Protocol message — ID: 5987
-#[derive(Debug, Clone, Default)]
-pub struct MountRenameRequestMessage {
-    pub name: String,
-    pub mount_id: i32,
-}
-
-impl DofusSerialize for MountRenameRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.name);
-        writer.write_var_int(self.mount_id);
-    }
-}
-
-impl DofusDeserialize for MountRenameRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            name: reader.read_utf()?,
-            mount_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for MountRenameRequestMessage {
-    const MESSAGE_ID: u16 = 5987;
-}
-
-/// Protocol message — ID: 5989
-#[derive(Debug, Clone, Default)]
-pub struct MountSetXpRatioRequestMessage {
-    pub xp_ratio: u8,
-}
-
-impl DofusSerialize for MountSetXpRatioRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.xp_ratio);
-    }
-}
-
-impl DofusDeserialize for MountSetXpRatioRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            xp_ratio: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for MountSetXpRatioRequestMessage {
-    const MESSAGE_ID: u16 = 5989;
-}
-
-/// Protocol message — ID: 5990
-#[derive(Debug, Clone, Default)]
-pub struct GameDataPaddockObjectAddMessage {
-    pub paddock_item_description: PaddockItem,
-}
-
-impl DofusSerialize for GameDataPaddockObjectAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.paddock_item_description.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameDataPaddockObjectAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            paddock_item_description: PaddockItem::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameDataPaddockObjectAddMessage {
-    const MESSAGE_ID: u16 = 5990;
-}
-
-/// Protocol message — ID: 5992
+/// Protocol message — ID: 8033
 #[derive(Debug, Clone, Default)]
 pub struct GameDataPaddockObjectListAddMessage {
     pub paddock_item_description: Vec<PaddockItem>,
@@ -526,85 +598,88 @@ impl DofusDeserialize for GameDataPaddockObjectListAddMessage {
 }
 
 impl DofusMessage for GameDataPaddockObjectListAddMessage {
-    const MESSAGE_ID: u16 = 5992;
+    const MESSAGE_ID: u16 = 8033;
 }
 
-/// Protocol message — ID: 5993
+/// Protocol message — ID: 8339
 #[derive(Debug, Clone, Default)]
-pub struct GameDataPaddockObjectRemoveMessage {
-    pub cell_id: i16,
+pub struct MountInformationRequestMessage {
+    pub id: f64,
+    pub time: f64,
 }
 
-impl DofusSerialize for GameDataPaddockObjectRemoveMessage {
+impl DofusSerialize for MountInformationRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
+        writer.write_double(self.id);
+        writer.write_double(self.time);
     }
 }
 
-impl DofusDeserialize for GameDataPaddockObjectRemoveMessage {
+impl DofusDeserialize for MountInformationRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            cell_id: reader.read_var_short()?,
+            id: reader.read_double()?,
+            time: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameDataPaddockObjectRemoveMessage {
-    const MESSAGE_ID: u16 = 5993;
+impl DofusMessage for MountInformationRequestMessage {
+    const MESSAGE_ID: u16 = 8339;
 }
 
-/// Protocol message — ID: 6052
+/// Protocol message — ID: 9033
 #[derive(Debug, Clone, Default)]
-pub struct PaddockMoveItemRequestMessage {
-    pub old_cell_id: i16,
-    pub new_cell_id: i16,
+pub struct MountRenameRequestMessage {
+    pub name: String,
+    pub mount_id: i32,
 }
 
-impl DofusSerialize for PaddockMoveItemRequestMessage {
+impl DofusSerialize for MountRenameRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.old_cell_id);
-        writer.write_var_short(self.new_cell_id);
+        writer.write_utf(&self.name);
+        writer.write_var_int(self.mount_id);
     }
 }
 
-impl DofusDeserialize for PaddockMoveItemRequestMessage {
+impl DofusDeserialize for MountRenameRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            old_cell_id: reader.read_var_short()?,
-            new_cell_id: reader.read_var_short()?,
+            name: reader.read_utf()?,
+            mount_id: reader.read_var_int()?,
         })
     }
 }
 
-impl DofusMessage for PaddockMoveItemRequestMessage {
-    const MESSAGE_ID: u16 = 6052;
+impl DofusMessage for MountRenameRequestMessage {
+    const MESSAGE_ID: u16 = 9033;
 }
 
-/// Protocol message — ID: 6172
+/// Protocol message — ID: 9127
 #[derive(Debug, Clone, Default)]
-pub struct MountDataErrorMessage {
-    pub reason: u8,
+pub struct MountEquipedErrorMessage {
+    pub error_type: u8,
 }
 
-impl DofusSerialize for MountDataErrorMessage {
+impl DofusSerialize for MountEquipedErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
+        writer.write_byte(self.error_type);
     }
 }
 
-impl DofusDeserialize for MountDataErrorMessage {
+impl DofusDeserialize for MountEquipedErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            reason: reader.read_byte()?,
+            error_type: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for MountDataErrorMessage {
-    const MESSAGE_ID: u16 = 6172;
+impl DofusMessage for MountEquipedErrorMessage {
+    const MESSAGE_ID: u16 = 9127;
 }
 
-/// Protocol message — ID: 6189
+/// Protocol message — ID: 9525
 #[derive(Debug, Clone, Default)]
 pub struct MountFeedRequestMessage {
     pub mount_uid: i32,
@@ -634,105 +709,30 @@ impl DofusDeserialize for MountFeedRequestMessage {
 }
 
 impl DofusMessage for MountFeedRequestMessage {
-    const MESSAGE_ID: u16 = 6189;
+    const MESSAGE_ID: u16 = 9525;
 }
 
-/// Protocol message — ID: 6308
+/// Protocol message — ID: 9656
 #[derive(Debug, Clone, Default)]
-pub struct MountReleasedMessage {
-    pub mount_id: i32,
+pub struct PaddockBuyRequestMessage {
+    pub proposed_price: i64,
 }
 
-impl DofusSerialize for MountReleasedMessage {
+impl DofusSerialize for PaddockBuyRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.mount_id);
+        writer.write_var_long(self.proposed_price);
     }
 }
 
-impl DofusDeserialize for MountReleasedMessage {
+impl DofusDeserialize for PaddockBuyRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            mount_id: reader.read_var_int()?,
+            proposed_price: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for MountReleasedMessage {
-    const MESSAGE_ID: u16 = 6308;
-}
-
-/// Protocol message — ID: 6516
-#[derive(Debug, Clone, Default)]
-pub struct PaddockBuyResultMessage {
-    pub paddock_id: f64,
-    pub bought: bool,
-    pub real_price: i64,
-}
-
-impl DofusSerialize for PaddockBuyResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.paddock_id);
-        writer.write_boolean(self.bought);
-        writer.write_var_long(self.real_price);
-    }
-}
-
-impl DofusDeserialize for PaddockBuyResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            paddock_id: reader.read_double()?,
-            bought: reader.read_boolean()?,
-            real_price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for PaddockBuyResultMessage {
-    const MESSAGE_ID: u16 = 6516;
-}
-
-/// Protocol message — ID: 6696
-#[derive(Debug, Clone, Default)]
-pub struct MountHarnessDissociateRequestMessage {
-}
-
-impl DofusSerialize for MountHarnessDissociateRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for MountHarnessDissociateRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for MountHarnessDissociateRequestMessage {
-    const MESSAGE_ID: u16 = 6696;
-}
-
-/// Protocol message — ID: 6697
-#[derive(Debug, Clone, Default)]
-pub struct MountHarnessColorsUpdateRequestMessage {
-    pub use_harness_colors: bool,
-}
-
-impl DofusSerialize for MountHarnessColorsUpdateRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.use_harness_colors);
-    }
-}
-
-impl DofusDeserialize for MountHarnessColorsUpdateRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            use_harness_colors: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for MountHarnessColorsUpdateRequestMessage {
-    const MESSAGE_ID: u16 = 6697;
+impl DofusMessage for PaddockBuyRequestMessage {
+    const MESSAGE_ID: u16 = 9656;
 }
 

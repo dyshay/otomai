@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6290
+/// Protocol message — ID: 8089
 #[derive(Debug, Clone, Default)]
 pub struct ObjectFeedMessage {
     pub object_u_i_d: i32,
@@ -40,6 +40,6 @@ impl DofusDeserialize for ObjectFeedMessage {
 }
 
 impl DofusMessage for ObjectFeedMessage {
-    const MESSAGE_ID: u16 = 6290;
+    const MESSAGE_ID: u16 = 8089;
 }
 

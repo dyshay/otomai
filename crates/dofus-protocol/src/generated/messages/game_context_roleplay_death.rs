@@ -6,49 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 745
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayFreeSoulRequestMessage {
-}
-
-impl DofusSerialize for GameRolePlayFreeSoulRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameRolePlayFreeSoulRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayFreeSoulRequestMessage {
-    const MESSAGE_ID: u16 = 745;
-}
-
-/// Protocol message — ID: 746
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayGameOverMessage {
-}
-
-impl DofusSerialize for GameRolePlayGameOverMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameRolePlayGameOverMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayGameOverMessage {
-    const MESSAGE_ID: u16 = 746;
-}
-
-/// Protocol message — ID: 5996
+/// Protocol message — ID: 528
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayPlayerLifeStatusMessage {
     pub state: u8,
@@ -72,10 +30,52 @@ impl DofusDeserialize for GameRolePlayPlayerLifeStatusMessage {
 }
 
 impl DofusMessage for GameRolePlayPlayerLifeStatusMessage {
-    const MESSAGE_ID: u16 = 5996;
+    const MESSAGE_ID: u16 = 528;
 }
 
-/// Protocol message — ID: 6512
+/// Protocol message — ID: 6865
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayFreeSoulRequestMessage {
+}
+
+impl DofusSerialize for GameRolePlayFreeSoulRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameRolePlayFreeSoulRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayFreeSoulRequestMessage {
+    const MESSAGE_ID: u16 = 6865;
+}
+
+/// Protocol message — ID: 7625
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayGameOverMessage {
+}
+
+impl DofusSerialize for GameRolePlayGameOverMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameRolePlayGameOverMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayGameOverMessage {
+    const MESSAGE_ID: u16 = 7625;
+}
+
+/// Protocol message — ID: 8483
 #[derive(Debug, Clone, Default)]
 pub struct WarnOnPermaDeathMessage {
     pub enable: bool,
@@ -96,6 +96,6 @@ impl DofusDeserialize for WarnOnPermaDeathMessage {
 }
 
 impl DofusMessage for WarnOnPermaDeathMessage {
-    const MESSAGE_ID: u16 = 6512;
+    const MESSAGE_ID: u16 = 8483;
 }
 

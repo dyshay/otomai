@@ -6,7 +6,88 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6276
+/// Protocol message — ID: 451
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+    pub solo: ArenaRankInfos,
+    pub team: ArenaRankInfos,
+    pub duel: ArenaRankInfos,
+}
+
+impl DofusSerialize for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.solo.serialize(writer);
+        self.team.serialize(writer);
+        self.duel.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            solo: ArenaRankInfos::deserialize(reader)?,
+            team: ArenaRankInfos::deserialize(reader)?,
+            duel: ArenaRankInfos::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+    const MESSAGE_ID: u16 = 451;
+}
+
+/// Protocol message — ID: 2247
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayArenaUpdatePlayerInfosMessage {
+    pub solo: ArenaRankInfos,
+}
+
+impl DofusSerialize for GameRolePlayArenaUpdatePlayerInfosMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.solo.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayArenaUpdatePlayerInfosMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            solo: ArenaRankInfos::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayArenaUpdatePlayerInfosMessage {
+    const MESSAGE_ID: u16 = 2247;
+}
+
+/// Protocol message — ID: 2536
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayArenaFightAnswerMessage {
+    pub fight_id: i16,
+    pub accept: bool,
+}
+
+impl DofusSerialize for GameRolePlayArenaFightAnswerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+        writer.write_boolean(self.accept);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayArenaFightAnswerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+            accept: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayArenaFightAnswerMessage {
+    const MESSAGE_ID: u16 = 2536;
+}
+
+/// Protocol message — ID: 3669
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayArenaFightPropositionMessage {
     pub fight_id: i16,
@@ -43,61 +124,10 @@ impl DofusDeserialize for GameRolePlayArenaFightPropositionMessage {
 }
 
 impl DofusMessage for GameRolePlayArenaFightPropositionMessage {
-    const MESSAGE_ID: u16 = 6276;
+    const MESSAGE_ID: u16 = 3669;
 }
 
-/// Protocol message — ID: 6279
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaFightAnswerMessage {
-    pub fight_id: i16,
-    pub accept: bool,
-}
-
-impl DofusSerialize for GameRolePlayArenaFightAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayArenaFightAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayArenaFightAnswerMessage {
-    const MESSAGE_ID: u16 = 6279;
-}
-
-/// Protocol message — ID: 6280
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaRegisterMessage {
-    pub battle_mode: i32,
-}
-
-impl DofusSerialize for GameRolePlayArenaRegisterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.battle_mode);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayArenaRegisterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            battle_mode: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayArenaRegisterMessage {
-    const MESSAGE_ID: u16 = 6280;
-}
-
-/// Protocol message — ID: 6281
+/// Protocol message — ID: 4175
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayArenaFighterStatusMessage {
     pub fight_id: i16,
@@ -124,10 +154,34 @@ impl DofusDeserialize for GameRolePlayArenaFighterStatusMessage {
 }
 
 impl DofusMessage for GameRolePlayArenaFighterStatusMessage {
-    const MESSAGE_ID: u16 = 6281;
+    const MESSAGE_ID: u16 = 4175;
 }
 
-/// Protocol message — ID: 6282
+/// Protocol message — ID: 4371
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayArenaRegisterMessage {
+    pub battle_mode: i32,
+}
+
+impl DofusSerialize for GameRolePlayArenaRegisterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.battle_mode);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayArenaRegisterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            battle_mode: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayArenaRegisterMessage {
+    const MESSAGE_ID: u16 = 4371;
+}
+
+/// Protocol message — ID: 6661
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayArenaUnregisterMessage {
 }
@@ -145,64 +199,44 @@ impl DofusDeserialize for GameRolePlayArenaUnregisterMessage {
 }
 
 impl DofusMessage for GameRolePlayArenaUnregisterMessage {
-    const MESSAGE_ID: u16 = 6282;
+    const MESSAGE_ID: u16 = 6661;
 }
 
-/// Protocol message — ID: 6284
+/// Protocol message — ID: 6871
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaRegistrationStatusMessage {
-    pub registered: bool,
-    pub step: u8,
-    pub battle_mode: i32,
+pub struct GameRolePlayArenaInvitationCandidatesAnswer {
+    pub candidates: Vec<LeagueFriendInformations>,
 }
 
-impl DofusSerialize for GameRolePlayArenaRegistrationStatusMessage {
+impl DofusSerialize for GameRolePlayArenaInvitationCandidatesAnswer {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.registered);
-        writer.write_byte(self.step);
-        writer.write_int(self.battle_mode);
+        writer.write_short(self.candidates.len() as _);
+        for item in &self.candidates {
+            item.serialize(writer);
+        }
     }
 }
 
-impl DofusDeserialize for GameRolePlayArenaRegistrationStatusMessage {
+impl DofusDeserialize for GameRolePlayArenaInvitationCandidatesAnswer {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            registered: reader.read_boolean()?,
-            step: reader.read_byte()?,
-            battle_mode: reader.read_int()?,
+            candidates: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(LeagueFriendInformations::deserialize(reader)?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for GameRolePlayArenaRegistrationStatusMessage {
-    const MESSAGE_ID: u16 = 6284;
+impl DofusMessage for GameRolePlayArenaInvitationCandidatesAnswer {
+    const MESSAGE_ID: u16 = 6871;
 }
 
-/// Protocol message — ID: 6301
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaUpdatePlayerInfosMessage {
-    pub solo: ArenaRankInfos,
-}
-
-impl DofusSerialize for GameRolePlayArenaUpdatePlayerInfosMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.solo.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayArenaUpdatePlayerInfosMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            solo: ArenaRankInfos::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayArenaUpdatePlayerInfosMessage {
-    const MESSAGE_ID: u16 = 6301;
-}
-
-/// Protocol message — ID: 6574
+/// Protocol message — ID: 6943
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayArenaSwitchToGameServerMessage {
     pub valid_token: bool,
@@ -239,10 +273,43 @@ impl DofusDeserialize for GameRolePlayArenaSwitchToGameServerMessage {
 }
 
 impl DofusMessage for GameRolePlayArenaSwitchToGameServerMessage {
-    const MESSAGE_ID: u16 = 6574;
+    const MESSAGE_ID: u16 = 6943;
 }
 
-/// Protocol message — ID: 6575
+/// Protocol message — ID: 8309
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayArenaLeagueRewardsMessage {
+    pub season_id: i16,
+    pub league_id: i16,
+    pub ladder_position: i32,
+    pub end_season_reward: bool,
+}
+
+impl DofusSerialize for GameRolePlayArenaLeagueRewardsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.season_id);
+        writer.write_var_short(self.league_id);
+        writer.write_int(self.ladder_position);
+        writer.write_boolean(self.end_season_reward);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayArenaLeagueRewardsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            season_id: reader.read_var_short()?,
+            league_id: reader.read_var_short()?,
+            ladder_position: reader.read_int()?,
+            end_season_reward: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayArenaLeagueRewardsMessage {
+    const MESSAGE_ID: u16 = 8309;
+}
+
+/// Protocol message — ID: 9126
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayArenaSwitchToFightServerMessage {
     pub address: String,
@@ -289,103 +356,36 @@ impl DofusDeserialize for GameRolePlayArenaSwitchToFightServerMessage {
 }
 
 impl DofusMessage for GameRolePlayArenaSwitchToFightServerMessage {
-    const MESSAGE_ID: u16 = 6575;
+    const MESSAGE_ID: u16 = 9126;
 }
 
-/// Protocol message — ID: 6728
+/// Protocol message — ID: 9995
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
-    pub solo: ArenaRankInfos,
-    pub team: ArenaRankInfos,
-    pub duel: ArenaRankInfos,
+pub struct GameRolePlayArenaRegistrationStatusMessage {
+    pub registered: bool,
+    pub step: u8,
+    pub battle_mode: i32,
 }
 
-impl DofusSerialize for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+impl DofusSerialize for GameRolePlayArenaRegistrationStatusMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.solo.serialize(writer);
-        self.team.serialize(writer);
-        self.duel.serialize(writer);
+        writer.write_boolean(self.registered);
+        writer.write_byte(self.step);
+        writer.write_int(self.battle_mode);
     }
 }
 
-impl DofusDeserialize for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
+impl DofusDeserialize for GameRolePlayArenaRegistrationStatusMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            solo: ArenaRankInfos::deserialize(reader)?,
-            team: ArenaRankInfos::deserialize(reader)?,
-            duel: ArenaRankInfos::deserialize(reader)?,
+            registered: reader.read_boolean()?,
+            step: reader.read_byte()?,
+            battle_mode: reader.read_int()?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayArenaUpdatePlayerInfosAllQueuesMessage {
-    const MESSAGE_ID: u16 = 6728;
-}
-
-/// Protocol message — ID: 6783
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaInvitationCandidatesAnswer {
-    pub candidates: Vec<LeagueFriendInformations>,
-}
-
-impl DofusSerialize for GameRolePlayArenaInvitationCandidatesAnswer {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.candidates.len() as _);
-        for item in &self.candidates {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameRolePlayArenaInvitationCandidatesAnswer {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            candidates: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(LeagueFriendInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayArenaInvitationCandidatesAnswer {
-    const MESSAGE_ID: u16 = 6783;
-}
-
-/// Protocol message — ID: 6785
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayArenaLeagueRewardsMessage {
-    pub season_id: i16,
-    pub league_id: i16,
-    pub ladder_position: i32,
-    pub end_season_reward: bool,
-}
-
-impl DofusSerialize for GameRolePlayArenaLeagueRewardsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.season_id);
-        writer.write_var_short(self.league_id);
-        writer.write_int(self.ladder_position);
-        writer.write_boolean(self.end_season_reward);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayArenaLeagueRewardsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            season_id: reader.read_var_short()?,
-            league_id: reader.read_var_short()?,
-            ladder_position: reader.read_int()?,
-            end_season_reward: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayArenaLeagueRewardsMessage {
-    const MESSAGE_ID: u16 = 6785;
+impl DofusMessage for GameRolePlayArenaRegistrationStatusMessage {
+    const MESSAGE_ID: u16 = 9995;
 }
 

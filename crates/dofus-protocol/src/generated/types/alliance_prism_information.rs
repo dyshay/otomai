@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 427
+/// Protocol type — ID: 5996
 #[derive(Debug, Clone, Default)]
 pub struct AlliancePrismInformation {
     pub type_id: u8,
@@ -42,6 +42,6 @@ impl DofusDeserialize for AlliancePrismInformation {
 }
 
 impl DofusType for AlliancePrismInformation {
-    const TYPE_ID: u16 = 427;
+    const TYPE_ID: u16 = 5996;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 465
+/// Protocol type — ID: 3298
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntStepDig {
 }
@@ -24,6 +24,6 @@ impl DofusDeserialize for TreasureHuntStepDig {
 }
 
 impl DofusType for TreasureHuntStepDig {
-    const TYPE_ID: u16 = 465;
+    const TYPE_ID: u16 = 3298;
 }
 

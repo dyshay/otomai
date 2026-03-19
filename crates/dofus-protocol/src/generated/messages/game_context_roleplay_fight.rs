@@ -6,112 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 300
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayRemoveChallengeMessage {
-    pub fight_id: i16,
-}
-
-impl DofusSerialize for GameRolePlayRemoveChallengeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayRemoveChallengeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayRemoveChallengeMessage {
-    const MESSAGE_ID: u16 = 300;
-}
-
-/// Protocol message — ID: 301
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayShowChallengeMessage {
-    pub commons_infos: FightCommonInformations,
-}
-
-impl DofusSerialize for GameRolePlayShowChallengeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.commons_infos.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayShowChallengeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            commons_infos: FightCommonInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayShowChallengeMessage {
-    const MESSAGE_ID: u16 = 301;
-}
-
-/// Protocol message — ID: 5731
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayPlayerFightRequestMessage {
-    pub target_id: i64,
-    pub target_cell_id: i16,
-    pub friendly: bool,
-}
-
-impl DofusSerialize for GameRolePlayPlayerFightRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.target_id);
-        writer.write_short(self.target_cell_id);
-        writer.write_boolean(self.friendly);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayPlayerFightRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            target_id: reader.read_var_long()?,
-            target_cell_id: reader.read_short()?,
-            friendly: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayPlayerFightRequestMessage {
-    const MESSAGE_ID: u16 = 5731;
-}
-
-/// Protocol message — ID: 5732
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayPlayerFightFriendlyAnswerMessage {
-    pub fight_id: i16,
-    pub accept: bool,
-}
-
-impl DofusSerialize for GameRolePlayPlayerFightFriendlyAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayPlayerFightFriendlyAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayPlayerFightFriendlyAnswerMessage {
-    const MESSAGE_ID: u16 = 5732;
-}
-
-/// Protocol message — ID: 5733
+/// Protocol message — ID: 2891
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayPlayerFightFriendlyAnsweredMessage {
     pub fight_id: i16,
@@ -141,121 +36,64 @@ impl DofusDeserialize for GameRolePlayPlayerFightFriendlyAnsweredMessage {
 }
 
 impl DofusMessage for GameRolePlayPlayerFightFriendlyAnsweredMessage {
-    const MESSAGE_ID: u16 = 5733;
+    const MESSAGE_ID: u16 = 2891;
 }
 
-/// Protocol message — ID: 5822
+/// Protocol message — ID: 3588
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayFightRequestCanceledMessage {
+pub struct GameRolePlayPlayerFightFriendlyAnswerMessage {
     pub fight_id: i16,
-    pub source_id: f64,
-    pub target_id: f64,
+    pub accept: bool,
 }
 
-impl DofusSerialize for GameRolePlayFightRequestCanceledMessage {
+impl DofusSerialize for GameRolePlayPlayerFightFriendlyAnswerMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.fight_id);
-        writer.write_double(self.source_id);
-        writer.write_double(self.target_id);
+        writer.write_boolean(self.accept);
     }
 }
 
-impl DofusDeserialize for GameRolePlayFightRequestCanceledMessage {
+impl DofusDeserialize for GameRolePlayPlayerFightFriendlyAnswerMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             fight_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
-            target_id: reader.read_double()?,
+            accept: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayFightRequestCanceledMessage {
-    const MESSAGE_ID: u16 = 5822;
+impl DofusMessage for GameRolePlayPlayerFightFriendlyAnswerMessage {
+    const MESSAGE_ID: u16 = 3588;
 }
 
-/// Protocol message — ID: 5937
+/// Protocol message — ID: 4276
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayPlayerFightFriendlyRequestedMessage {
-    pub fight_id: i16,
-    pub source_id: i64,
-    pub target_id: i64,
-}
-
-impl DofusSerialize for GameRolePlayPlayerFightFriendlyRequestedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.fight_id);
-        writer.write_var_long(self.source_id);
-        writer.write_var_long(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayPlayerFightFriendlyRequestedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_var_short()?,
-            source_id: reader.read_var_long()?,
-            target_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayPlayerFightFriendlyRequestedMessage {
-    const MESSAGE_ID: u16 = 5937;
-}
-
-/// Protocol message — ID: 6073
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayAggressionMessage {
-    pub attacker_id: i64,
-    pub defender_id: i64,
-}
-
-impl DofusSerialize for GameRolePlayAggressionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.attacker_id);
-        writer.write_var_long(self.defender_id);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayAggressionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            attacker_id: reader.read_var_long()?,
-            defender_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayAggressionMessage {
-    const MESSAGE_ID: u16 = 6073;
-}
-
-/// Protocol message — ID: 6191
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayAttackMonsterRequestMessage {
+pub struct GameRolePlayMonsterNotAngryAtPlayerMessage {
+    pub player_id: i64,
     pub monster_group_id: f64,
 }
 
-impl DofusSerialize for GameRolePlayAttackMonsterRequestMessage {
+impl DofusSerialize for GameRolePlayMonsterNotAngryAtPlayerMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.player_id);
         writer.write_double(self.monster_group_id);
     }
 }
 
-impl DofusDeserialize for GameRolePlayAttackMonsterRequestMessage {
+impl DofusDeserialize for GameRolePlayMonsterNotAngryAtPlayerMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            player_id: reader.read_var_long()?,
             monster_group_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayAttackMonsterRequestMessage {
-    const MESSAGE_ID: u16 = 6191;
+impl DofusMessage for GameRolePlayMonsterNotAngryAtPlayerMessage {
+    const MESSAGE_ID: u16 = 4276;
 }
 
-/// Protocol message — ID: 6741
+/// Protocol message — ID: 4325
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayMonsterAngryAtPlayerMessage {
     pub player_id: i64,
@@ -285,33 +123,195 @@ impl DofusDeserialize for GameRolePlayMonsterAngryAtPlayerMessage {
 }
 
 impl DofusMessage for GameRolePlayMonsterAngryAtPlayerMessage {
-    const MESSAGE_ID: u16 = 6741;
+    const MESSAGE_ID: u16 = 4325;
 }
 
-/// Protocol message — ID: 6742
+/// Protocol message — ID: 5454
 #[derive(Debug, Clone, Default)]
-pub struct GameRolePlayMonsterNotAngryAtPlayerMessage {
-    pub player_id: i64,
+pub struct GameRolePlayFightRequestCanceledMessage {
+    pub fight_id: i16,
+    pub source_id: f64,
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameRolePlayFightRequestCanceledMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+        writer.write_double(self.source_id);
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayFightRequestCanceledMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayFightRequestCanceledMessage {
+    const MESSAGE_ID: u16 = 5454;
+}
+
+/// Protocol message — ID: 5626
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayAggressionMessage {
+    pub attacker_id: i64,
+    pub defender_id: i64,
+}
+
+impl DofusSerialize for GameRolePlayAggressionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.attacker_id);
+        writer.write_var_long(self.defender_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayAggressionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            attacker_id: reader.read_var_long()?,
+            defender_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayAggressionMessage {
+    const MESSAGE_ID: u16 = 5626;
+}
+
+/// Protocol message — ID: 6006
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayShowChallengeMessage {
+    pub commons_infos: FightCommonInformations,
+}
+
+impl DofusSerialize for GameRolePlayShowChallengeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.commons_infos.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayShowChallengeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            commons_infos: FightCommonInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayShowChallengeMessage {
+    const MESSAGE_ID: u16 = 6006;
+}
+
+/// Protocol message — ID: 8087
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayPlayerFightRequestMessage {
+    pub target_id: i64,
+    pub target_cell_id: i16,
+    pub friendly: bool,
+}
+
+impl DofusSerialize for GameRolePlayPlayerFightRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.target_id);
+        writer.write_short(self.target_cell_id);
+        writer.write_boolean(self.friendly);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayPlayerFightRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            target_id: reader.read_var_long()?,
+            target_cell_id: reader.read_short()?,
+            friendly: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayPlayerFightRequestMessage {
+    const MESSAGE_ID: u16 = 8087;
+}
+
+/// Protocol message — ID: 8153
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayPlayerFightFriendlyRequestedMessage {
+    pub fight_id: i16,
+    pub source_id: i64,
+    pub target_id: i64,
+}
+
+impl DofusSerialize for GameRolePlayPlayerFightFriendlyRequestedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+        writer.write_var_long(self.source_id);
+        writer.write_var_long(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayPlayerFightFriendlyRequestedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+            source_id: reader.read_var_long()?,
+            target_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayPlayerFightFriendlyRequestedMessage {
+    const MESSAGE_ID: u16 = 8153;
+}
+
+/// Protocol message — ID: 9279
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayRemoveChallengeMessage {
+    pub fight_id: i16,
+}
+
+impl DofusSerialize for GameRolePlayRemoveChallengeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.fight_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayRemoveChallengeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayRemoveChallengeMessage {
+    const MESSAGE_ID: u16 = 9279;
+}
+
+/// Protocol message — ID: 9947
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayAttackMonsterRequestMessage {
     pub monster_group_id: f64,
 }
 
-impl DofusSerialize for GameRolePlayMonsterNotAngryAtPlayerMessage {
+impl DofusSerialize for GameRolePlayAttackMonsterRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.player_id);
         writer.write_double(self.monster_group_id);
     }
 }
 
-impl DofusDeserialize for GameRolePlayMonsterNotAngryAtPlayerMessage {
+impl DofusDeserialize for GameRolePlayAttackMonsterRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            player_id: reader.read_var_long()?,
             monster_group_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameRolePlayMonsterNotAngryAtPlayerMessage {
-    const MESSAGE_ID: u16 = 6742;
+impl DofusMessage for GameRolePlayAttackMonsterRequestMessage {
+    const MESSAGE_ID: u16 = 9947;
 }
 

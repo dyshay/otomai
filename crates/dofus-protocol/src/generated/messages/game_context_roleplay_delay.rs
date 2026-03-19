@@ -6,64 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6150
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayDelayedActionFinishedMessage {
-    pub delayed_character_id: f64,
-    pub delay_type_id: u8,
-}
-
-impl DofusSerialize for GameRolePlayDelayedActionFinishedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.delayed_character_id);
-        writer.write_byte(self.delay_type_id);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayDelayedActionFinishedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            delayed_character_id: reader.read_double()?,
-            delay_type_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayDelayedActionFinishedMessage {
-    const MESSAGE_ID: u16 = 6150;
-}
-
-/// Protocol message — ID: 6153
-#[derive(Debug, Clone, Default)]
-pub struct GameRolePlayDelayedActionMessage {
-    pub delayed_character_id: f64,
-    pub delay_type_id: u8,
-    pub delay_end_time: f64,
-}
-
-impl DofusSerialize for GameRolePlayDelayedActionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.delayed_character_id);
-        writer.write_byte(self.delay_type_id);
-        writer.write_double(self.delay_end_time);
-    }
-}
-
-impl DofusDeserialize for GameRolePlayDelayedActionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            delayed_character_id: reader.read_double()?,
-            delay_type_id: reader.read_byte()?,
-            delay_end_time: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameRolePlayDelayedActionMessage {
-    const MESSAGE_ID: u16 = 6153;
-}
-
-/// Protocol message — ID: 6425
+/// Protocol message — ID: 748
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayDelayedObjectUseMessage {
     pub delayed_character_id: f64,
@@ -93,6 +36,63 @@ impl DofusDeserialize for GameRolePlayDelayedObjectUseMessage {
 }
 
 impl DofusMessage for GameRolePlayDelayedObjectUseMessage {
-    const MESSAGE_ID: u16 = 6425;
+    const MESSAGE_ID: u16 = 748;
+}
+
+/// Protocol message — ID: 1671
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayDelayedActionMessage {
+    pub delayed_character_id: f64,
+    pub delay_type_id: u8,
+    pub delay_end_time: f64,
+}
+
+impl DofusSerialize for GameRolePlayDelayedActionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.delayed_character_id);
+        writer.write_byte(self.delay_type_id);
+        writer.write_double(self.delay_end_time);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayDelayedActionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            delayed_character_id: reader.read_double()?,
+            delay_type_id: reader.read_byte()?,
+            delay_end_time: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayDelayedActionMessage {
+    const MESSAGE_ID: u16 = 1671;
+}
+
+/// Protocol message — ID: 2289
+#[derive(Debug, Clone, Default)]
+pub struct GameRolePlayDelayedActionFinishedMessage {
+    pub delayed_character_id: f64,
+    pub delay_type_id: u8,
+}
+
+impl DofusSerialize for GameRolePlayDelayedActionFinishedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.delayed_character_id);
+        writer.write_byte(self.delay_type_id);
+    }
+}
+
+impl DofusDeserialize for GameRolePlayDelayedActionFinishedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            delayed_character_id: reader.read_double()?,
+            delay_type_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameRolePlayDelayedActionFinishedMessage {
+    const MESSAGE_ID: u16 = 2289;
 }
 

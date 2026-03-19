@@ -6,82 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 1810
-#[derive(Debug, Clone, Default)]
-pub struct SetEnablePVPRequestMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for SetEnablePVPRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for SetEnablePVPRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for SetEnablePVPRequestMessage {
-    const MESSAGE_ID: u16 = 1810;
-}
-
-/// Protocol message — ID: 6058
-#[derive(Debug, Clone, Default)]
-pub struct AlignmentRankUpdateMessage {
-    pub alignment_rank: u8,
-    pub verbose: bool,
-}
-
-impl DofusSerialize for AlignmentRankUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.alignment_rank);
-        writer.write_boolean(self.verbose);
-    }
-}
-
-impl DofusDeserialize for AlignmentRankUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alignment_rank: reader.read_byte()?,
-            verbose: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for AlignmentRankUpdateMessage {
-    const MESSAGE_ID: u16 = 6058;
-}
-
-/// Protocol message — ID: 6443
-#[derive(Debug, Clone, Default)]
-pub struct SetEnableAVARequestMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for SetEnableAVARequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for SetEnableAVARequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for SetEnableAVARequestMessage {
-    const MESSAGE_ID: u16 = 6443;
-}
-
-/// Protocol message — ID: 6454
+/// Protocol message — ID: 2008
 #[derive(Debug, Clone, Default)]
 pub struct UpdateMapPlayersAgressableStatusMessage {
     pub player_ids: Vec<i64>,
@@ -125,10 +50,37 @@ impl DofusDeserialize for UpdateMapPlayersAgressableStatusMessage {
 }
 
 impl DofusMessage for UpdateMapPlayersAgressableStatusMessage {
-    const MESSAGE_ID: u16 = 6454;
+    const MESSAGE_ID: u16 = 2008;
 }
 
-/// Protocol message — ID: 6456
+/// Protocol message — ID: 2029
+#[derive(Debug, Clone, Default)]
+pub struct AlignmentRankUpdateMessage {
+    pub alignment_rank: u8,
+    pub verbose: bool,
+}
+
+impl DofusSerialize for AlignmentRankUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.alignment_rank);
+        writer.write_boolean(self.verbose);
+    }
+}
+
+impl DofusDeserialize for AlignmentRankUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alignment_rank: reader.read_byte()?,
+            verbose: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for AlignmentRankUpdateMessage {
+    const MESSAGE_ID: u16 = 2029;
+}
+
+/// Protocol message — ID: 7042
 #[derive(Debug, Clone, Default)]
 pub struct UpdateSelfAgressableStatusMessage {
     pub status: u8,
@@ -152,6 +104,54 @@ impl DofusDeserialize for UpdateSelfAgressableStatusMessage {
 }
 
 impl DofusMessage for UpdateSelfAgressableStatusMessage {
-    const MESSAGE_ID: u16 = 6456;
+    const MESSAGE_ID: u16 = 7042;
+}
+
+/// Protocol message — ID: 7829
+#[derive(Debug, Clone, Default)]
+pub struct SetEnableAVARequestMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for SetEnableAVARequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for SetEnableAVARequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for SetEnableAVARequestMessage {
+    const MESSAGE_ID: u16 = 7829;
+}
+
+/// Protocol message — ID: 8131
+#[derive(Debug, Clone, Default)]
+pub struct SetEnablePVPRequestMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for SetEnablePVPRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for SetEnablePVPRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for SetEnablePVPRequestMessage {
+    const MESSAGE_ID: u16 = 8131;
 }
 

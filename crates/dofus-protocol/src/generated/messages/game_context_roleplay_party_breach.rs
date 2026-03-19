@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6824
+/// Protocol message — ID: 3413
 #[derive(Debug, Clone, Default)]
 pub struct PartyMemberInBreachFightMessage {
     pub party_id: i32,
@@ -51,6 +51,6 @@ impl DofusDeserialize for PartyMemberInBreachFightMessage {
 }
 
 impl DofusMessage for PartyMemberInBreachFightMessage {
-    const MESSAGE_ID: u16 = 6824;
+    const MESSAGE_ID: u16 = 3413;
 }
 

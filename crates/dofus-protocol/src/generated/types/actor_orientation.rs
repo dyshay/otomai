@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 353
+/// Protocol type — ID: 3924
 #[derive(Debug, Clone, Default)]
 pub struct ActorOrientation {
     pub id: f64,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ActorOrientation {
 }
 
 impl DofusType for ActorOrientation {
-    const TYPE_ID: u16 = 353;
+    const TYPE_ID: u16 = 3924;
 }
 

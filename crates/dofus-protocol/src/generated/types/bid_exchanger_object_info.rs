@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 122
+/// Protocol type — ID: 9234
 #[derive(Debug, Clone, Default)]
 pub struct BidExchangerObjectInfo {
     pub object_u_i_d: i32,
@@ -57,6 +57,6 @@ impl DofusDeserialize for BidExchangerObjectInfo {
 }
 
 impl DofusType for BidExchangerObjectInfo {
-    const TYPE_ID: u16 = 122;
+    const TYPE_ID: u16 = 9234;
 }
 

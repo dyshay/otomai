@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 123
+/// Protocol type — ID: 4296
 #[derive(Debug, Clone, Default)]
 pub struct GoldItem {
     pub sum: i64,
@@ -27,6 +27,6 @@ impl DofusDeserialize for GoldItem {
 }
 
 impl DofusType for GoldItem {
-    const TYPE_ID: u16 = 123;
+    const TYPE_ID: u16 = 4296;
 }
 

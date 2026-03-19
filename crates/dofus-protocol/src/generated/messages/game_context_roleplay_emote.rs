@@ -6,112 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5644
-#[derive(Debug, Clone, Default)]
-pub struct EmoteAddMessage {
-    pub emote_id: u8,
-}
-
-impl DofusSerialize for EmoteAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.emote_id);
-    }
-}
-
-impl DofusDeserialize for EmoteAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            emote_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for EmoteAddMessage {
-    const MESSAGE_ID: u16 = 5644;
-}
-
-/// Protocol message — ID: 5683
-#[derive(Debug, Clone, Default)]
-pub struct EmotePlayMessage {
-    pub emote_id: u8,
-    pub emote_start_time: f64,
-    pub actor_id: f64,
-    pub account_id: i32,
-}
-
-impl DofusSerialize for EmotePlayMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.emote_id);
-        writer.write_double(self.emote_start_time);
-        writer.write_double(self.actor_id);
-        writer.write_int(self.account_id);
-    }
-}
-
-impl DofusDeserialize for EmotePlayMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            emote_id: reader.read_byte()?,
-            emote_start_time: reader.read_double()?,
-            actor_id: reader.read_double()?,
-            account_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for EmotePlayMessage {
-    const MESSAGE_ID: u16 = 5683;
-}
-
-/// Protocol message — ID: 5685
-#[derive(Debug, Clone, Default)]
-pub struct EmotePlayRequestMessage {
-    pub emote_id: u8,
-}
-
-impl DofusSerialize for EmotePlayRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.emote_id);
-    }
-}
-
-impl DofusDeserialize for EmotePlayRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            emote_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for EmotePlayRequestMessage {
-    const MESSAGE_ID: u16 = 5685;
-}
-
-/// Protocol message — ID: 5687
-#[derive(Debug, Clone, Default)]
-pub struct EmoteRemoveMessage {
-    pub emote_id: u8,
-}
-
-impl DofusSerialize for EmoteRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.emote_id);
-    }
-}
-
-impl DofusDeserialize for EmoteRemoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            emote_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for EmoteRemoveMessage {
-    const MESSAGE_ID: u16 = 5687;
-}
-
-/// Protocol message — ID: 5688
+/// Protocol message — ID: 790
 #[derive(Debug, Clone, Default)]
 pub struct EmotePlayErrorMessage {
     pub emote_id: u8,
@@ -132,44 +27,10 @@ impl DofusDeserialize for EmotePlayErrorMessage {
 }
 
 impl DofusMessage for EmotePlayErrorMessage {
-    const MESSAGE_ID: u16 = 5688;
+    const MESSAGE_ID: u16 = 790;
 }
 
-/// Protocol message — ID: 5689
-#[derive(Debug, Clone, Default)]
-pub struct EmoteListMessage {
-    pub emote_ids: Vec<u8>,
-}
-
-impl DofusSerialize for EmoteListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.emote_ids.len() as _);
-        for item in &self.emote_ids {
-            writer.write_byte(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for EmoteListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            emote_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for EmoteListMessage {
-    const MESSAGE_ID: u16 = 5689;
-}
-
-/// Protocol message — ID: 5690
+/// Protocol message — ID: 918
 #[derive(Debug, Clone, Default)]
 pub struct EmotePlayAbstractMessage {
     pub emote_id: u8,
@@ -193,10 +54,10 @@ impl DofusDeserialize for EmotePlayAbstractMessage {
 }
 
 impl DofusMessage for EmotePlayAbstractMessage {
-    const MESSAGE_ID: u16 = 5690;
+    const MESSAGE_ID: u16 = 918;
 }
 
-/// Protocol message — ID: 5691
+/// Protocol message — ID: 2881
 #[derive(Debug, Clone, Default)]
 pub struct EmotePlayMassiveMessage {
     pub emote_id: u8,
@@ -233,6 +94,145 @@ impl DofusDeserialize for EmotePlayMassiveMessage {
 }
 
 impl DofusMessage for EmotePlayMassiveMessage {
-    const MESSAGE_ID: u16 = 5691;
+    const MESSAGE_ID: u16 = 2881;
+}
+
+/// Protocol message — ID: 3309
+#[derive(Debug, Clone, Default)]
+pub struct EmoteRemoveMessage {
+    pub emote_id: u8,
+}
+
+impl DofusSerialize for EmoteRemoveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.emote_id);
+    }
+}
+
+impl DofusDeserialize for EmoteRemoveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            emote_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for EmoteRemoveMessage {
+    const MESSAGE_ID: u16 = 3309;
+}
+
+/// Protocol message — ID: 4945
+#[derive(Debug, Clone, Default)]
+pub struct EmotePlayRequestMessage {
+    pub emote_id: u8,
+}
+
+impl DofusSerialize for EmotePlayRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.emote_id);
+    }
+}
+
+impl DofusDeserialize for EmotePlayRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            emote_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for EmotePlayRequestMessage {
+    const MESSAGE_ID: u16 = 4945;
+}
+
+/// Protocol message — ID: 6335
+#[derive(Debug, Clone, Default)]
+pub struct EmoteListMessage {
+    pub emote_ids: Vec<u8>,
+}
+
+impl DofusSerialize for EmoteListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.emote_ids.len() as _);
+        for item in &self.emote_ids {
+            writer.write_byte(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for EmoteListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            emote_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for EmoteListMessage {
+    const MESSAGE_ID: u16 = 6335;
+}
+
+/// Protocol message — ID: 6496
+#[derive(Debug, Clone, Default)]
+pub struct EmotePlayMessage {
+    pub emote_id: u8,
+    pub emote_start_time: f64,
+    pub actor_id: f64,
+    pub account_id: i32,
+}
+
+impl DofusSerialize for EmotePlayMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.emote_id);
+        writer.write_double(self.emote_start_time);
+        writer.write_double(self.actor_id);
+        writer.write_int(self.account_id);
+    }
+}
+
+impl DofusDeserialize for EmotePlayMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            emote_id: reader.read_byte()?,
+            emote_start_time: reader.read_double()?,
+            actor_id: reader.read_double()?,
+            account_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for EmotePlayMessage {
+    const MESSAGE_ID: u16 = 6496;
+}
+
+/// Protocol message — ID: 8673
+#[derive(Debug, Clone, Default)]
+pub struct EmoteAddMessage {
+    pub emote_id: u8,
+}
+
+impl DofusSerialize for EmoteAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.emote_id);
+    }
+}
+
+impl DofusDeserialize for EmoteAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            emote_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for EmoteAddMessage {
+    const MESSAGE_ID: u16 = 8673;
 }
 

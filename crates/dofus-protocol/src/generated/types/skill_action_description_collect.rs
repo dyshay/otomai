@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 99
+/// Protocol type — ID: 6581
 #[derive(Debug, Clone, Default)]
 pub struct SkillActionDescriptionCollect {
     pub skill_id: i16,
@@ -36,6 +36,6 @@ impl DofusDeserialize for SkillActionDescriptionCollect {
 }
 
 impl DofusType for SkillActionDescriptionCollect {
-    const TYPE_ID: u16 = 99;
+    const TYPE_ID: u16 = 6581;
 }
 

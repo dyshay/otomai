@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5666
+/// Protocol message — ID: 2066
 #[derive(Debug, Clone, Default)]
 pub struct LockableChangeCodeMessage {
     pub code: String,
@@ -27,34 +27,10 @@ impl DofusDeserialize for LockableChangeCodeMessage {
 }
 
 impl DofusMessage for LockableChangeCodeMessage {
-    const MESSAGE_ID: u16 = 5666;
+    const MESSAGE_ID: u16 = 2066;
 }
 
-/// Protocol message — ID: 5667
-#[derive(Debug, Clone, Default)]
-pub struct LockableUseCodeMessage {
-    pub code: String,
-}
-
-impl DofusSerialize for LockableUseCodeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.code);
-    }
-}
-
-impl DofusDeserialize for LockableUseCodeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            code: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for LockableUseCodeMessage {
-    const MESSAGE_ID: u16 = 5667;
-}
-
-/// Protocol message — ID: 5668
+/// Protocol message — ID: 2112
 #[derive(Debug, Clone, Default)]
 pub struct LockableStateUpdateHouseDoorMessage {
     pub locked: bool,
@@ -84,10 +60,85 @@ impl DofusDeserialize for LockableStateUpdateHouseDoorMessage {
 }
 
 impl DofusMessage for LockableStateUpdateHouseDoorMessage {
-    const MESSAGE_ID: u16 = 5668;
+    const MESSAGE_ID: u16 = 2112;
 }
 
-/// Protocol message — ID: 5669
+/// Protocol message — ID: 2846
+#[derive(Debug, Clone, Default)]
+pub struct LockableShowCodeDialogMessage {
+    pub change_or_use: bool,
+    pub code_size: u8,
+}
+
+impl DofusSerialize for LockableShowCodeDialogMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.change_or_use);
+        writer.write_byte(self.code_size);
+    }
+}
+
+impl DofusDeserialize for LockableShowCodeDialogMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            change_or_use: reader.read_boolean()?,
+            code_size: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for LockableShowCodeDialogMessage {
+    const MESSAGE_ID: u16 = 2846;
+}
+
+/// Protocol message — ID: 3545
+#[derive(Debug, Clone, Default)]
+pub struct LockableUseCodeMessage {
+    pub code: String,
+}
+
+impl DofusSerialize for LockableUseCodeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.code);
+    }
+}
+
+impl DofusDeserialize for LockableUseCodeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            code: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for LockableUseCodeMessage {
+    const MESSAGE_ID: u16 = 3545;
+}
+
+/// Protocol message — ID: 4109
+#[derive(Debug, Clone, Default)]
+pub struct LockableStateUpdateAbstractMessage {
+    pub locked: bool,
+}
+
+impl DofusSerialize for LockableStateUpdateAbstractMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.locked);
+    }
+}
+
+impl DofusDeserialize for LockableStateUpdateAbstractMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            locked: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for LockableStateUpdateAbstractMessage {
+    const MESSAGE_ID: u16 = 4109;
+}
+
+/// Protocol message — ID: 6717
 #[derive(Debug, Clone, Default)]
 pub struct LockableStateUpdateStorageMessage {
     pub locked: bool,
@@ -114,34 +165,10 @@ impl DofusDeserialize for LockableStateUpdateStorageMessage {
 }
 
 impl DofusMessage for LockableStateUpdateStorageMessage {
-    const MESSAGE_ID: u16 = 5669;
+    const MESSAGE_ID: u16 = 6717;
 }
 
-/// Protocol message — ID: 5671
-#[derive(Debug, Clone, Default)]
-pub struct LockableStateUpdateAbstractMessage {
-    pub locked: bool,
-}
-
-impl DofusSerialize for LockableStateUpdateAbstractMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.locked);
-    }
-}
-
-impl DofusDeserialize for LockableStateUpdateAbstractMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            locked: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for LockableStateUpdateAbstractMessage {
-    const MESSAGE_ID: u16 = 5671;
-}
-
-/// Protocol message — ID: 5672
+/// Protocol message — ID: 7160
 #[derive(Debug, Clone, Default)]
 pub struct LockableCodeResultMessage {
     pub result: u8,
@@ -162,33 +189,6 @@ impl DofusDeserialize for LockableCodeResultMessage {
 }
 
 impl DofusMessage for LockableCodeResultMessage {
-    const MESSAGE_ID: u16 = 5672;
-}
-
-/// Protocol message — ID: 5740
-#[derive(Debug, Clone, Default)]
-pub struct LockableShowCodeDialogMessage {
-    pub change_or_use: bool,
-    pub code_size: u8,
-}
-
-impl DofusSerialize for LockableShowCodeDialogMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.change_or_use);
-        writer.write_byte(self.code_size);
-    }
-}
-
-impl DofusDeserialize for LockableShowCodeDialogMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            change_or_use: reader.read_boolean()?,
-            code_size: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for LockableShowCodeDialogMessage {
-    const MESSAGE_ID: u16 = 5740;
+    const MESSAGE_ID: u16 = 7160;
 }
 

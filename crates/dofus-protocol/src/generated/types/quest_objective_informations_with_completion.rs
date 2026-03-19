@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 386
+/// Protocol type — ID: 5778
 #[derive(Debug, Clone, Default)]
 pub struct QuestObjectiveInformationsWithCompletion {
     pub objective_id: i16,
@@ -49,6 +49,6 @@ impl DofusDeserialize for QuestObjectiveInformationsWithCompletion {
 }
 
 impl DofusType for QuestObjectiveInformationsWithCompletion {
-    const TYPE_ID: u16 = 386;
+    const TYPE_ID: u16 = 5778;
 }
 

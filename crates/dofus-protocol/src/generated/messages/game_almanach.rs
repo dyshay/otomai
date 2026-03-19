@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6341
+/// Protocol message — ID: 5290
 #[derive(Debug, Clone, Default)]
 pub struct AlmanachCalendarDateMessage {
     pub date: i32,
@@ -27,6 +27,6 @@ impl DofusDeserialize for AlmanachCalendarDateMessage {
 }
 
 impl DofusMessage for AlmanachCalendarDateMessage {
-    const MESSAGE_ID: u16 = 6341;
+    const MESSAGE_ID: u16 = 5290;
 }
 

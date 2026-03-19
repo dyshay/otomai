@@ -6,31 +6,31 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5661
+/// Protocol message — ID: 780
 #[derive(Debug, Clone, Default)]
-pub struct HouseKickIndoorMerchantRequestMessage {
-    pub cell_id: i16,
+pub struct HouseLockFromInsideRequestMessage {
+    pub code: String,
 }
 
-impl DofusSerialize for HouseKickIndoorMerchantRequestMessage {
+impl DofusSerialize for HouseLockFromInsideRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
+        writer.write_utf(&self.code);
     }
 }
 
-impl DofusDeserialize for HouseKickIndoorMerchantRequestMessage {
+impl DofusDeserialize for HouseLockFromInsideRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            cell_id: reader.read_var_short()?,
+            code: reader.read_utf()?,
         })
     }
 }
 
-impl DofusMessage for HouseKickIndoorMerchantRequestMessage {
-    const MESSAGE_ID: u16 = 5661;
+impl DofusMessage for HouseLockFromInsideRequestMessage {
+    const MESSAGE_ID: u16 = 780;
 }
 
-/// Protocol message — ID: 5697
+/// Protocol message — ID: 1525
 #[derive(Debug, Clone, Default)]
 pub struct HouseSellRequestMessage {
     pub instance_id: i32,
@@ -57,34 +57,10 @@ impl DofusDeserialize for HouseSellRequestMessage {
 }
 
 impl DofusMessage for HouseSellRequestMessage {
-    const MESSAGE_ID: u16 = 5697;
+    const MESSAGE_ID: u16 = 1525;
 }
 
-/// Protocol message — ID: 5698
-#[derive(Debug, Clone, Default)]
-pub struct HouseKickRequestMessage {
-    pub id: i64,
-}
-
-impl DofusSerialize for HouseKickRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.id);
-    }
-}
-
-impl DofusDeserialize for HouseKickRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseKickRequestMessage {
-    const MESSAGE_ID: u16 = 5698;
-}
-
-/// Protocol message — ID: 5734
+/// Protocol message — ID: 3052
 #[derive(Debug, Clone, Default)]
 pub struct HousePropertiesMessage {
     pub house_id: i32,
@@ -125,10 +101,170 @@ impl DofusDeserialize for HousePropertiesMessage {
 }
 
 impl DofusMessage for HousePropertiesMessage {
-    const MESSAGE_ID: u16 = 5734;
+    const MESSAGE_ID: u16 = 3052;
 }
 
-/// Protocol message — ID: 5735
+/// Protocol message — ID: 3504
+#[derive(Debug, Clone, Default)]
+pub struct HouseBuyRequestMessage {
+    pub proposed_price: i64,
+}
+
+impl DofusSerialize for HouseBuyRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.proposed_price);
+    }
+}
+
+impl DofusDeserialize for HouseBuyRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            proposed_price: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for HouseBuyRequestMessage {
+    const MESSAGE_ID: u16 = 3504;
+}
+
+/// Protocol message — ID: 3694
+#[derive(Debug, Clone, Default)]
+pub struct HouseKickRequestMessage {
+    pub id: i64,
+}
+
+impl DofusSerialize for HouseKickRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
+    }
+}
+
+impl DofusDeserialize for HouseKickRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for HouseKickRequestMessage {
+    const MESSAGE_ID: u16 = 3694;
+}
+
+/// Protocol message — ID: 3696
+#[derive(Debug, Clone, Default)]
+pub struct HouseKickIndoorMerchantRequestMessage {
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for HouseKickIndoorMerchantRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for HouseKickIndoorMerchantRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for HouseKickIndoorMerchantRequestMessage {
+    const MESSAGE_ID: u16 = 3696;
+}
+
+/// Protocol message — ID: 5809
+#[derive(Debug, Clone, Default)]
+pub struct HouseToSellListRequestMessage {
+    pub page_index: i16,
+}
+
+impl DofusSerialize for HouseToSellListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.page_index);
+    }
+}
+
+impl DofusDeserialize for HouseToSellListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            page_index: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for HouseToSellListRequestMessage {
+    const MESSAGE_ID: u16 = 5809;
+}
+
+/// Protocol message — ID: 6173
+#[derive(Debug, Clone, Default)]
+pub struct HouseSellFromInsideRequestMessage {
+    pub instance_id: i32,
+    pub amount: i64,
+    pub for_sale: bool,
+}
+
+impl DofusSerialize for HouseSellFromInsideRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.instance_id);
+        writer.write_var_long(self.amount);
+        writer.write_boolean(self.for_sale);
+    }
+}
+
+impl DofusDeserialize for HouseSellFromInsideRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            instance_id: reader.read_int()?,
+            amount: reader.read_var_long()?,
+            for_sale: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for HouseSellFromInsideRequestMessage {
+    const MESSAGE_ID: u16 = 6173;
+}
+
+/// Protocol message — ID: 6480
+#[derive(Debug, Clone, Default)]
+pub struct AccountHouseMessage {
+    pub houses: Vec<AccountHouseInformations>,
+}
+
+impl DofusSerialize for AccountHouseMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.houses.len() as _);
+        for item in &self.houses {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for AccountHouseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            houses: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(AccountHouseInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for AccountHouseMessage {
+    const MESSAGE_ID: u16 = 6480;
+}
+
+/// Protocol message — ID: 7313
 #[derive(Debug, Clone, Default)]
 pub struct HouseBuyResultMessage {
     pub second_hand: bool,
@@ -164,151 +300,10 @@ impl DofusDeserialize for HouseBuyResultMessage {
 }
 
 impl DofusMessage for HouseBuyResultMessage {
-    const MESSAGE_ID: u16 = 5735;
+    const MESSAGE_ID: u16 = 7313;
 }
 
-/// Protocol message — ID: 5738
-#[derive(Debug, Clone, Default)]
-pub struct HouseBuyRequestMessage {
-    pub proposed_price: i64,
-}
-
-impl DofusSerialize for HouseBuyRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.proposed_price);
-    }
-}
-
-impl DofusDeserialize for HouseBuyRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            proposed_price: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseBuyRequestMessage {
-    const MESSAGE_ID: u16 = 5738;
-}
-
-/// Protocol message — ID: 5884
-#[derive(Debug, Clone, Default)]
-pub struct HouseSellFromInsideRequestMessage {
-    pub instance_id: i32,
-    pub amount: i64,
-    pub for_sale: bool,
-}
-
-impl DofusSerialize for HouseSellFromInsideRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.instance_id);
-        writer.write_var_long(self.amount);
-        writer.write_boolean(self.for_sale);
-    }
-}
-
-impl DofusDeserialize for HouseSellFromInsideRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            instance_id: reader.read_int()?,
-            amount: reader.read_var_long()?,
-            for_sale: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseSellFromInsideRequestMessage {
-    const MESSAGE_ID: u16 = 5884;
-}
-
-/// Protocol message — ID: 5885
-#[derive(Debug, Clone, Default)]
-pub struct HouseLockFromInsideRequestMessage {
-    pub code: String,
-}
-
-impl DofusSerialize for HouseLockFromInsideRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.code);
-    }
-}
-
-impl DofusDeserialize for HouseLockFromInsideRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            code: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseLockFromInsideRequestMessage {
-    const MESSAGE_ID: u16 = 5885;
-}
-
-/// Protocol message — ID: 6137
-#[derive(Debug, Clone, Default)]
-pub struct HouseToSellFilterMessage {
-    pub area_id: i32,
-    pub at_least_nb_room: u8,
-    pub at_least_nb_chest: u8,
-    pub skill_requested: i16,
-    pub max_price: i64,
-    pub order_by: u8,
-}
-
-impl DofusSerialize for HouseToSellFilterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.area_id);
-        writer.write_byte(self.at_least_nb_room);
-        writer.write_byte(self.at_least_nb_chest);
-        writer.write_var_short(self.skill_requested);
-        writer.write_var_long(self.max_price);
-        writer.write_byte(self.order_by);
-    }
-}
-
-impl DofusDeserialize for HouseToSellFilterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            area_id: reader.read_int()?,
-            at_least_nb_room: reader.read_byte()?,
-            at_least_nb_chest: reader.read_byte()?,
-            skill_requested: reader.read_var_short()?,
-            max_price: reader.read_var_long()?,
-            order_by: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseToSellFilterMessage {
-    const MESSAGE_ID: u16 = 6137;
-}
-
-/// Protocol message — ID: 6139
-#[derive(Debug, Clone, Default)]
-pub struct HouseToSellListRequestMessage {
-    pub page_index: i16,
-}
-
-impl DofusSerialize for HouseToSellListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.page_index);
-    }
-}
-
-impl DofusDeserialize for HouseToSellListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            page_index: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for HouseToSellListRequestMessage {
-    const MESSAGE_ID: u16 = 6139;
-}
-
-/// Protocol message — ID: 6140
+/// Protocol message — ID: 7851
 #[derive(Debug, Clone, Default)]
 pub struct HouseToSellListMessage {
     pub page_index: i16,
@@ -345,44 +340,49 @@ impl DofusDeserialize for HouseToSellListMessage {
 }
 
 impl DofusMessage for HouseToSellListMessage {
-    const MESSAGE_ID: u16 = 6140;
+    const MESSAGE_ID: u16 = 7851;
 }
 
-/// Protocol message — ID: 6315
+/// Protocol message — ID: 7868
 #[derive(Debug, Clone, Default)]
-pub struct AccountHouseMessage {
-    pub houses: Vec<AccountHouseInformations>,
+pub struct HouseToSellFilterMessage {
+    pub area_id: i32,
+    pub at_least_nb_room: u8,
+    pub at_least_nb_chest: u8,
+    pub skill_requested: i16,
+    pub max_price: i64,
+    pub order_by: u8,
 }
 
-impl DofusSerialize for AccountHouseMessage {
+impl DofusSerialize for HouseToSellFilterMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.houses.len() as _);
-        for item in &self.houses {
-            item.serialize(writer);
-        }
+        writer.write_int(self.area_id);
+        writer.write_byte(self.at_least_nb_room);
+        writer.write_byte(self.at_least_nb_chest);
+        writer.write_var_short(self.skill_requested);
+        writer.write_var_long(self.max_price);
+        writer.write_byte(self.order_by);
     }
 }
 
-impl DofusDeserialize for AccountHouseMessage {
+impl DofusDeserialize for HouseToSellFilterMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            houses: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(AccountHouseInformations::deserialize(reader)?);
-                }
-                v
-            },
+            area_id: reader.read_int()?,
+            at_least_nb_room: reader.read_byte()?,
+            at_least_nb_chest: reader.read_byte()?,
+            skill_requested: reader.read_var_short()?,
+            max_price: reader.read_var_long()?,
+            order_by: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for AccountHouseMessage {
-    const MESSAGE_ID: u16 = 6315;
+impl DofusMessage for HouseToSellFilterMessage {
+    const MESSAGE_ID: u16 = 7868;
 }
 
-/// Protocol message — ID: 6727
+/// Protocol message — ID: 8778
 #[derive(Debug, Clone, Default)]
 pub struct HouseSellingUpdateMessage {
     pub house_id: i32,
@@ -415,6 +415,6 @@ impl DofusDeserialize for HouseSellingUpdateMessage {
 }
 
 impl DofusMessage for HouseSellingUpdateMessage {
-    const MESSAGE_ID: u16 = 6727;
+    const MESSAGE_ID: u16 = 8778;
 }
 

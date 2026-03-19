@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 574
+/// Protocol type — ID: 1888
 #[derive(Debug, Clone, Default)]
 pub struct SpawnCharacterInformation {
     pub name: String,
@@ -30,6 +30,6 @@ impl DofusDeserialize for SpawnCharacterInformation {
 }
 
 impl DofusType for SpawnCharacterInformation {
-    const TYPE_ID: u16 = 574;
+    const TYPE_ID: u16 = 1888;
 }
 

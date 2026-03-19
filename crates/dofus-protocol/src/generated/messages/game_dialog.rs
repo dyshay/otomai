@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5501
+/// Protocol message — ID: 1095
 #[derive(Debug, Clone, Default)]
 pub struct LeaveDialogRequestMessage {
 }
@@ -24,10 +24,10 @@ impl DofusDeserialize for LeaveDialogRequestMessage {
 }
 
 impl DofusMessage for LeaveDialogRequestMessage {
-    const MESSAGE_ID: u16 = 5501;
+    const MESSAGE_ID: u16 = 1095;
 }
 
-/// Protocol message — ID: 5502
+/// Protocol message — ID: 5720
 #[derive(Debug, Clone, Default)]
 pub struct LeaveDialogMessage {
     pub dialog_type: u8,
@@ -48,10 +48,10 @@ impl DofusDeserialize for LeaveDialogMessage {
 }
 
 impl DofusMessage for LeaveDialogMessage {
-    const MESSAGE_ID: u16 = 5502;
+    const MESSAGE_ID: u16 = 5720;
 }
 
-/// Protocol message — ID: 6012
+/// Protocol message — ID: 6445
 #[derive(Debug, Clone, Default)]
 pub struct PauseDialogMessage {
     pub dialog_type: u8,
@@ -72,6 +72,6 @@ impl DofusDeserialize for PauseDialogMessage {
 }
 
 impl DofusMessage for PauseDialogMessage {
-    const MESSAGE_ID: u16 = 6012;
+    const MESSAGE_ID: u16 = 6445;
 }
 

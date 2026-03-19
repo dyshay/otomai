@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 466
+/// Protocol type — ID: 1367
 #[derive(Debug, Clone, Default)]
 pub struct PortalInformation {
     pub portal_id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for PortalInformation {
 }
 
 impl DofusType for PortalInformation {
-    const TYPE_ID: u16 = 466;
+    const TYPE_ID: u16 = 1367;
 }
 

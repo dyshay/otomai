@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 455
+/// Protocol type — ID: 6947
 #[derive(Debug, Clone, Default)]
 pub struct GameFightFighterMonsterLightInformations {
     pub sex: bool,
@@ -48,6 +48,6 @@ impl DofusDeserialize for GameFightFighterMonsterLightInformations {
 }
 
 impl DofusType for GameFightFighterMonsterLightInformations {
-    const TYPE_ID: u16 = 455;
+    const TYPE_ID: u16 = 6947;
 }
 

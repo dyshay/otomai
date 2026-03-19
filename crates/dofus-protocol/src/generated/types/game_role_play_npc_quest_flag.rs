@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 384
+/// Protocol type — ID: 9023
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayNpcQuestFlag {
     pub quests_to_valid_id: Vec<i16>,
@@ -50,6 +50,6 @@ impl DofusDeserialize for GameRolePlayNpcQuestFlag {
 }
 
 impl DofusType for GameRolePlayNpcQuestFlag {
-    const TYPE_ID: u16 = 384;
+    const TYPE_ID: u16 = 9023;
 }
 

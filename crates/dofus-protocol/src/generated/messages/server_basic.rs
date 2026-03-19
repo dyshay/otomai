@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 189
+/// Protocol message — ID: 3816
 #[derive(Debug, Clone, Default)]
 pub struct SystemMessageDisplayMessage {
     pub hang_up: bool,
@@ -43,6 +43,6 @@ impl DofusDeserialize for SystemMessageDisplayMessage {
 }
 
 impl DofusMessage for SystemMessageDisplayMessage {
-    const MESSAGE_ID: u16 = 189;
+    const MESSAGE_ID: u16 = 3816;
 }
 

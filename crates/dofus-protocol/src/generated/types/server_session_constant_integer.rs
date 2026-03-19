@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 433
+/// Protocol type — ID: 292
 #[derive(Debug, Clone, Default)]
 pub struct ServerSessionConstantInteger {
     pub id: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ServerSessionConstantInteger {
 }
 
 impl DofusType for ServerSessionConstantInteger {
-    const TYPE_ID: u16 = 433;
+    const TYPE_ID: u16 = 292;
 }
 

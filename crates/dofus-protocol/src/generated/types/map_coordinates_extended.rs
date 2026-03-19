@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 176
+/// Protocol type — ID: 1591
 #[derive(Debug, Clone, Default)]
 pub struct MapCoordinatesExtended {
     pub world_x: i16,
@@ -36,6 +36,6 @@ impl DofusDeserialize for MapCoordinatesExtended {
 }
 
 impl DofusType for MapCoordinatesExtended {
-    const TYPE_ID: u16 = 176;
+    const TYPE_ID: u16 = 1591;
 }
 

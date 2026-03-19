@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 473
+/// Protocol type — ID: 2701
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntFlag {
     pub map_id: f64,
@@ -30,6 +30,6 @@ impl DofusDeserialize for TreasureHuntFlag {
 }
 
 impl DofusType for TreasureHuntFlag {
-    const TYPE_ID: u16 = 473;
+    const TYPE_ID: u16 = 2701;
 }
 

@@ -6,167 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6619
-#[derive(Debug, Clone, Default)]
-pub struct EditHavenBagCancelRequestMessage {
-}
-
-impl DofusSerialize for EditHavenBagCancelRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for EditHavenBagCancelRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for EditHavenBagCancelRequestMessage {
-    const MESSAGE_ID: u16 = 6619;
-}
-
-/// Protocol message — ID: 6620
-#[derive(Debug, Clone, Default)]
-pub struct HavenBagPackListMessage {
-    pub pack_ids: Vec<u8>,
-}
-
-impl DofusSerialize for HavenBagPackListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.pack_ids.len() as _);
-        for item in &self.pack_ids {
-            writer.write_byte(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for HavenBagPackListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            pack_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for HavenBagPackListMessage {
-    const MESSAGE_ID: u16 = 6620;
-}
-
-/// Protocol message — ID: 6621
-#[derive(Debug, Clone, Default)]
-pub struct CloseHavenBagFurnitureSequenceRequestMessage {
-}
-
-impl DofusSerialize for CloseHavenBagFurnitureSequenceRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for CloseHavenBagFurnitureSequenceRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for CloseHavenBagFurnitureSequenceRequestMessage {
-    const MESSAGE_ID: u16 = 6621;
-}
-
-/// Protocol message — ID: 6626
-#[derive(Debug, Clone, Default)]
-pub struct EditHavenBagRequestMessage {
-}
-
-impl DofusSerialize for EditHavenBagRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for EditHavenBagRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for EditHavenBagRequestMessage {
-    const MESSAGE_ID: u16 = 6626;
-}
-
-/// Protocol message — ID: 6628
-#[derive(Debug, Clone, Default)]
-pub struct EditHavenBagFinishedMessage {
-}
-
-impl DofusSerialize for EditHavenBagFinishedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for EditHavenBagFinishedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for EditHavenBagFinishedMessage {
-    const MESSAGE_ID: u16 = 6628;
-}
-
-/// Protocol message — ID: 6631
-#[derive(Debug, Clone, Default)]
-pub struct ExitHavenBagRequestMessage {
-}
-
-impl DofusSerialize for ExitHavenBagRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ExitHavenBagRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ExitHavenBagRequestMessage {
-    const MESSAGE_ID: u16 = 6631;
-}
-
-/// Protocol message — ID: 6632
-#[derive(Debug, Clone, Default)]
-pub struct EditHavenBagStartMessage {
-}
-
-impl DofusSerialize for EditHavenBagStartMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for EditHavenBagStartMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for EditHavenBagStartMessage {
-    const MESSAGE_ID: u16 = 6632;
-}
-
-/// Protocol message — ID: 6634
+/// Protocol message — ID: 162
 #[derive(Debug, Clone, Default)]
 pub struct HavenBagFurnituresMessage {
     pub furnitures_infos: Vec<HavenBagFurnitureInformation>,
@@ -197,10 +37,47 @@ impl DofusDeserialize for HavenBagFurnituresMessage {
 }
 
 impl DofusMessage for HavenBagFurnituresMessage {
-    const MESSAGE_ID: u16 = 6634;
+    const MESSAGE_ID: u16 = 162;
 }
 
-/// Protocol message — ID: 6635
+/// Protocol message — ID: 1486
+#[derive(Debug, Clone, Default)]
+pub struct HavenBagRoomUpdateMessage {
+    pub action: u8,
+    pub rooms_preview: Vec<HavenBagRoomPreviewInformation>,
+}
+
+impl DofusSerialize for HavenBagRoomUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.action);
+        writer.write_short(self.rooms_preview.len() as _);
+        for item in &self.rooms_preview {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for HavenBagRoomUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action: reader.read_byte()?,
+            rooms_preview: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(HavenBagRoomPreviewInformation::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for HavenBagRoomUpdateMessage {
+    const MESSAGE_ID: u16 = 1486;
+}
+
+/// Protocol message — ID: 2398
 #[derive(Debug, Clone, Default)]
 pub struct OpenHavenBagFurnitureSequenceRequestMessage {
 }
@@ -218,34 +95,79 @@ impl DofusDeserialize for OpenHavenBagFurnitureSequenceRequestMessage {
 }
 
 impl DofusMessage for OpenHavenBagFurnitureSequenceRequestMessage {
-    const MESSAGE_ID: u16 = 6635;
+    const MESSAGE_ID: u16 = 2398;
 }
 
-/// Protocol message — ID: 6636
+/// Protocol message — ID: 2826
 #[derive(Debug, Clone, Default)]
-pub struct EnterHavenBagRequestMessage {
-    pub haven_bag_owner: i64,
+pub struct EditHavenBagRequestMessage {
 }
 
-impl DofusSerialize for EnterHavenBagRequestMessage {
+impl DofusSerialize for EditHavenBagRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.haven_bag_owner);
     }
 }
 
-impl DofusDeserialize for EnterHavenBagRequestMessage {
+impl DofusDeserialize for EditHavenBagRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            haven_bag_owner: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for EnterHavenBagRequestMessage {
-    const MESSAGE_ID: u16 = 6636;
+impl DofusMessage for EditHavenBagRequestMessage {
+    const MESSAGE_ID: u16 = 2826;
 }
 
-/// Protocol message — ID: 6637
+/// Protocol message — ID: 4026
+#[derive(Debug, Clone, Default)]
+pub struct ChangeThemeRequestMessage {
+    pub theme: u8,
+}
+
+impl DofusSerialize for ChangeThemeRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.theme);
+    }
+}
+
+impl DofusDeserialize for ChangeThemeRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            theme: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ChangeThemeRequestMessage {
+    const MESSAGE_ID: u16 = 4026;
+}
+
+/// Protocol message — ID: 5326
+#[derive(Debug, Clone, Default)]
+pub struct ChangeHavenBagRoomRequestMessage {
+    pub room_id: u8,
+}
+
+impl DofusSerialize for ChangeHavenBagRoomRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.room_id);
+    }
+}
+
+impl DofusDeserialize for ChangeHavenBagRoomRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            room_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for ChangeHavenBagRoomRequestMessage {
+    const MESSAGE_ID: u16 = 5326;
+}
+
+/// Protocol message — ID: 5848
 #[derive(Debug, Clone, Default)]
 pub struct HavenBagFurnituresRequestMessage {
     pub cell_ids: Vec<i16>,
@@ -302,58 +224,110 @@ impl DofusDeserialize for HavenBagFurnituresRequestMessage {
 }
 
 impl DofusMessage for HavenBagFurnituresRequestMessage {
-    const MESSAGE_ID: u16 = 6637;
+    const MESSAGE_ID: u16 = 5848;
 }
 
-/// Protocol message — ID: 6638
+/// Protocol message — ID: 6025
 #[derive(Debug, Clone, Default)]
-pub struct ChangeHavenBagRoomRequestMessage {
-    pub room_id: u8,
+pub struct EnterHavenBagRequestMessage {
+    pub haven_bag_owner: i64,
 }
 
-impl DofusSerialize for ChangeHavenBagRoomRequestMessage {
+impl DofusSerialize for EnterHavenBagRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.room_id);
+        writer.write_var_long(self.haven_bag_owner);
     }
 }
 
-impl DofusDeserialize for ChangeHavenBagRoomRequestMessage {
+impl DofusDeserialize for EnterHavenBagRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            room_id: reader.read_byte()?,
+            haven_bag_owner: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for ChangeHavenBagRoomRequestMessage {
-    const MESSAGE_ID: u16 = 6638;
+impl DofusMessage for EnterHavenBagRequestMessage {
+    const MESSAGE_ID: u16 = 6025;
 }
 
-/// Protocol message — ID: 6639
+/// Protocol message — ID: 6189
 #[derive(Debug, Clone, Default)]
-pub struct ChangeThemeRequestMessage {
-    pub theme: u8,
+pub struct EditHavenBagStartMessage {
 }
 
-impl DofusSerialize for ChangeThemeRequestMessage {
+impl DofusSerialize for EditHavenBagStartMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.theme);
     }
 }
 
-impl DofusDeserialize for ChangeThemeRequestMessage {
+impl DofusDeserialize for EditHavenBagStartMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            theme: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for ChangeThemeRequestMessage {
-    const MESSAGE_ID: u16 = 6639;
+impl DofusMessage for EditHavenBagStartMessage {
+    const MESSAGE_ID: u16 = 6189;
 }
 
-/// Protocol message — ID: 6644
+/// Protocol message — ID: 6985
+#[derive(Debug, Clone, Default)]
+pub struct CloseHavenBagFurnitureSequenceRequestMessage {
+}
+
+impl DofusSerialize for CloseHavenBagFurnitureSequenceRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CloseHavenBagFurnitureSequenceRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CloseHavenBagFurnitureSequenceRequestMessage {
+    const MESSAGE_ID: u16 = 6985;
+}
+
+/// Protocol message — ID: 7074
+#[derive(Debug, Clone, Default)]
+pub struct HavenBagPackListMessage {
+    pub pack_ids: Vec<u8>,
+}
+
+impl DofusSerialize for HavenBagPackListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.pack_ids.len() as _);
+        for item in &self.pack_ids {
+            writer.write_byte(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for HavenBagPackListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            pack_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for HavenBagPackListMessage {
+    const MESSAGE_ID: u16 = 7074;
+}
+
+/// Protocol message — ID: 7129
 #[derive(Debug, Clone, Default)]
 pub struct HavenBagDailyLoteryMessage {
     pub return_type: u8,
@@ -377,10 +351,10 @@ impl DofusDeserialize for HavenBagDailyLoteryMessage {
 }
 
 impl DofusMessage for HavenBagDailyLoteryMessage {
-    const MESSAGE_ID: u16 = 6644;
+    const MESSAGE_ID: u16 = 7129;
 }
 
-/// Protocol message — ID: 6652
+/// Protocol message — ID: 9331
 #[derive(Debug, Clone, Default)]
 pub struct KickHavenBagRequestMessage {
     pub guest_id: i64,
@@ -401,43 +375,69 @@ impl DofusDeserialize for KickHavenBagRequestMessage {
 }
 
 impl DofusMessage for KickHavenBagRequestMessage {
-    const MESSAGE_ID: u16 = 6652;
+    const MESSAGE_ID: u16 = 9331;
 }
 
-/// Protocol message — ID: 6860
+/// Protocol message — ID: 9636
 #[derive(Debug, Clone, Default)]
-pub struct HavenBagRoomUpdateMessage {
-    pub action: u8,
-    pub rooms_preview: Vec<HavenBagRoomPreviewInformation>,
+pub struct EditHavenBagFinishedMessage {
 }
 
-impl DofusSerialize for HavenBagRoomUpdateMessage {
+impl DofusSerialize for EditHavenBagFinishedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.action);
-        writer.write_short(self.rooms_preview.len() as _);
-        for item in &self.rooms_preview {
-            item.serialize(writer);
-        }
     }
 }
 
-impl DofusDeserialize for HavenBagRoomUpdateMessage {
+impl DofusDeserialize for EditHavenBagFinishedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            action: reader.read_byte()?,
-            rooms_preview: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(HavenBagRoomPreviewInformation::deserialize(reader)?);
-                }
-                v
-            },
         })
     }
 }
 
-impl DofusMessage for HavenBagRoomUpdateMessage {
-    const MESSAGE_ID: u16 = 6860;
+impl DofusMessage for EditHavenBagFinishedMessage {
+    const MESSAGE_ID: u16 = 9636;
+}
+
+/// Protocol message — ID: 9787
+#[derive(Debug, Clone, Default)]
+pub struct EditHavenBagCancelRequestMessage {
+}
+
+impl DofusSerialize for EditHavenBagCancelRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for EditHavenBagCancelRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for EditHavenBagCancelRequestMessage {
+    const MESSAGE_ID: u16 = 9787;
+}
+
+/// Protocol message — ID: 9801
+#[derive(Debug, Clone, Default)]
+pub struct ExitHavenBagRequestMessage {
+}
+
+impl DofusSerialize for ExitHavenBagRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ExitHavenBagRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ExitHavenBagRequestMessage {
+    const MESSAGE_ID: u16 = 9801;
 }
 

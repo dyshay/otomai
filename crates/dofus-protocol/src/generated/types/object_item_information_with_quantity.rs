@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 387
+/// Protocol type — ID: 6404
 #[derive(Debug, Clone, Default)]
 pub struct ObjectItemInformationWithQuantity {
     pub object_g_i_d: i16,
@@ -41,6 +41,6 @@ impl DofusDeserialize for ObjectItemInformationWithQuantity {
 }
 
 impl DofusType for ObjectItemInformationWithQuantity {
-    const TYPE_ID: u16 = 387;
+    const TYPE_ID: u16 = 6404;
 }
 

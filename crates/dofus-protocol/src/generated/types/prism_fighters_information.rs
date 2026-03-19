@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 443
+/// Protocol type — ID: 4016
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightersInformation {
     pub sub_area_id: i16,
@@ -52,6 +52,6 @@ impl DofusDeserialize for PrismFightersInformation {
 }
 
 impl DofusType for PrismFightersInformation {
-    const TYPE_ID: u16 = 443;
+    const TYPE_ID: u16 = 4016;
 }
 

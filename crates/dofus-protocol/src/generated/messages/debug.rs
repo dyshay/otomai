@@ -6,7 +6,55 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 2001
+/// Protocol message — ID: 2283
+#[derive(Debug, Clone, Default)]
+pub struct DebugInClientMessage {
+    pub level: u8,
+    pub message: String,
+}
+
+impl DofusSerialize for DebugInClientMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.level);
+        writer.write_utf(&self.message);
+    }
+}
+
+impl DofusDeserialize for DebugInClientMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            level: reader.read_byte()?,
+            message: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for DebugInClientMessage {
+    const MESSAGE_ID: u16 = 2283;
+}
+
+/// Protocol message — ID: 2501
+#[derive(Debug, Clone, Default)]
+pub struct DebugClearHighlightCellsMessage {
+}
+
+impl DofusSerialize for DebugClearHighlightCellsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for DebugClearHighlightCellsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for DebugClearHighlightCellsMessage {
+    const MESSAGE_ID: u16 = 2501;
+}
+
+/// Protocol message — ID: 7861
 #[derive(Debug, Clone, Default)]
 pub struct DebugHighlightCellsMessage {
     pub color: f64,
@@ -40,54 +88,6 @@ impl DofusDeserialize for DebugHighlightCellsMessage {
 }
 
 impl DofusMessage for DebugHighlightCellsMessage {
-    const MESSAGE_ID: u16 = 2001;
-}
-
-/// Protocol message — ID: 2002
-#[derive(Debug, Clone, Default)]
-pub struct DebugClearHighlightCellsMessage {
-}
-
-impl DofusSerialize for DebugClearHighlightCellsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for DebugClearHighlightCellsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for DebugClearHighlightCellsMessage {
-    const MESSAGE_ID: u16 = 2002;
-}
-
-/// Protocol message — ID: 6028
-#[derive(Debug, Clone, Default)]
-pub struct DebugInClientMessage {
-    pub level: u8,
-    pub message: String,
-}
-
-impl DofusSerialize for DebugInClientMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.level);
-        writer.write_utf(&self.message);
-    }
-}
-
-impl DofusDeserialize for DebugInClientMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            level: reader.read_byte()?,
-            message: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for DebugInClientMessage {
-    const MESSAGE_ID: u16 = 6028;
+    const MESSAGE_ID: u16 = 7861;
 }
 

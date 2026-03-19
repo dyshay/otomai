@@ -6,112 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6580
-#[derive(Debug, Clone, Default)]
-pub struct IdolPartyLostMessage {
-    pub idol_id: i16,
-}
-
-impl DofusSerialize for IdolPartyLostMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.idol_id);
-    }
-}
-
-impl DofusDeserialize for IdolPartyLostMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            idol_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for IdolPartyLostMessage {
-    const MESSAGE_ID: u16 = 6580;
-}
-
-/// Protocol message — ID: 6581
-#[derive(Debug, Clone, Default)]
-pub struct IdolSelectedMessage {
-    pub activate: bool,
-    pub party: bool,
-    pub idol_id: i16,
-}
-
-impl DofusSerialize for IdolSelectedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.activate).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.party).unwrap();
-        writer.write_byte(_flag);
-        writer.write_var_short(self.idol_id);
-    }
-}
-
-impl DofusDeserialize for IdolSelectedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        let _flag0 = reader.read_byte()?;
-        Ok(Self {
-            activate: boolean_byte_wrapper::get_flag(_flag0, 0)?,
-            party: boolean_byte_wrapper::get_flag(_flag0, 1)?,
-            idol_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for IdolSelectedMessage {
-    const MESSAGE_ID: u16 = 6581;
-}
-
-/// Protocol message — ID: 6582
-#[derive(Debug, Clone, Default)]
-pub struct IdolPartyRegisterRequestMessage {
-    pub register: bool,
-}
-
-impl DofusSerialize for IdolPartyRegisterRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.register);
-    }
-}
-
-impl DofusDeserialize for IdolPartyRegisterRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            register: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for IdolPartyRegisterRequestMessage {
-    const MESSAGE_ID: u16 = 6582;
-}
-
-/// Protocol message — ID: 6583
-#[derive(Debug, Clone, Default)]
-pub struct IdolPartyRefreshMessage {
-    pub party_idol: PartyIdol,
-}
-
-impl DofusSerialize for IdolPartyRefreshMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.party_idol.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for IdolPartyRefreshMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            party_idol: PartyIdol::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for IdolPartyRefreshMessage {
-    const MESSAGE_ID: u16 = 6583;
-}
-
-/// Protocol message — ID: 6584
+/// Protocol message — ID: 1593
 #[derive(Debug, Clone, Default)]
 pub struct IdolSelectErrorMessage {
     pub activate: bool,
@@ -144,10 +39,102 @@ impl DofusDeserialize for IdolSelectErrorMessage {
 }
 
 impl DofusMessage for IdolSelectErrorMessage {
-    const MESSAGE_ID: u16 = 6584;
+    const MESSAGE_ID: u16 = 1593;
 }
 
-/// Protocol message — ID: 6585
+/// Protocol message — ID: 2458
+#[derive(Debug, Clone, Default)]
+pub struct IdolSelectedMessage {
+    pub activate: bool,
+    pub party: bool,
+    pub idol_id: i16,
+}
+
+impl DofusSerialize for IdolSelectedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        let mut _flag: u8 = 0;
+        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.activate).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.party).unwrap();
+        writer.write_byte(_flag);
+        writer.write_var_short(self.idol_id);
+    }
+}
+
+impl DofusDeserialize for IdolSelectedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        let _flag0 = reader.read_byte()?;
+        Ok(Self {
+            activate: boolean_byte_wrapper::get_flag(_flag0, 0)?,
+            party: boolean_byte_wrapper::get_flag(_flag0, 1)?,
+            idol_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for IdolSelectedMessage {
+    const MESSAGE_ID: u16 = 2458;
+}
+
+/// Protocol message — ID: 4921
+#[derive(Debug, Clone, Default)]
+pub struct IdolFightPreparationUpdateMessage {
+    pub idol_source: u8,
+    pub idols: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for IdolFightPreparationUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.idol_source);
+        writer.write_short(self.idols.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for IdolFightPreparationUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            idol_source: reader.read_byte()?,
+            idols: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for IdolFightPreparationUpdateMessage {
+    const MESSAGE_ID: u16 = 4921;
+}
+
+/// Protocol message — ID: 5851
+#[derive(Debug, Clone, Default)]
+pub struct IdolPartyRefreshMessage {
+    pub party_idol: PartyIdol,
+}
+
+impl DofusSerialize for IdolPartyRefreshMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.party_idol.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for IdolPartyRefreshMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            party_idol: PartyIdol::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for IdolPartyRefreshMessage {
+    const MESSAGE_ID: u16 = 5851;
+}
+
+/// Protocol message — ID: 6079
 #[derive(Debug, Clone, Default)]
 pub struct IdolListMessage {
     pub chosen_idols: Vec<i16>,
@@ -202,45 +189,34 @@ impl DofusDeserialize for IdolListMessage {
 }
 
 impl DofusMessage for IdolListMessage {
-    const MESSAGE_ID: u16 = 6585;
+    const MESSAGE_ID: u16 = 6079;
 }
 
-/// Protocol message — ID: 6586
+/// Protocol message — ID: 7898
 #[derive(Debug, Clone, Default)]
-pub struct IdolFightPreparationUpdateMessage {
-    pub idol_source: u8,
-    pub idols: Vec<Vec<u8>>,
+pub struct IdolPartyRegisterRequestMessage {
+    pub register: bool,
 }
 
-impl DofusSerialize for IdolFightPreparationUpdateMessage {
+impl DofusSerialize for IdolPartyRegisterRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.idol_source);
-        writer.write_short(self.idols.len() as _);
-        // polymorphic vector (unresolved base type)
+        writer.write_boolean(self.register);
     }
 }
 
-impl DofusDeserialize for IdolFightPreparationUpdateMessage {
+impl DofusDeserialize for IdolPartyRegisterRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            idol_source: reader.read_byte()?,
-            idols: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
+            register: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for IdolFightPreparationUpdateMessage {
-    const MESSAGE_ID: u16 = 6586;
+impl DofusMessage for IdolPartyRegisterRequestMessage {
+    const MESSAGE_ID: u16 = 7898;
 }
 
-/// Protocol message — ID: 6587
+/// Protocol message — ID: 9165
 #[derive(Debug, Clone, Default)]
 pub struct IdolSelectRequestMessage {
     pub activate: bool,
@@ -270,6 +246,30 @@ impl DofusDeserialize for IdolSelectRequestMessage {
 }
 
 impl DofusMessage for IdolSelectRequestMessage {
-    const MESSAGE_ID: u16 = 6587;
+    const MESSAGE_ID: u16 = 9165;
+}
+
+/// Protocol message — ID: 9953
+#[derive(Debug, Clone, Default)]
+pub struct IdolPartyLostMessage {
+    pub idol_id: i16,
+}
+
+impl DofusSerialize for IdolPartyLostMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.idol_id);
+    }
+}
+
+impl DofusDeserialize for IdolPartyLostMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            idol_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for IdolPartyLostMessage {
+    const MESSAGE_ID: u16 = 9953;
 }
 

@@ -6,44 +6,71 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 4001
+/// Protocol message — ID: 429
 #[derive(Debug, Clone, Default)]
-pub struct FriendsGetListMessage {
+pub struct FriendSetWarnOnLevelGainMessage {
+    pub enable: bool,
 }
 
-impl DofusSerialize for FriendsGetListMessage {
+impl DofusSerialize for FriendSetWarnOnLevelGainMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
     }
 }
 
-impl DofusDeserialize for FriendsGetListMessage {
+impl DofusDeserialize for FriendSetWarnOnLevelGainMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            enable: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for FriendsGetListMessage {
-    const MESSAGE_ID: u16 = 4001;
+impl DofusMessage for FriendSetWarnOnLevelGainMessage {
+    const MESSAGE_ID: u16 = 429;
 }
 
-/// Protocol message — ID: 4002
+/// Protocol message — ID: 800
 #[derive(Debug, Clone, Default)]
-pub struct FriendsListMessage {
-    pub friends_list: Vec<Vec<u8>>,
+pub struct FriendJoinRequestMessage {
+    pub name: String,
 }
 
-impl DofusSerialize for FriendsListMessage {
+impl DofusSerialize for FriendJoinRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.friends_list.len() as _);
+        writer.write_utf(&self.name);
+    }
+}
+
+impl DofusDeserialize for FriendJoinRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendJoinRequestMessage {
+    const MESSAGE_ID: u16 = 800;
+}
+
+/// Protocol message — ID: 1119
+#[derive(Debug, Clone, Default)]
+pub struct AcquaintancesListMessage {
+    pub acquaintance_list: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for AcquaintancesListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.acquaintance_list.len() as _);
         // polymorphic vector (unresolved base type)
     }
 }
 
-impl DofusDeserialize for FriendsListMessage {
+impl DofusDeserialize for AcquaintancesListMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            friends_list: {
+            acquaintance_list: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
@@ -55,11 +82,70 @@ impl DofusDeserialize for FriendsListMessage {
     }
 }
 
-impl DofusMessage for FriendsListMessage {
-    const MESSAGE_ID: u16 = 4002;
+impl DofusMessage for AcquaintancesListMessage {
+    const MESSAGE_ID: u16 = 1119;
 }
 
-/// Protocol message — ID: 4004
+/// Protocol message — ID: 1152
+#[derive(Debug, Clone, Default)]
+pub struct IgnoredAddedMessage {
+    pub ignore_added: Box<IgnoredInformationsVariant>,
+    pub session: bool,
+}
+
+impl DofusSerialize for IgnoredAddedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.ignore_added.get_type_id());
+        (*self.ignore_added).serialize(writer);
+        writer.write_boolean(self.session);
+    }
+}
+
+impl DofusDeserialize for IgnoredAddedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ignore_added: {
+                let type_id = reader.read_ushort()?;
+                Box::new(IgnoredInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+            session: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for IgnoredAddedMessage {
+    const MESSAGE_ID: u16 = 1152;
+}
+
+/// Protocol message — ID: 1543
+#[derive(Debug, Clone, Default)]
+pub struct AcquaintanceAddedMessage {
+    pub acquaintance_added: Box<AcquaintanceInformationVariant>,
+}
+
+impl DofusSerialize for AcquaintanceAddedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.acquaintance_added.get_type_id());
+        (*self.acquaintance_added).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AcquaintanceAddedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            acquaintance_added: {
+                let type_id = reader.read_ushort()?;
+                Box::new(AcquaintanceInformationVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for AcquaintanceAddedMessage {
+    const MESSAGE_ID: u16 = 1543;
+}
+
+/// Protocol message — ID: 1663
 #[derive(Debug, Clone, Default)]
 pub struct FriendAddRequestMessage {
     pub name: String,
@@ -80,10 +166,34 @@ impl DofusDeserialize for FriendAddRequestMessage {
 }
 
 impl DofusMessage for FriendAddRequestMessage {
-    const MESSAGE_ID: u16 = 4004;
+    const MESSAGE_ID: u16 = 1663;
 }
 
-/// Protocol message — ID: 5599
+/// Protocol message — ID: 2659
+#[derive(Debug, Clone, Default)]
+pub struct FriendSetWarnOnConnectionMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for FriendSetWarnOnConnectionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for FriendSetWarnOnConnectionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendSetWarnOnConnectionMessage {
+    const MESSAGE_ID: u16 = 2659;
+}
+
+/// Protocol message — ID: 2999
 #[derive(Debug, Clone, Default)]
 pub struct FriendAddedMessage {
     pub friend_added: Box<FriendInformationsVariant>,
@@ -108,22 +218,50 @@ impl DofusDeserialize for FriendAddedMessage {
 }
 
 impl DofusMessage for FriendAddedMessage {
-    const MESSAGE_ID: u16 = 5599;
+    const MESSAGE_ID: u16 = 2999;
 }
 
-/// Protocol message — ID: 5600
+/// Protocol message — ID: 3021
 #[derive(Debug, Clone, Default)]
-pub struct FriendAddFailureMessage {
+pub struct FriendUpdateMessage {
+    pub friend_updated: Box<FriendInformationsVariant>,
+}
+
+impl DofusSerialize for FriendUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.friend_updated.get_type_id());
+        (*self.friend_updated).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for FriendUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            friend_updated: {
+                let type_id = reader.read_ushort()?;
+                Box::new(FriendInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for FriendUpdateMessage {
+    const MESSAGE_ID: u16 = 3021;
+}
+
+/// Protocol message — ID: 3617
+#[derive(Debug, Clone, Default)]
+pub struct IgnoredAddFailureMessage {
     pub reason: u8,
 }
 
-impl DofusSerialize for FriendAddFailureMessage {
+impl DofusSerialize for IgnoredAddFailureMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_byte(self.reason);
     }
 }
 
-impl DofusDeserialize for FriendAddFailureMessage {
+impl DofusDeserialize for IgnoredAddFailureMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             reason: reader.read_byte()?,
@@ -131,86 +269,39 @@ impl DofusDeserialize for FriendAddFailureMessage {
     }
 }
 
-impl DofusMessage for FriendAddFailureMessage {
-    const MESSAGE_ID: u16 = 5600;
+impl DofusMessage for IgnoredAddFailureMessage {
+    const MESSAGE_ID: u16 = 3617;
 }
 
-/// Protocol message — ID: 5601
+/// Protocol message — ID: 3802
 #[derive(Debug, Clone, Default)]
-pub struct FriendDeleteResultMessage {
-    pub success: bool,
-    pub name: String,
+pub struct SpouseInformationsMessage {
+    pub spouse: Box<FriendSpouseInformationsVariant>,
 }
 
-impl DofusSerialize for FriendDeleteResultMessage {
+impl DofusSerialize for SpouseInformationsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.success);
-        writer.write_utf(&self.name);
+        writer.write_ushort(self.spouse.get_type_id());
+        (*self.spouse).serialize(writer);
     }
 }
 
-impl DofusDeserialize for FriendDeleteResultMessage {
+impl DofusDeserialize for SpouseInformationsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            success: reader.read_boolean()?,
-            name: reader.read_utf()?,
+            spouse: {
+                let type_id = reader.read_ushort()?;
+                Box::new(FriendSpouseInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
         })
     }
 }
 
-impl DofusMessage for FriendDeleteResultMessage {
-    const MESSAGE_ID: u16 = 5601;
+impl DofusMessage for SpouseInformationsMessage {
+    const MESSAGE_ID: u16 = 3802;
 }
 
-/// Protocol message — ID: 5602
-#[derive(Debug, Clone, Default)]
-pub struct FriendSetWarnOnConnectionMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for FriendSetWarnOnConnectionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for FriendSetWarnOnConnectionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendSetWarnOnConnectionMessage {
-    const MESSAGE_ID: u16 = 5602;
-}
-
-/// Protocol message — ID: 5603
-#[derive(Debug, Clone, Default)]
-pub struct FriendDeleteRequestMessage {
-    pub account_id: i32,
-}
-
-impl DofusSerialize for FriendDeleteRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.account_id);
-    }
-}
-
-impl DofusDeserialize for FriendDeleteRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            account_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendDeleteRequestMessage {
-    const MESSAGE_ID: u16 = 5603;
-}
-
-/// Protocol message — ID: 5604
+/// Protocol message — ID: 3828
 #[derive(Debug, Clone, Default)]
 pub struct FriendSpouseJoinRequestMessage {
 }
@@ -228,46 +319,22 @@ impl DofusDeserialize for FriendSpouseJoinRequestMessage {
 }
 
 impl DofusMessage for FriendSpouseJoinRequestMessage {
-    const MESSAGE_ID: u16 = 5604;
+    const MESSAGE_ID: u16 = 3828;
 }
 
-/// Protocol message — ID: 5605
+/// Protocol message — ID: 3898
 #[derive(Debug, Clone, Default)]
-pub struct FriendJoinRequestMessage {
-    pub name: String,
-}
-
-impl DofusSerialize for FriendJoinRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.name);
-    }
-}
-
-impl DofusDeserialize for FriendJoinRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendJoinRequestMessage {
-    const MESSAGE_ID: u16 = 5605;
-}
-
-/// Protocol message — ID: 5606
-#[derive(Debug, Clone, Default)]
-pub struct FriendSpouseFollowWithCompassRequestMessage {
+pub struct GuildMemberSetWarnOnConnectionMessage {
     pub enable: bool,
 }
 
-impl DofusSerialize for FriendSpouseFollowWithCompassRequestMessage {
+impl DofusSerialize for GuildMemberSetWarnOnConnectionMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_boolean(self.enable);
     }
 }
 
-impl DofusDeserialize for FriendSpouseFollowWithCompassRequestMessage {
+impl DofusDeserialize for GuildMemberSetWarnOnConnectionMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             enable: reader.read_boolean()?,
@@ -275,115 +342,35 @@ impl DofusDeserialize for FriendSpouseFollowWithCompassRequestMessage {
     }
 }
 
-impl DofusMessage for FriendSpouseFollowWithCompassRequestMessage {
-    const MESSAGE_ID: u16 = 5606;
+impl DofusMessage for GuildMemberSetWarnOnConnectionMessage {
+    const MESSAGE_ID: u16 = 3898;
 }
 
-/// Protocol message — ID: 5630
+/// Protocol message — ID: 3991
 #[derive(Debug, Clone, Default)]
-pub struct FriendWarnOnConnectionStateMessage {
-    pub enable: bool,
+pub struct ContactAddFailureMessage {
+    pub reason: u8,
 }
 
-impl DofusSerialize for FriendWarnOnConnectionStateMessage {
+impl DofusSerialize for ContactAddFailureMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
+        writer.write_byte(self.reason);
     }
 }
 
-impl DofusDeserialize for FriendWarnOnConnectionStateMessage {
+impl DofusDeserialize for ContactAddFailureMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            enable: reader.read_boolean()?,
+            reason: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for FriendWarnOnConnectionStateMessage {
-    const MESSAGE_ID: u16 = 5630;
+impl DofusMessage for ContactAddFailureMessage {
+    const MESSAGE_ID: u16 = 3991;
 }
 
-/// Protocol message — ID: 5673
-#[derive(Debug, Clone, Default)]
-pub struct IgnoredAddRequestMessage {
-    pub name: String,
-    pub session: bool,
-}
-
-impl DofusSerialize for IgnoredAddRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.name);
-        writer.write_boolean(self.session);
-    }
-}
-
-impl DofusDeserialize for IgnoredAddRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            name: reader.read_utf()?,
-            session: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for IgnoredAddRequestMessage {
-    const MESSAGE_ID: u16 = 5673;
-}
-
-/// Protocol message — ID: 5674
-#[derive(Debug, Clone, Default)]
-pub struct IgnoredListMessage {
-    pub ignored_list: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for IgnoredListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.ignored_list.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for IgnoredListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            ignored_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for IgnoredListMessage {
-    const MESSAGE_ID: u16 = 5674;
-}
-
-/// Protocol message — ID: 5676
-#[derive(Debug, Clone, Default)]
-pub struct IgnoredGetListMessage {
-}
-
-impl DofusSerialize for IgnoredGetListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for IgnoredGetListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for IgnoredGetListMessage {
-    const MESSAGE_ID: u16 = 5676;
-}
-
-/// Protocol message — ID: 5677
+/// Protocol message — ID: 4091
 #[derive(Debug, Clone, Default)]
 pub struct IgnoredDeleteResultMessage {
     pub success: bool,
@@ -413,53 +400,416 @@ impl DofusDeserialize for IgnoredDeleteResultMessage {
 }
 
 impl DofusMessage for IgnoredDeleteResultMessage {
-    const MESSAGE_ID: u16 = 5677;
+    const MESSAGE_ID: u16 = 4091;
 }
 
-/// Protocol message — ID: 5678
+/// Protocol message — ID: 4243
 #[derive(Debug, Clone, Default)]
-pub struct IgnoredAddedMessage {
-    pub ignore_added: Box<IgnoredInformationsVariant>,
+pub struct SpouseGetInformationsMessage {
+}
+
+impl DofusSerialize for SpouseGetInformationsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for SpouseGetInformationsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for SpouseGetInformationsMessage {
+    const MESSAGE_ID: u16 = 4243;
+}
+
+/// Protocol message — ID: 4244
+#[derive(Debug, Clone, Default)]
+pub struct IgnoredListMessage {
+    pub ignored_list: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for IgnoredListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.ignored_list.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for IgnoredListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            ignored_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for IgnoredListMessage {
+    const MESSAGE_ID: u16 = 4244;
+}
+
+/// Protocol message — ID: 4315
+#[derive(Debug, Clone, Default)]
+pub struct IgnoredGetListMessage {
+}
+
+impl DofusSerialize for IgnoredGetListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for IgnoredGetListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for IgnoredGetListMessage {
+    const MESSAGE_ID: u16 = 4315;
+}
+
+/// Protocol message — ID: 4763
+#[derive(Debug, Clone, Default)]
+pub struct GuildMemberWarnOnConnectionStateMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for GuildMemberWarnOnConnectionStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for GuildMemberWarnOnConnectionStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GuildMemberWarnOnConnectionStateMessage {
+    const MESSAGE_ID: u16 = 4763;
+}
+
+/// Protocol message — ID: 5614
+#[derive(Debug, Clone, Default)]
+pub struct FriendDeleteRequestMessage {
+    pub account_id: i32,
+}
+
+impl DofusSerialize for FriendDeleteRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.account_id);
+    }
+}
+
+impl DofusDeserialize for FriendDeleteRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            account_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendDeleteRequestMessage {
+    const MESSAGE_ID: u16 = 5614;
+}
+
+/// Protocol message — ID: 5690
+#[derive(Debug, Clone, Default)]
+pub struct IgnoredAddRequestMessage {
+    pub name: String,
     pub session: bool,
 }
 
-impl DofusSerialize for IgnoredAddedMessage {
+impl DofusSerialize for IgnoredAddRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.ignore_added.get_type_id());
-        (*self.ignore_added).serialize(writer);
+        writer.write_utf(&self.name);
         writer.write_boolean(self.session);
     }
 }
 
-impl DofusDeserialize for IgnoredAddedMessage {
+impl DofusDeserialize for IgnoredAddRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            ignore_added: {
-                let type_id = reader.read_ushort()?;
-                Box::new(IgnoredInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
+            name: reader.read_utf()?,
             session: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for IgnoredAddedMessage {
-    const MESSAGE_ID: u16 = 5678;
+impl DofusMessage for IgnoredAddRequestMessage {
+    const MESSAGE_ID: u16 = 5690;
 }
 
-/// Protocol message — ID: 5679
+/// Protocol message — ID: 5776
 #[derive(Debug, Clone, Default)]
-pub struct IgnoredAddFailureMessage {
+pub struct FriendDeleteResultMessage {
+    pub success: bool,
+    pub name: String,
+}
+
+impl DofusSerialize for FriendDeleteResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.success);
+        writer.write_utf(&self.name);
+    }
+}
+
+impl DofusDeserialize for FriendDeleteResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            success: reader.read_boolean()?,
+            name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendDeleteResultMessage {
+    const MESSAGE_ID: u16 = 5776;
+}
+
+/// Protocol message — ID: 5813
+#[derive(Debug, Clone, Default)]
+pub struct FriendsListMessage {
+    pub friends_list: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for FriendsListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.friends_list.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for FriendsListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            friends_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for FriendsListMessage {
+    const MESSAGE_ID: u16 = 5813;
+}
+
+/// Protocol message — ID: 6257
+#[derive(Debug, Clone, Default)]
+pub struct AcquaintancesGetListMessage {
+}
+
+impl DofusSerialize for AcquaintancesGetListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AcquaintancesGetListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AcquaintancesGetListMessage {
+    const MESSAGE_ID: u16 = 6257;
+}
+
+/// Protocol message — ID: 6299
+#[derive(Debug, Clone, Default)]
+pub struct FriendSetStatusShareMessage {
+    pub share: bool,
+}
+
+impl DofusSerialize for FriendSetStatusShareMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.share);
+    }
+}
+
+impl DofusDeserialize for FriendSetStatusShareMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            share: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendSetStatusShareMessage {
+    const MESSAGE_ID: u16 = 6299;
+}
+
+/// Protocol message — ID: 6364
+#[derive(Debug, Clone, Default)]
+pub struct FriendWarnOnConnectionStateMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for FriendWarnOnConnectionStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for FriendWarnOnConnectionStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendWarnOnConnectionStateMessage {
+    const MESSAGE_ID: u16 = 6364;
+}
+
+/// Protocol message — ID: 7455
+#[derive(Debug, Clone, Default)]
+pub struct FriendsGetListMessage {
+}
+
+impl DofusSerialize for FriendsGetListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for FriendsGetListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for FriendsGetListMessage {
+    const MESSAGE_ID: u16 = 7455;
+}
+
+/// Protocol message — ID: 7752
+#[derive(Debug, Clone, Default)]
+pub struct FriendWarnOnLevelGainStateMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for FriendWarnOnLevelGainStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for FriendWarnOnLevelGainStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendWarnOnLevelGainStateMessage {
+    const MESSAGE_ID: u16 = 7752;
+}
+
+/// Protocol message — ID: 8129
+#[derive(Debug, Clone, Default)]
+pub struct SpouseStatusMessage {
+    pub has_spouse: bool,
+}
+
+impl DofusSerialize for SpouseStatusMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.has_spouse);
+    }
+}
+
+impl DofusDeserialize for SpouseStatusMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            has_spouse: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for SpouseStatusMessage {
+    const MESSAGE_ID: u16 = 8129;
+}
+
+/// Protocol message — ID: 9162
+#[derive(Debug, Clone, Default)]
+pub struct FriendStatusShareStateMessage {
+    pub share: bool,
+}
+
+impl DofusSerialize for FriendStatusShareStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.share);
+    }
+}
+
+impl DofusDeserialize for FriendStatusShareStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            share: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendStatusShareStateMessage {
+    const MESSAGE_ID: u16 = 9162;
+}
+
+/// Protocol message — ID: 9296
+#[derive(Debug, Clone, Default)]
+pub struct WarnOnPermaDeathStateMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for WarnOnPermaDeathStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for WarnOnPermaDeathStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for WarnOnPermaDeathStateMessage {
+    const MESSAGE_ID: u16 = 9296;
+}
+
+/// Protocol message — ID: 9558
+#[derive(Debug, Clone, Default)]
+pub struct FriendAddFailureMessage {
     pub reason: u8,
 }
 
-impl DofusSerialize for IgnoredAddFailureMessage {
+impl DofusSerialize for FriendAddFailureMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_byte(self.reason);
     }
 }
 
-impl DofusDeserialize for IgnoredAddFailureMessage {
+impl DofusDeserialize for FriendAddFailureMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             reason: reader.read_byte()?,
@@ -467,11 +817,35 @@ impl DofusDeserialize for IgnoredAddFailureMessage {
     }
 }
 
-impl DofusMessage for IgnoredAddFailureMessage {
-    const MESSAGE_ID: u16 = 5679;
+impl DofusMessage for FriendAddFailureMessage {
+    const MESSAGE_ID: u16 = 9558;
 }
 
-/// Protocol message — ID: 5680
+/// Protocol message — ID: 9603
+#[derive(Debug, Clone, Default)]
+pub struct FriendSpouseFollowWithCompassRequestMessage {
+    pub enable: bool,
+}
+
+impl DofusSerialize for FriendSpouseFollowWithCompassRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enable);
+    }
+}
+
+impl DofusDeserialize for FriendSpouseFollowWithCompassRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enable: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FriendSpouseFollowWithCompassRequestMessage {
+    const MESSAGE_ID: u16 = 9603;
+}
+
+/// Protocol message — ID: 9881
 #[derive(Debug, Clone, Default)]
 pub struct IgnoredDeleteRequestMessage {
     pub account_id: i32,
@@ -495,380 +869,6 @@ impl DofusDeserialize for IgnoredDeleteRequestMessage {
 }
 
 impl DofusMessage for IgnoredDeleteRequestMessage {
-    const MESSAGE_ID: u16 = 5680;
-}
-
-/// Protocol message — ID: 5924
-#[derive(Debug, Clone, Default)]
-pub struct FriendUpdateMessage {
-    pub friend_updated: Box<FriendInformationsVariant>,
-}
-
-impl DofusSerialize for FriendUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.friend_updated.get_type_id());
-        (*self.friend_updated).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for FriendUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            friend_updated: {
-                let type_id = reader.read_ushort()?;
-                Box::new(FriendInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for FriendUpdateMessage {
-    const MESSAGE_ID: u16 = 5924;
-}
-
-/// Protocol message — ID: 6077
-#[derive(Debug, Clone, Default)]
-pub struct FriendSetWarnOnLevelGainMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for FriendSetWarnOnLevelGainMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for FriendSetWarnOnLevelGainMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendSetWarnOnLevelGainMessage {
-    const MESSAGE_ID: u16 = 6077;
-}
-
-/// Protocol message — ID: 6078
-#[derive(Debug, Clone, Default)]
-pub struct FriendWarnOnLevelGainStateMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for FriendWarnOnLevelGainStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for FriendWarnOnLevelGainStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendWarnOnLevelGainStateMessage {
-    const MESSAGE_ID: u16 = 6078;
-}
-
-/// Protocol message — ID: 6159
-#[derive(Debug, Clone, Default)]
-pub struct GuildMemberSetWarnOnConnectionMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for GuildMemberSetWarnOnConnectionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for GuildMemberSetWarnOnConnectionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GuildMemberSetWarnOnConnectionMessage {
-    const MESSAGE_ID: u16 = 6159;
-}
-
-/// Protocol message — ID: 6160
-#[derive(Debug, Clone, Default)]
-pub struct GuildMemberWarnOnConnectionStateMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for GuildMemberWarnOnConnectionStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for GuildMemberWarnOnConnectionStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GuildMemberWarnOnConnectionStateMessage {
-    const MESSAGE_ID: u16 = 6160;
-}
-
-/// Protocol message — ID: 6265
-#[derive(Debug, Clone, Default)]
-pub struct SpouseStatusMessage {
-    pub has_spouse: bool,
-}
-
-impl DofusSerialize for SpouseStatusMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.has_spouse);
-    }
-}
-
-impl DofusDeserialize for SpouseStatusMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            has_spouse: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for SpouseStatusMessage {
-    const MESSAGE_ID: u16 = 6265;
-}
-
-/// Protocol message — ID: 6355
-#[derive(Debug, Clone, Default)]
-pub struct SpouseGetInformationsMessage {
-}
-
-impl DofusSerialize for SpouseGetInformationsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for SpouseGetInformationsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for SpouseGetInformationsMessage {
-    const MESSAGE_ID: u16 = 6355;
-}
-
-/// Protocol message — ID: 6356
-#[derive(Debug, Clone, Default)]
-pub struct SpouseInformationsMessage {
-    pub spouse: Box<FriendSpouseInformationsVariant>,
-}
-
-impl DofusSerialize for SpouseInformationsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.spouse.get_type_id());
-        (*self.spouse).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for SpouseInformationsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            spouse: {
-                let type_id = reader.read_ushort()?;
-                Box::new(FriendSpouseInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for SpouseInformationsMessage {
-    const MESSAGE_ID: u16 = 6356;
-}
-
-/// Protocol message — ID: 6513
-#[derive(Debug, Clone, Default)]
-pub struct WarnOnPermaDeathStateMessage {
-    pub enable: bool,
-}
-
-impl DofusSerialize for WarnOnPermaDeathStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enable);
-    }
-}
-
-impl DofusDeserialize for WarnOnPermaDeathStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enable: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for WarnOnPermaDeathStateMessage {
-    const MESSAGE_ID: u16 = 6513;
-}
-
-/// Protocol message — ID: 6818
-#[derive(Debug, Clone, Default)]
-pub struct AcquaintanceAddedMessage {
-    pub acquaintance_added: Box<AcquaintanceInformationVariant>,
-}
-
-impl DofusSerialize for AcquaintanceAddedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.acquaintance_added.get_type_id());
-        (*self.acquaintance_added).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AcquaintanceAddedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            acquaintance_added: {
-                let type_id = reader.read_ushort()?;
-                Box::new(AcquaintanceInformationVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for AcquaintanceAddedMessage {
-    const MESSAGE_ID: u16 = 6818;
-}
-
-/// Protocol message — ID: 6819
-#[derive(Debug, Clone, Default)]
-pub struct AcquaintancesGetListMessage {
-}
-
-impl DofusSerialize for AcquaintancesGetListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for AcquaintancesGetListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for AcquaintancesGetListMessage {
-    const MESSAGE_ID: u16 = 6819;
-}
-
-/// Protocol message — ID: 6820
-#[derive(Debug, Clone, Default)]
-pub struct AcquaintancesListMessage {
-    pub acquaintance_list: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for AcquaintancesListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.acquaintance_list.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for AcquaintancesListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            acquaintance_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for AcquaintancesListMessage {
-    const MESSAGE_ID: u16 = 6820;
-}
-
-/// Protocol message — ID: 6821
-#[derive(Debug, Clone, Default)]
-pub struct ContactAddFailureMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for ContactAddFailureMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for ContactAddFailureMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for ContactAddFailureMessage {
-    const MESSAGE_ID: u16 = 6821;
-}
-
-/// Protocol message — ID: 6822
-#[derive(Debug, Clone, Default)]
-pub struct FriendSetStatusShareMessage {
-    pub share: bool,
-}
-
-impl DofusSerialize for FriendSetStatusShareMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.share);
-    }
-}
-
-impl DofusDeserialize for FriendSetStatusShareMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            share: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendSetStatusShareMessage {
-    const MESSAGE_ID: u16 = 6822;
-}
-
-/// Protocol message — ID: 6823
-#[derive(Debug, Clone, Default)]
-pub struct FriendStatusShareStateMessage {
-    pub share: bool,
-}
-
-impl DofusSerialize for FriendStatusShareStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.share);
-    }
-}
-
-impl DofusDeserialize for FriendStatusShareStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            share: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FriendStatusShareStateMessage {
-    const MESSAGE_ID: u16 = 6823;
+    const MESSAGE_ID: u16 = 9881;
 }
 

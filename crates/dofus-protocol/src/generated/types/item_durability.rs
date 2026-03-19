@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 168
+/// Protocol type — ID: 5623
 #[derive(Debug, Clone, Default)]
 pub struct ItemDurability {
     pub durability: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ItemDurability {
 }
 
 impl DofusType for ItemDurability {
-    const TYPE_ID: u16 = 168;
+    const TYPE_ID: u16 = 5623;
 }
 

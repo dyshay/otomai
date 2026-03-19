@@ -6,155 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 200
-#[derive(Debug, Clone, Default)]
-pub struct GameContextCreateMessage {
-    pub context: u8,
-}
-
-impl DofusSerialize for GameContextCreateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.context);
-    }
-}
-
-impl DofusDeserialize for GameContextCreateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            context: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextCreateMessage {
-    const MESSAGE_ID: u16 = 200;
-}
-
-/// Protocol message — ID: 201
-#[derive(Debug, Clone, Default)]
-pub struct GameContextDestroyMessage {
-}
-
-impl DofusSerialize for GameContextDestroyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameContextDestroyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameContextDestroyMessage {
-    const MESSAGE_ID: u16 = 201;
-}
-
-/// Protocol message — ID: 250
-#[derive(Debug, Clone, Default)]
-pub struct GameContextCreateRequestMessage {
-}
-
-impl DofusSerialize for GameContextCreateRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameContextCreateRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameContextCreateRequestMessage {
-    const MESSAGE_ID: u16 = 250;
-}
-
-/// Protocol message — ID: 251
-#[derive(Debug, Clone, Default)]
-pub struct GameContextRemoveElementMessage {
-    pub id: f64,
-}
-
-impl DofusSerialize for GameContextRemoveElementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-    }
-}
-
-impl DofusDeserialize for GameContextRemoveElementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextRemoveElementMessage {
-    const MESSAGE_ID: u16 = 251;
-}
-
-/// Protocol message — ID: 252
-#[derive(Debug, Clone, Default)]
-pub struct GameContextRemoveMultipleElementsMessage {
-    pub elements_ids: Vec<f64>,
-}
-
-impl DofusSerialize for GameContextRemoveMultipleElementsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.elements_ids.len() as _);
-        for item in &self.elements_ids {
-            writer.write_double(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for GameContextRemoveMultipleElementsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            elements_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_double()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameContextRemoveMultipleElementsMessage {
-    const MESSAGE_ID: u16 = 252;
-}
-
-/// Protocol message — ID: 253
-#[derive(Debug, Clone, Default)]
-pub struct GameContextMoveElementMessage {
-    pub movement: EntityMovementInformations,
-}
-
-impl DofusSerialize for GameContextMoveElementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.movement.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameContextMoveElementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            movement: EntityMovementInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextMoveElementMessage {
-    const MESSAGE_ID: u16 = 253;
-}
-
-/// Protocol message — ID: 254
+/// Protocol message — ID: 721
 #[derive(Debug, Clone, Default)]
 pub struct GameContextMoveMultipleElementsMessage {
     pub movements: Vec<EntityMovementInformations>,
@@ -185,10 +37,44 @@ impl DofusDeserialize for GameContextMoveMultipleElementsMessage {
 }
 
 impl DofusMessage for GameContextMoveMultipleElementsMessage {
-    const MESSAGE_ID: u16 = 254;
+    const MESSAGE_ID: u16 = 721;
 }
 
-/// Protocol message — ID: 255
+/// Protocol message — ID: 849
+#[derive(Debug, Clone, Default)]
+pub struct GameContextRemoveMultipleElementsMessage {
+    pub elements_ids: Vec<f64>,
+}
+
+impl DofusSerialize for GameContextRemoveMultipleElementsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.elements_ids.len() as _);
+        for item in &self.elements_ids {
+            writer.write_double(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for GameContextRemoveMultipleElementsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            elements_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_double()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameContextRemoveMultipleElementsMessage {
+    const MESSAGE_ID: u16 = 849;
+}
+
+/// Protocol message — ID: 927
 #[derive(Debug, Clone, Default)]
 pub struct GameContextQuitMessage {
 }
@@ -206,648 +92,10 @@ impl DofusDeserialize for GameContextQuitMessage {
 }
 
 impl DofusMessage for GameContextQuitMessage {
-    const MESSAGE_ID: u16 = 255;
+    const MESSAGE_ID: u16 = 927;
 }
 
-/// Protocol message — ID: 945
-#[derive(Debug, Clone, Default)]
-pub struct GameMapChangeOrientationRequestMessage {
-    pub direction: u8,
-}
-
-impl DofusSerialize for GameMapChangeOrientationRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.direction);
-    }
-}
-
-impl DofusDeserialize for GameMapChangeOrientationRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            direction: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapChangeOrientationRequestMessage {
-    const MESSAGE_ID: u16 = 945;
-}
-
-/// Protocol message — ID: 946
-#[derive(Debug, Clone, Default)]
-pub struct GameMapChangeOrientationMessage {
-    pub orientation: ActorOrientation,
-}
-
-impl DofusSerialize for GameMapChangeOrientationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.orientation.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameMapChangeOrientationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            orientation: ActorOrientation::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapChangeOrientationMessage {
-    const MESSAGE_ID: u16 = 946;
-}
-
-/// Protocol message — ID: 950
-#[derive(Debug, Clone, Default)]
-pub struct GameMapMovementRequestMessage {
-    pub key_movements: Vec<i16>,
-    pub map_id: f64,
-}
-
-impl DofusSerialize for GameMapMovementRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.key_movements.len() as _);
-        for item in &self.key_movements {
-            writer.write_short(*item);
-        }
-        writer.write_double(self.map_id);
-    }
-}
-
-impl DofusDeserialize for GameMapMovementRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            key_movements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_short()?);
-                }
-                v
-            },
-            map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapMovementRequestMessage {
-    const MESSAGE_ID: u16 = 950;
-}
-
-/// Protocol message — ID: 951
-#[derive(Debug, Clone, Default)]
-pub struct GameMapMovementMessage {
-    pub key_movements: Vec<i16>,
-    pub forced_direction: i16,
-    pub actor_id: f64,
-}
-
-impl DofusSerialize for GameMapMovementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.key_movements.len() as _);
-        for item in &self.key_movements {
-            writer.write_short(*item);
-        }
-        writer.write_short(self.forced_direction);
-        writer.write_double(self.actor_id);
-    }
-}
-
-impl DofusDeserialize for GameMapMovementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            key_movements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_short()?);
-                }
-                v
-            },
-            forced_direction: reader.read_short()?,
-            actor_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapMovementMessage {
-    const MESSAGE_ID: u16 = 951;
-}
-
-/// Protocol message — ID: 952
-#[derive(Debug, Clone, Default)]
-pub struct GameMapMovementConfirmMessage {
-}
-
-impl DofusSerialize for GameMapMovementConfirmMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameMapMovementConfirmMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameMapMovementConfirmMessage {
-    const MESSAGE_ID: u16 = 952;
-}
-
-/// Protocol message — ID: 953
-#[derive(Debug, Clone, Default)]
-pub struct GameMapMovementCancelMessage {
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for GameMapMovementCancelMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for GameMapMovementCancelMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapMovementCancelMessage {
-    const MESSAGE_ID: u16 = 953;
-}
-
-/// Protocol message — ID: 954
-#[derive(Debug, Clone, Default)]
-pub struct GameMapNoMovementMessage {
-    pub cell_x: i16,
-    pub cell_y: i16,
-}
-
-impl DofusSerialize for GameMapNoMovementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.cell_x);
-        writer.write_short(self.cell_y);
-    }
-}
-
-impl DofusDeserialize for GameMapNoMovementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_x: reader.read_short()?,
-            cell_y: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for GameMapNoMovementMessage {
-    const MESSAGE_ID: u16 = 954;
-}
-
-/// Protocol message — ID: 5611
-#[derive(Debug, Clone, Default)]
-pub struct ShowCellRequestMessage {
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for ShowCellRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for ShowCellRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ShowCellRequestMessage {
-    const MESSAGE_ID: u16 = 5611;
-}
-
-/// Protocol message — ID: 5612
-#[derive(Debug, Clone, Default)]
-pub struct ShowCellMessage {
-    pub source_id: f64,
-    pub cell_id: i16,
-}
-
-impl DofusSerialize for ShowCellMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.source_id);
-        writer.write_var_short(self.cell_id);
-    }
-}
-
-impl DofusDeserialize for ShowCellMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            source_id: reader.read_double()?,
-            cell_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for ShowCellMessage {
-    const MESSAGE_ID: u16 = 5612;
-}
-
-/// Protocol message — ID: 5637
-#[derive(Debug, Clone, Default)]
-pub struct GameContextRefreshEntityLookMessage {
-    pub id: f64,
-    pub look: EntityLook,
-}
-
-impl DofusSerialize for GameContextRefreshEntityLookMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        self.look.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameContextRefreshEntityLookMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-            look: EntityLook::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextRefreshEntityLookMessage {
-    const MESSAGE_ID: u16 = 5637;
-}
-
-/// Protocol message — ID: 5693
-#[derive(Debug, Clone, Default)]
-pub struct GameEntityDispositionMessage {
-    pub disposition: IdentifiedEntityDispositionInformations,
-}
-
-impl DofusSerialize for GameEntityDispositionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.disposition.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for GameEntityDispositionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            disposition: IdentifiedEntityDispositionInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for GameEntityDispositionMessage {
-    const MESSAGE_ID: u16 = 5693;
-}
-
-/// Protocol message — ID: 5695
-#[derive(Debug, Clone, Default)]
-pub struct GameEntityDispositionErrorMessage {
-}
-
-impl DofusSerialize for GameEntityDispositionErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameEntityDispositionErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameEntityDispositionErrorMessage {
-    const MESSAGE_ID: u16 = 5695;
-}
-
-/// Protocol message — ID: 5696
-#[derive(Debug, Clone, Default)]
-pub struct GameEntitiesDispositionMessage {
-    pub dispositions: Vec<IdentifiedEntityDispositionInformations>,
-}
-
-impl DofusSerialize for GameEntitiesDispositionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.dispositions.len() as _);
-        for item in &self.dispositions {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameEntitiesDispositionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dispositions: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(IdentifiedEntityDispositionInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameEntitiesDispositionMessage {
-    const MESSAGE_ID: u16 = 5696;
-}
-
-/// Protocol message — ID: 6024
-#[derive(Debug, Clone, Default)]
-pub struct GameContextCreateErrorMessage {
-}
-
-impl DofusSerialize for GameContextCreateErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GameContextCreateErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GameContextCreateErrorMessage {
-    const MESSAGE_ID: u16 = 6024;
-}
-
-/// Protocol message — ID: 6071
-#[derive(Debug, Clone, Default)]
-pub struct GameContextReadyMessage {
-    pub map_id: f64,
-}
-
-impl DofusSerialize for GameContextReadyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-    }
-}
-
-impl DofusDeserialize for GameContextReadyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextReadyMessage {
-    const MESSAGE_ID: u16 = 6071;
-}
-
-/// Protocol message — ID: 6081
-#[derive(Debug, Clone, Default)]
-pub struct GameContextKickMessage {
-    pub target_id: f64,
-}
-
-impl DofusSerialize for GameContextKickMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.target_id);
-    }
-}
-
-impl DofusDeserialize for GameContextKickMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            target_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextKickMessage {
-    const MESSAGE_ID: u16 = 6081;
-}
-
-/// Protocol message — ID: 6155
-#[derive(Debug, Clone, Default)]
-pub struct GameMapChangeOrientationsMessage {
-    pub orientations: Vec<ActorOrientation>,
-}
-
-impl DofusSerialize for GameMapChangeOrientationsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.orientations.len() as _);
-        for item in &self.orientations {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GameMapChangeOrientationsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            orientations: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ActorOrientation::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameMapChangeOrientationsMessage {
-    const MESSAGE_ID: u16 = 6155;
-}
-
-/// Protocol message — ID: 6158
-#[derive(Debug, Clone, Default)]
-pub struct ShowCellSpectatorMessage {
-    pub source_id: f64,
-    pub cell_id: i16,
-    pub player_name: String,
-}
-
-impl DofusSerialize for ShowCellSpectatorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.source_id);
-        writer.write_var_short(self.cell_id);
-        writer.write_utf(&self.player_name);
-    }
-}
-
-impl DofusDeserialize for ShowCellSpectatorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            source_id: reader.read_double()?,
-            cell_id: reader.read_var_short()?,
-            player_name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for ShowCellSpectatorMessage {
-    const MESSAGE_ID: u16 = 6158;
-}
-
-/// Protocol message — ID: 6412
-#[derive(Debug, Clone, Default)]
-pub struct GameContextRemoveElementWithEventMessage {
-    pub id: f64,
-    pub element_event_id: u8,
-}
-
-impl DofusSerialize for GameContextRemoveElementWithEventMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.id);
-        writer.write_byte(self.element_event_id);
-    }
-}
-
-impl DofusDeserialize for GameContextRemoveElementWithEventMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            id: reader.read_double()?,
-            element_event_id: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for GameContextRemoveElementWithEventMessage {
-    const MESSAGE_ID: u16 = 6412;
-}
-
-/// Protocol message — ID: 6416
-#[derive(Debug, Clone, Default)]
-pub struct GameContextRemoveMultipleElementsWithEventsMessage {
-    pub elements_ids: Vec<f64>,
-    pub element_event_ids: Vec<u8>,
-}
-
-impl DofusSerialize for GameContextRemoveMultipleElementsWithEventsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.elements_ids.len() as _);
-        for item in &self.elements_ids {
-            writer.write_double(*item);
-        }
-        writer.write_short(self.element_event_ids.len() as _);
-        for item in &self.element_event_ids {
-            writer.write_byte(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for GameContextRemoveMultipleElementsWithEventsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            elements_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_double()?);
-                }
-                v
-            },
-            element_event_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_byte()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GameContextRemoveMultipleElementsWithEventsMessage {
-    const MESSAGE_ID: u16 = 6416;
-}
-
-/// Protocol message — ID: 6496
-#[derive(Debug, Clone, Default)]
-pub struct GameCautiousMapMovementRequestMessage {
-    pub key_movements: Vec<i16>,
-    pub map_id: f64,
-}
-
-impl DofusSerialize for GameCautiousMapMovementRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.key_movements.len() as _);
-        for item in &self.key_movements {
-            writer.write_short(*item);
-        }
-        writer.write_double(self.map_id);
-    }
-}
-
-impl DofusDeserialize for GameCautiousMapMovementRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            key_movements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_short()?);
-                }
-                v
-            },
-            map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameCautiousMapMovementRequestMessage {
-    const MESSAGE_ID: u16 = 6496;
-}
-
-/// Protocol message — ID: 6497
-#[derive(Debug, Clone, Default)]
-pub struct GameCautiousMapMovementMessage {
-    pub key_movements: Vec<i16>,
-    pub forced_direction: i16,
-    pub actor_id: f64,
-}
-
-impl DofusSerialize for GameCautiousMapMovementMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.key_movements.len() as _);
-        for item in &self.key_movements {
-            writer.write_short(*item);
-        }
-        writer.write_short(self.forced_direction);
-        writer.write_double(self.actor_id);
-    }
-}
-
-impl DofusDeserialize for GameCautiousMapMovementMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            key_movements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_short()?);
-                }
-                v
-            },
-            forced_direction: reader.read_short()?,
-            actor_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GameCautiousMapMovementMessage {
-    const MESSAGE_ID: u16 = 6497;
-}
-
-/// Protocol message — ID: 6618
+/// Protocol message — ID: 979
 #[derive(Debug, Clone, Default)]
 pub struct GameRefreshMonsterBoostsMessage {
     pub monster_boosts: Vec<MonsterBoosts>,
@@ -891,6 +139,758 @@ impl DofusDeserialize for GameRefreshMonsterBoostsMessage {
 }
 
 impl DofusMessage for GameRefreshMonsterBoostsMessage {
-    const MESSAGE_ID: u16 = 6618;
+    const MESSAGE_ID: u16 = 979;
+}
+
+/// Protocol message — ID: 1226
+#[derive(Debug, Clone, Default)]
+pub struct GameContextDestroyMessage {
+}
+
+impl DofusSerialize for GameContextDestroyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameContextDestroyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameContextDestroyMessage {
+    const MESSAGE_ID: u16 = 1226;
+}
+
+/// Protocol message — ID: 1882
+#[derive(Debug, Clone, Default)]
+pub struct GameMapMovementConfirmMessage {
+}
+
+impl DofusSerialize for GameMapMovementConfirmMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameMapMovementConfirmMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameMapMovementConfirmMessage {
+    const MESSAGE_ID: u16 = 1882;
+}
+
+/// Protocol message — ID: 2017
+#[derive(Debug, Clone, Default)]
+pub struct GameContextRefreshEntityLookMessage {
+    pub id: f64,
+    pub look: EntityLook,
+}
+
+impl DofusSerialize for GameContextRefreshEntityLookMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+        self.look.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameContextRefreshEntityLookMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+            look: EntityLook::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextRefreshEntityLookMessage {
+    const MESSAGE_ID: u16 = 2017;
+}
+
+/// Protocol message — ID: 3376
+#[derive(Debug, Clone, Default)]
+pub struct GameMapMovementRequestMessage {
+    pub key_movements: Vec<i16>,
+    pub map_id: f64,
+}
+
+impl DofusSerialize for GameMapMovementRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.key_movements.len() as _);
+        for item in &self.key_movements {
+            writer.write_short(*item);
+        }
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for GameMapMovementRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            key_movements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_short()?);
+                }
+                v
+            },
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapMovementRequestMessage {
+    const MESSAGE_ID: u16 = 3376;
+}
+
+/// Protocol message — ID: 3535
+#[derive(Debug, Clone, Default)]
+pub struct ShowCellRequestMessage {
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for ShowCellRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for ShowCellRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ShowCellRequestMessage {
+    const MESSAGE_ID: u16 = 3535;
+}
+
+/// Protocol message — ID: 3636
+#[derive(Debug, Clone, Default)]
+pub struct GameEntityDispositionMessage {
+    pub disposition: IdentifiedEntityDispositionInformations,
+}
+
+impl DofusSerialize for GameEntityDispositionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.disposition.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameEntityDispositionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            disposition: IdentifiedEntityDispositionInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameEntityDispositionMessage {
+    const MESSAGE_ID: u16 = 3636;
+}
+
+/// Protocol message — ID: 3954
+#[derive(Debug, Clone, Default)]
+pub struct GameCautiousMapMovementMessage {
+    pub key_movements: Vec<i16>,
+    pub forced_direction: i16,
+    pub actor_id: f64,
+}
+
+impl DofusSerialize for GameCautiousMapMovementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.key_movements.len() as _);
+        for item in &self.key_movements {
+            writer.write_short(*item);
+        }
+        writer.write_short(self.forced_direction);
+        writer.write_double(self.actor_id);
+    }
+}
+
+impl DofusDeserialize for GameCautiousMapMovementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            key_movements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_short()?);
+                }
+                v
+            },
+            forced_direction: reader.read_short()?,
+            actor_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameCautiousMapMovementMessage {
+    const MESSAGE_ID: u16 = 3954;
+}
+
+/// Protocol message — ID: 4471
+#[derive(Debug, Clone, Default)]
+pub struct GameContextKickMessage {
+    pub target_id: f64,
+}
+
+impl DofusSerialize for GameContextKickMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.target_id);
+    }
+}
+
+impl DofusDeserialize for GameContextKickMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            target_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextKickMessage {
+    const MESSAGE_ID: u16 = 4471;
+}
+
+/// Protocol message — ID: 5147
+#[derive(Debug, Clone, Default)]
+pub struct GameMapChangeOrientationMessage {
+    pub orientation: ActorOrientation,
+}
+
+impl DofusSerialize for GameMapChangeOrientationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.orientation.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameMapChangeOrientationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            orientation: ActorOrientation::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapChangeOrientationMessage {
+    const MESSAGE_ID: u16 = 5147;
+}
+
+/// Protocol message — ID: 5266
+#[derive(Debug, Clone, Default)]
+pub struct GameMapMovementCancelMessage {
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for GameMapMovementCancelMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for GameMapMovementCancelMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapMovementCancelMessage {
+    const MESSAGE_ID: u16 = 5266;
+}
+
+/// Protocol message — ID: 5382
+#[derive(Debug, Clone, Default)]
+pub struct GameMapNoMovementMessage {
+    pub cell_x: i16,
+    pub cell_y: i16,
+}
+
+impl DofusSerialize for GameMapNoMovementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.cell_x);
+        writer.write_short(self.cell_y);
+    }
+}
+
+impl DofusDeserialize for GameMapNoMovementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cell_x: reader.read_short()?,
+            cell_y: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapNoMovementMessage {
+    const MESSAGE_ID: u16 = 5382;
+}
+
+/// Protocol message — ID: 5538
+#[derive(Debug, Clone, Default)]
+pub struct GameMapMovementMessage {
+    pub key_movements: Vec<i16>,
+    pub forced_direction: i16,
+    pub actor_id: f64,
+}
+
+impl DofusSerialize for GameMapMovementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.key_movements.len() as _);
+        for item in &self.key_movements {
+            writer.write_short(*item);
+        }
+        writer.write_short(self.forced_direction);
+        writer.write_double(self.actor_id);
+    }
+}
+
+impl DofusDeserialize for GameMapMovementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            key_movements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_short()?);
+                }
+                v
+            },
+            forced_direction: reader.read_short()?,
+            actor_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapMovementMessage {
+    const MESSAGE_ID: u16 = 5538;
+}
+
+/// Protocol message — ID: 5569
+#[derive(Debug, Clone, Default)]
+pub struct GameMapChangeOrientationRequestMessage {
+    pub direction: u8,
+}
+
+impl DofusSerialize for GameMapChangeOrientationRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.direction);
+    }
+}
+
+impl DofusDeserialize for GameMapChangeOrientationRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            direction: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameMapChangeOrientationRequestMessage {
+    const MESSAGE_ID: u16 = 5569;
+}
+
+/// Protocol message — ID: 5646
+#[derive(Debug, Clone, Default)]
+pub struct GameEntitiesDispositionMessage {
+    pub dispositions: Vec<IdentifiedEntityDispositionInformations>,
+}
+
+impl DofusSerialize for GameEntitiesDispositionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.dispositions.len() as _);
+        for item in &self.dispositions {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameEntitiesDispositionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dispositions: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(IdentifiedEntityDispositionInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameEntitiesDispositionMessage {
+    const MESSAGE_ID: u16 = 5646;
+}
+
+/// Protocol message — ID: 5883
+#[derive(Debug, Clone, Default)]
+pub struct GameCautiousMapMovementRequestMessage {
+    pub key_movements: Vec<i16>,
+    pub map_id: f64,
+}
+
+impl DofusSerialize for GameCautiousMapMovementRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.key_movements.len() as _);
+        for item in &self.key_movements {
+            writer.write_short(*item);
+        }
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for GameCautiousMapMovementRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            key_movements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_short()?);
+                }
+                v
+            },
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameCautiousMapMovementRequestMessage {
+    const MESSAGE_ID: u16 = 5883;
+}
+
+/// Protocol message — ID: 5960
+#[derive(Debug, Clone, Default)]
+pub struct GameContextReadyMessage {
+    pub map_id: f64,
+}
+
+impl DofusSerialize for GameContextReadyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for GameContextReadyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextReadyMessage {
+    const MESSAGE_ID: u16 = 5960;
+}
+
+/// Protocol message — ID: 6005
+#[derive(Debug, Clone, Default)]
+pub struct GameContextRemoveElementWithEventMessage {
+    pub id: f64,
+    pub element_event_id: u8,
+}
+
+impl DofusSerialize for GameContextRemoveElementWithEventMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+        writer.write_byte(self.element_event_id);
+    }
+}
+
+impl DofusDeserialize for GameContextRemoveElementWithEventMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+            element_event_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextRemoveElementWithEventMessage {
+    const MESSAGE_ID: u16 = 6005;
+}
+
+/// Protocol message — ID: 6223
+#[derive(Debug, Clone, Default)]
+pub struct GameContextCreateErrorMessage {
+}
+
+impl DofusSerialize for GameContextCreateErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameContextCreateErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameContextCreateErrorMessage {
+    const MESSAGE_ID: u16 = 6223;
+}
+
+/// Protocol message — ID: 6344
+#[derive(Debug, Clone, Default)]
+pub struct GameContextRemoveElementMessage {
+    pub id: f64,
+}
+
+impl DofusSerialize for GameContextRemoveElementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.id);
+    }
+}
+
+impl DofusDeserialize for GameContextRemoveElementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextRemoveElementMessage {
+    const MESSAGE_ID: u16 = 6344;
+}
+
+/// Protocol message — ID: 6430
+#[derive(Debug, Clone, Default)]
+pub struct ShowCellMessage {
+    pub source_id: f64,
+    pub cell_id: i16,
+}
+
+impl DofusSerialize for ShowCellMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.source_id);
+        writer.write_var_short(self.cell_id);
+    }
+}
+
+impl DofusDeserialize for ShowCellMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            source_id: reader.read_double()?,
+            cell_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for ShowCellMessage {
+    const MESSAGE_ID: u16 = 6430;
+}
+
+/// Protocol message — ID: 7003
+#[derive(Debug, Clone, Default)]
+pub struct GameEntityDispositionErrorMessage {
+}
+
+impl DofusSerialize for GameEntityDispositionErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameEntityDispositionErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameEntityDispositionErrorMessage {
+    const MESSAGE_ID: u16 = 7003;
+}
+
+/// Protocol message — ID: 7867
+#[derive(Debug, Clone, Default)]
+pub struct GameContextMoveElementMessage {
+    pub movement: EntityMovementInformations,
+}
+
+impl DofusSerialize for GameContextMoveElementMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.movement.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for GameContextMoveElementMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            movement: EntityMovementInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextMoveElementMessage {
+    const MESSAGE_ID: u16 = 7867;
+}
+
+/// Protocol message — ID: 8097
+#[derive(Debug, Clone, Default)]
+pub struct GameContextCreateMessage {
+    pub context: u8,
+}
+
+impl DofusSerialize for GameContextCreateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.context);
+    }
+}
+
+impl DofusDeserialize for GameContextCreateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            context: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for GameContextCreateMessage {
+    const MESSAGE_ID: u16 = 8097;
+}
+
+/// Protocol message — ID: 8305
+#[derive(Debug, Clone, Default)]
+pub struct GameContextCreateRequestMessage {
+}
+
+impl DofusSerialize for GameContextCreateRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameContextCreateRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameContextCreateRequestMessage {
+    const MESSAGE_ID: u16 = 8305;
+}
+
+/// Protocol message — ID: 9422
+#[derive(Debug, Clone, Default)]
+pub struct GameMapChangeOrientationsMessage {
+    pub orientations: Vec<ActorOrientation>,
+}
+
+impl DofusSerialize for GameMapChangeOrientationsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.orientations.len() as _);
+        for item in &self.orientations {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GameMapChangeOrientationsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            orientations: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ActorOrientation::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameMapChangeOrientationsMessage {
+    const MESSAGE_ID: u16 = 9422;
+}
+
+/// Protocol message — ID: 9734
+#[derive(Debug, Clone, Default)]
+pub struct ShowCellSpectatorMessage {
+    pub source_id: f64,
+    pub cell_id: i16,
+    pub player_name: String,
+}
+
+impl DofusSerialize for ShowCellSpectatorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.source_id);
+        writer.write_var_short(self.cell_id);
+        writer.write_utf(&self.player_name);
+    }
+}
+
+impl DofusDeserialize for ShowCellSpectatorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            source_id: reader.read_double()?,
+            cell_id: reader.read_var_short()?,
+            player_name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for ShowCellSpectatorMessage {
+    const MESSAGE_ID: u16 = 9734;
+}
+
+/// Protocol message — ID: 9998
+#[derive(Debug, Clone, Default)]
+pub struct GameContextRemoveMultipleElementsWithEventsMessage {
+    pub elements_ids: Vec<f64>,
+    pub element_event_ids: Vec<u8>,
+}
+
+impl DofusSerialize for GameContextRemoveMultipleElementsWithEventsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.elements_ids.len() as _);
+        for item in &self.elements_ids {
+            writer.write_double(*item);
+        }
+        writer.write_short(self.element_event_ids.len() as _);
+        for item in &self.element_event_ids {
+            writer.write_byte(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for GameContextRemoveMultipleElementsWithEventsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            elements_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_double()?);
+                }
+                v
+            },
+            element_event_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_byte()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GameContextRemoveMultipleElementsWithEventsMessage {
+    const MESSAGE_ID: u16 = 9998;
 }
 

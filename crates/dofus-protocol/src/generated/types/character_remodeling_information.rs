@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 479
+/// Protocol type — ID: 2924
 #[derive(Debug, Clone, Default)]
 pub struct CharacterRemodelingInformation {
     pub id: i64,
@@ -52,6 +52,6 @@ impl DofusDeserialize for CharacterRemodelingInformation {
 }
 
 impl DofusType for CharacterRemodelingInformation {
-    const TYPE_ID: u16 = 479;
+    const TYPE_ID: u16 = 2924;
 }
 

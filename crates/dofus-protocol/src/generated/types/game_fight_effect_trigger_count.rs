@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 569
+/// Protocol type — ID: 7452
 #[derive(Debug, Clone, Default)]
 pub struct GameFightEffectTriggerCount {
     pub effect_id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for GameFightEffectTriggerCount {
 }
 
 impl DofusType for GameFightEffectTriggerCount {
-    const TYPE_ID: u16 = 569;
+    const TYPE_ID: u16 = 7452;
 }
 

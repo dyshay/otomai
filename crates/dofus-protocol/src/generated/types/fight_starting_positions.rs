@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 513
+/// Protocol type — ID: 9262
 #[derive(Debug, Clone, Default)]
 pub struct FightStartingPositions {
     pub positions_for_challengers: Vec<i16>,
@@ -50,6 +50,6 @@ impl DofusDeserialize for FightStartingPositions {
 }
 
 impl DofusType for FightStartingPositions {
-    const TYPE_ID: u16 = 513;
+    const TYPE_ID: u16 = 9262;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5739
+/// Protocol message — ID: 3240
 #[derive(Debug, Clone, Default)]
 pub struct PurchasableDialogMessage {
     pub buy_or_sell: bool,
@@ -42,6 +42,6 @@ impl DofusDeserialize for PurchasableDialogMessage {
 }
 
 impl DofusMessage for PurchasableDialogMessage {
-    const MESSAGE_ID: u16 = 5739;
+    const MESSAGE_ID: u16 = 3240;
 }
 

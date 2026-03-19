@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6134
+/// Protocol message — ID: 4006
 #[derive(Debug, Clone, Default)]
 pub struct PopupWarningMessage {
     pub lock_duration: u8,
@@ -33,6 +33,6 @@ impl DofusDeserialize for PopupWarningMessage {
 }
 
 impl DofusMessage for PopupWarningMessage {
-    const MESSAGE_ID: u16 = 6134;
+    const MESSAGE_ID: u16 = 4006;
 }
 

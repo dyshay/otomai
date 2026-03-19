@@ -6,21 +6,21 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5001
+/// Protocol message — ID: 1013
 #[derive(Debug, Clone, Default)]
-pub struct InteractiveUseRequestMessage {
+pub struct InteractiveUseErrorMessage {
     pub elem_id: i32,
     pub skill_instance_uid: i32,
 }
 
-impl DofusSerialize for InteractiveUseRequestMessage {
+impl DofusSerialize for InteractiveUseErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_int(self.elem_id);
         writer.write_var_int(self.skill_instance_uid);
     }
 }
 
-impl DofusDeserialize for InteractiveUseRequestMessage {
+impl DofusDeserialize for InteractiveUseErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             elem_id: reader.read_var_int()?,
@@ -29,11 +29,11 @@ impl DofusDeserialize for InteractiveUseRequestMessage {
     }
 }
 
-impl DofusMessage for InteractiveUseRequestMessage {
-    const MESSAGE_ID: u16 = 5001;
+impl DofusMessage for InteractiveUseErrorMessage {
+    const MESSAGE_ID: u16 = 1013;
 }
 
-/// Protocol message — ID: 5002
+/// Protocol message — ID: 2058
 #[derive(Debug, Clone, Default)]
 pub struct InteractiveMapUpdateMessage {
     pub interactive_elements: Vec<Vec<u8>>,
@@ -62,34 +62,64 @@ impl DofusDeserialize for InteractiveMapUpdateMessage {
 }
 
 impl DofusMessage for InteractiveMapUpdateMessage {
-    const MESSAGE_ID: u16 = 5002;
+    const MESSAGE_ID: u16 = 2058;
 }
 
-/// Protocol message — ID: 5708
+/// Protocol message — ID: 2904
 #[derive(Debug, Clone, Default)]
-pub struct InteractiveElementUpdatedMessage {
-    pub interactive_element: InteractiveElement,
+pub struct InteractiveUseEndedMessage {
+    pub elem_id: i32,
+    pub skill_id: i16,
 }
 
-impl DofusSerialize for InteractiveElementUpdatedMessage {
+impl DofusSerialize for InteractiveUseEndedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.interactive_element.serialize(writer);
+        writer.write_var_int(self.elem_id);
+        writer.write_var_short(self.skill_id);
     }
 }
 
-impl DofusDeserialize for InteractiveElementUpdatedMessage {
+impl DofusDeserialize for InteractiveUseEndedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            interactive_element: InteractiveElement::deserialize(reader)?,
+            elem_id: reader.read_var_int()?,
+            skill_id: reader.read_var_short()?,
         })
     }
 }
 
-impl DofusMessage for InteractiveElementUpdatedMessage {
-    const MESSAGE_ID: u16 = 5708;
+impl DofusMessage for InteractiveUseEndedMessage {
+    const MESSAGE_ID: u16 = 2904;
 }
 
-/// Protocol message — ID: 5709
+/// Protocol message — ID: 3068
+#[derive(Debug, Clone, Default)]
+pub struct InteractiveUseRequestMessage {
+    pub elem_id: i32,
+    pub skill_instance_uid: i32,
+}
+
+impl DofusSerialize for InteractiveUseRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.elem_id);
+        writer.write_var_int(self.skill_instance_uid);
+    }
+}
+
+impl DofusDeserialize for InteractiveUseRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            elem_id: reader.read_var_int()?,
+            skill_instance_uid: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for InteractiveUseRequestMessage {
+    const MESSAGE_ID: u16 = 3068;
+}
+
+/// Protocol message — ID: 5472
 #[derive(Debug, Clone, Default)]
 pub struct StatedElementUpdatedMessage {
     pub stated_element: StatedElement,
@@ -110,44 +140,10 @@ impl DofusDeserialize for StatedElementUpdatedMessage {
 }
 
 impl DofusMessage for StatedElementUpdatedMessage {
-    const MESSAGE_ID: u16 = 5709;
+    const MESSAGE_ID: u16 = 5472;
 }
 
-/// Protocol message — ID: 5716
-#[derive(Debug, Clone, Default)]
-pub struct StatedMapUpdateMessage {
-    pub stated_elements: Vec<StatedElement>,
-}
-
-impl DofusSerialize for StatedMapUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.stated_elements.len() as _);
-        for item in &self.stated_elements {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for StatedMapUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            stated_elements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(StatedElement::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for StatedMapUpdateMessage {
-    const MESSAGE_ID: u16 = 5716;
-}
-
-/// Protocol message — ID: 5745
+/// Protocol message — ID: 9111
 #[derive(Debug, Clone, Default)]
 pub struct InteractiveUsedMessage {
     pub entity_id: i64,
@@ -180,60 +176,64 @@ impl DofusDeserialize for InteractiveUsedMessage {
 }
 
 impl DofusMessage for InteractiveUsedMessage {
-    const MESSAGE_ID: u16 = 5745;
+    const MESSAGE_ID: u16 = 9111;
 }
 
-/// Protocol message — ID: 6112
+/// Protocol message — ID: 9817
 #[derive(Debug, Clone, Default)]
-pub struct InteractiveUseEndedMessage {
-    pub elem_id: i32,
-    pub skill_id: i16,
+pub struct InteractiveElementUpdatedMessage {
+    pub interactive_element: InteractiveElement,
 }
 
-impl DofusSerialize for InteractiveUseEndedMessage {
+impl DofusSerialize for InteractiveElementUpdatedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.elem_id);
-        writer.write_var_short(self.skill_id);
+        self.interactive_element.serialize(writer);
     }
 }
 
-impl DofusDeserialize for InteractiveUseEndedMessage {
+impl DofusDeserialize for InteractiveElementUpdatedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            elem_id: reader.read_var_int()?,
-            skill_id: reader.read_var_short()?,
+            interactive_element: InteractiveElement::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for InteractiveUseEndedMessage {
-    const MESSAGE_ID: u16 = 6112;
+impl DofusMessage for InteractiveElementUpdatedMessage {
+    const MESSAGE_ID: u16 = 9817;
 }
 
-/// Protocol message — ID: 6384
+/// Protocol message — ID: 9971
 #[derive(Debug, Clone, Default)]
-pub struct InteractiveUseErrorMessage {
-    pub elem_id: i32,
-    pub skill_instance_uid: i32,
+pub struct StatedMapUpdateMessage {
+    pub stated_elements: Vec<StatedElement>,
 }
 
-impl DofusSerialize for InteractiveUseErrorMessage {
+impl DofusSerialize for StatedMapUpdateMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.elem_id);
-        writer.write_var_int(self.skill_instance_uid);
+        writer.write_short(self.stated_elements.len() as _);
+        for item in &self.stated_elements {
+            item.serialize(writer);
+        }
     }
 }
 
-impl DofusDeserialize for InteractiveUseErrorMessage {
+impl DofusDeserialize for StatedMapUpdateMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            elem_id: reader.read_var_int()?,
-            skill_instance_uid: reader.read_var_int()?,
+            stated_elements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(StatedElement::deserialize(reader)?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for InteractiveUseErrorMessage {
-    const MESSAGE_ID: u16 = 6384;
+impl DofusMessage for StatedMapUpdateMessage {
+    const MESSAGE_ID: u16 = 9971;
 }
 

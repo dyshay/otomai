@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 49
+/// Protocol type — ID: 1759
 #[derive(Debug, Clone, Default)]
 pub struct SpellItem {
     pub spell_id: i32,
@@ -30,6 +30,6 @@ impl DofusDeserialize for SpellItem {
 }
 
 impl DofusType for SpellItem {
-    const TYPE_ID: u16 = 49;
+    const TYPE_ID: u16 = 1759;
 }
 

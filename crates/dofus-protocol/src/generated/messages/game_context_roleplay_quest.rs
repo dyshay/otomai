@@ -6,7 +6,62 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5622
+/// Protocol message — ID: 1205
+#[derive(Debug, Clone, Default)]
+pub struct GuidedModeReturnRequestMessage {
+}
+
+impl DofusSerialize for GuidedModeReturnRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GuidedModeReturnRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GuidedModeReturnRequestMessage {
+    const MESSAGE_ID: u16 = 1205;
+}
+
+/// Protocol message — ID: 1822
+#[derive(Debug, Clone, Default)]
+pub struct RefreshFollowedQuestsOrderRequestMessage {
+    pub quests: Vec<i16>,
+}
+
+impl DofusSerialize for RefreshFollowedQuestsOrderRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.quests.len() as _);
+        for item in &self.quests {
+            writer.write_var_short(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for RefreshFollowedQuestsOrderRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quests: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for RefreshFollowedQuestsOrderRequestMessage {
+    const MESSAGE_ID: u16 = 1822;
+}
+
+/// Protocol message — ID: 2214
 #[derive(Debug, Clone, Default)]
 pub struct QuestStepInfoRequestMessage {
     pub quest_id: i16,
@@ -27,31 +82,64 @@ impl DofusDeserialize for QuestStepInfoRequestMessage {
 }
 
 impl DofusMessage for QuestStepInfoRequestMessage {
-    const MESSAGE_ID: u16 = 5622;
+    const MESSAGE_ID: u16 = 2214;
 }
 
-/// Protocol message — ID: 5623
+/// Protocol message — ID: 2332
 #[derive(Debug, Clone, Default)]
-pub struct QuestListRequestMessage {
+pub struct UnfollowQuestObjectiveRequestMessage {
+    pub quest_id: i16,
+    pub objective_id: i16,
 }
 
-impl DofusSerialize for QuestListRequestMessage {
+impl DofusSerialize for UnfollowQuestObjectiveRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+        writer.write_short(self.objective_id);
     }
 }
 
-impl DofusDeserialize for QuestListRequestMessage {
+impl DofusDeserialize for UnfollowQuestObjectiveRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            quest_id: reader.read_var_short()?,
+            objective_id: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for QuestListRequestMessage {
-    const MESSAGE_ID: u16 = 5623;
+impl DofusMessage for UnfollowQuestObjectiveRequestMessage {
+    const MESSAGE_ID: u16 = 2332;
 }
 
-/// Protocol message — ID: 5625
+/// Protocol message — ID: 2378
+#[derive(Debug, Clone, Default)]
+pub struct FollowQuestObjectiveRequestMessage {
+    pub quest_id: i16,
+    pub objective_id: i16,
+}
+
+impl DofusSerialize for FollowQuestObjectiveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+        writer.write_short(self.objective_id);
+    }
+}
+
+impl DofusDeserialize for FollowQuestObjectiveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+            objective_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for FollowQuestObjectiveRequestMessage {
+    const MESSAGE_ID: u16 = 2378;
+}
+
+/// Protocol message — ID: 2660
 #[derive(Debug, Clone, Default)]
 pub struct QuestStepInfoMessage {
     pub infos: Box<QuestActiveInformationsVariant>,
@@ -76,10 +164,239 @@ impl DofusDeserialize for QuestStepInfoMessage {
 }
 
 impl DofusMessage for QuestStepInfoMessage {
-    const MESSAGE_ID: u16 = 5625;
+    const MESSAGE_ID: u16 = 2660;
 }
 
-/// Protocol message — ID: 5626
+/// Protocol message — ID: 2692
+#[derive(Debug, Clone, Default)]
+pub struct QuestStepStartedMessage {
+    pub quest_id: i16,
+    pub step_id: i16,
+}
+
+impl DofusSerialize for QuestStepStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+        writer.write_var_short(self.step_id);
+    }
+}
+
+impl DofusDeserialize for QuestStepStartedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+            step_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestStepStartedMessage {
+    const MESSAGE_ID: u16 = 2692;
+}
+
+/// Protocol message — ID: 3134
+#[derive(Debug, Clone, Default)]
+pub struct FollowedQuestsMessage {
+    pub quests: Vec<QuestActiveDetailedInformations>,
+}
+
+impl DofusSerialize for FollowedQuestsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.quests.len() as _);
+        for item in &self.quests {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for FollowedQuestsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quests: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(QuestActiveDetailedInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for FollowedQuestsMessage {
+    const MESSAGE_ID: u16 = 3134;
+}
+
+/// Protocol message — ID: 3293
+#[derive(Debug, Clone, Default)]
+pub struct QuestListRequestMessage {
+}
+
+impl DofusSerialize for QuestListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for QuestListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for QuestListRequestMessage {
+    const MESSAGE_ID: u16 = 3293;
+}
+
+/// Protocol message — ID: 5740
+#[derive(Debug, Clone, Default)]
+pub struct GuidedModeQuitRequestMessage {
+}
+
+impl DofusSerialize for GuidedModeQuitRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GuidedModeQuitRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GuidedModeQuitRequestMessage {
+    const MESSAGE_ID: u16 = 5740;
+}
+
+/// Protocol message — ID: 5795
+#[derive(Debug, Clone, Default)]
+pub struct QuestStartedMessage {
+    pub quest_id: i16,
+}
+
+impl DofusSerialize for QuestStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+    }
+}
+
+impl DofusDeserialize for QuestStartedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestStartedMessage {
+    const MESSAGE_ID: u16 = 5795;
+}
+
+/// Protocol message — ID: 5890
+#[derive(Debug, Clone, Default)]
+pub struct QuestStepValidatedMessage {
+    pub quest_id: i16,
+    pub step_id: i16,
+}
+
+impl DofusSerialize for QuestStepValidatedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+        writer.write_var_short(self.step_id);
+    }
+}
+
+impl DofusDeserialize for QuestStepValidatedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+            step_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestStepValidatedMessage {
+    const MESSAGE_ID: u16 = 5890;
+}
+
+/// Protocol message — ID: 6179
+#[derive(Debug, Clone, Default)]
+pub struct QuestStartRequestMessage {
+    pub quest_id: i16,
+}
+
+impl DofusSerialize for QuestStartRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+    }
+}
+
+impl DofusDeserialize for QuestStartRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestStartRequestMessage {
+    const MESSAGE_ID: u16 = 6179;
+}
+
+/// Protocol message — ID: 6610
+#[derive(Debug, Clone, Default)]
+pub struct QuestObjectiveValidationMessage {
+    pub quest_id: i16,
+    pub objective_id: i16,
+}
+
+impl DofusSerialize for QuestObjectiveValidationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+        writer.write_var_short(self.objective_id);
+    }
+}
+
+impl DofusDeserialize for QuestObjectiveValidationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+            objective_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestObjectiveValidationMessage {
+    const MESSAGE_ID: u16 = 6610;
+}
+
+/// Protocol message — ID: 7778
+#[derive(Debug, Clone, Default)]
+pub struct QuestValidatedMessage {
+    pub quest_id: i16,
+}
+
+impl DofusSerialize for QuestValidatedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.quest_id);
+    }
+}
+
+impl DofusDeserialize for QuestValidatedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quest_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for QuestValidatedMessage {
+    const MESSAGE_ID: u16 = 7778;
+}
+
+/// Protocol message — ID: 7788
 #[derive(Debug, Clone, Default)]
 pub struct QuestListMessage {
     pub finished_quests_ids: Vec<i16>,
@@ -147,178 +464,10 @@ impl DofusDeserialize for QuestListMessage {
 }
 
 impl DofusMessage for QuestListMessage {
-    const MESSAGE_ID: u16 = 5626;
+    const MESSAGE_ID: u16 = 7788;
 }
 
-/// Protocol message — ID: 5643
-#[derive(Debug, Clone, Default)]
-pub struct QuestStartRequestMessage {
-    pub quest_id: i16,
-}
-
-impl DofusSerialize for QuestStartRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-    }
-}
-
-impl DofusDeserialize for QuestStartRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestStartRequestMessage {
-    const MESSAGE_ID: u16 = 5643;
-}
-
-/// Protocol message — ID: 6085
-#[derive(Debug, Clone, Default)]
-pub struct QuestObjectiveValidationMessage {
-    pub quest_id: i16,
-    pub objective_id: i16,
-}
-
-impl DofusSerialize for QuestObjectiveValidationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-        writer.write_var_short(self.objective_id);
-    }
-}
-
-impl DofusDeserialize for QuestObjectiveValidationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-            objective_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestObjectiveValidationMessage {
-    const MESSAGE_ID: u16 = 6085;
-}
-
-/// Protocol message — ID: 6088
-#[derive(Debug, Clone, Default)]
-pub struct GuidedModeReturnRequestMessage {
-}
-
-impl DofusSerialize for GuidedModeReturnRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GuidedModeReturnRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GuidedModeReturnRequestMessage {
-    const MESSAGE_ID: u16 = 6088;
-}
-
-/// Protocol message — ID: 6091
-#[derive(Debug, Clone, Default)]
-pub struct QuestStartedMessage {
-    pub quest_id: i16,
-}
-
-impl DofusSerialize for QuestStartedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-    }
-}
-
-impl DofusDeserialize for QuestStartedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestStartedMessage {
-    const MESSAGE_ID: u16 = 6091;
-}
-
-/// Protocol message — ID: 6092
-#[derive(Debug, Clone, Default)]
-pub struct GuidedModeQuitRequestMessage {
-}
-
-impl DofusSerialize for GuidedModeQuitRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for GuidedModeQuitRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for GuidedModeQuitRequestMessage {
-    const MESSAGE_ID: u16 = 6092;
-}
-
-/// Protocol message — ID: 6096
-#[derive(Debug, Clone, Default)]
-pub struct QuestStepStartedMessage {
-    pub quest_id: i16,
-    pub step_id: i16,
-}
-
-impl DofusSerialize for QuestStepStartedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-        writer.write_var_short(self.step_id);
-    }
-}
-
-impl DofusDeserialize for QuestStepStartedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-            step_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestStepStartedMessage {
-    const MESSAGE_ID: u16 = 6096;
-}
-
-/// Protocol message — ID: 6097
-#[derive(Debug, Clone, Default)]
-pub struct QuestValidatedMessage {
-    pub quest_id: i16,
-}
-
-impl DofusSerialize for QuestValidatedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-    }
-}
-
-impl DofusDeserialize for QuestValidatedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestValidatedMessage {
-    const MESSAGE_ID: u16 = 6097;
-}
-
-/// Protocol message — ID: 6098
+/// Protocol message — ID: 8139
 #[derive(Debug, Clone, Default)]
 pub struct QuestObjectiveValidatedMessage {
     pub quest_id: i16,
@@ -342,155 +491,6 @@ impl DofusDeserialize for QuestObjectiveValidatedMessage {
 }
 
 impl DofusMessage for QuestObjectiveValidatedMessage {
-    const MESSAGE_ID: u16 = 6098;
-}
-
-/// Protocol message — ID: 6099
-#[derive(Debug, Clone, Default)]
-pub struct QuestStepValidatedMessage {
-    pub quest_id: i16,
-    pub step_id: i16,
-}
-
-impl DofusSerialize for QuestStepValidatedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-        writer.write_var_short(self.step_id);
-    }
-}
-
-impl DofusDeserialize for QuestStepValidatedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-            step_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for QuestStepValidatedMessage {
-    const MESSAGE_ID: u16 = 6099;
-}
-
-/// Protocol message — ID: 6717
-#[derive(Debug, Clone, Default)]
-pub struct FollowedQuestsMessage {
-    pub quests: Vec<QuestActiveDetailedInformations>,
-}
-
-impl DofusSerialize for FollowedQuestsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.quests.len() as _);
-        for item in &self.quests {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for FollowedQuestsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quests: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(QuestActiveDetailedInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for FollowedQuestsMessage {
-    const MESSAGE_ID: u16 = 6717;
-}
-
-/// Protocol message — ID: 6722
-#[derive(Debug, Clone, Default)]
-pub struct RefreshFollowedQuestsOrderRequestMessage {
-    pub quests: Vec<i16>,
-}
-
-impl DofusSerialize for RefreshFollowedQuestsOrderRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.quests.len() as _);
-        for item in &self.quests {
-            writer.write_var_short(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for RefreshFollowedQuestsOrderRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quests: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for RefreshFollowedQuestsOrderRequestMessage {
-    const MESSAGE_ID: u16 = 6722;
-}
-
-/// Protocol message — ID: 6723
-#[derive(Debug, Clone, Default)]
-pub struct UnfollowQuestObjectiveRequestMessage {
-    pub quest_id: i16,
-    pub objective_id: i16,
-}
-
-impl DofusSerialize for UnfollowQuestObjectiveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-        writer.write_short(self.objective_id);
-    }
-}
-
-impl DofusDeserialize for UnfollowQuestObjectiveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-            objective_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for UnfollowQuestObjectiveRequestMessage {
-    const MESSAGE_ID: u16 = 6723;
-}
-
-/// Protocol message — ID: 6724
-#[derive(Debug, Clone, Default)]
-pub struct FollowQuestObjectiveRequestMessage {
-    pub quest_id: i16,
-    pub objective_id: i16,
-}
-
-impl DofusSerialize for FollowQuestObjectiveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.quest_id);
-        writer.write_short(self.objective_id);
-    }
-}
-
-impl DofusDeserialize for FollowQuestObjectiveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quest_id: reader.read_var_short()?,
-            objective_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for FollowQuestObjectiveRequestMessage {
-    const MESSAGE_ID: u16 = 6724;
+    const MESSAGE_ID: u16 = 8139;
 }
 

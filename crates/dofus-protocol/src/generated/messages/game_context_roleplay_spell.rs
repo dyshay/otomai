@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6705
+/// Protocol message — ID: 2623
 #[derive(Debug, Clone, Default)]
 pub struct SpellVariantActivationMessage {
     pub spell_id: i16,
@@ -30,10 +30,10 @@ impl DofusDeserialize for SpellVariantActivationMessage {
 }
 
 impl DofusMessage for SpellVariantActivationMessage {
-    const MESSAGE_ID: u16 = 6705;
+    const MESSAGE_ID: u16 = 2623;
 }
 
-/// Protocol message — ID: 6707
+/// Protocol message — ID: 7240
 #[derive(Debug, Clone, Default)]
 pub struct SpellVariantActivationRequestMessage {
     pub spell_id: i16,
@@ -54,6 +54,6 @@ impl DofusDeserialize for SpellVariantActivationRequestMessage {
 }
 
 impl DofusMessage for SpellVariantActivationRequestMessage {
-    const MESSAGE_ID: u16 = 6707;
+    const MESSAGE_ID: u16 = 7240;
 }
 

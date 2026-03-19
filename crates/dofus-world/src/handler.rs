@@ -11,11 +11,9 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     tracing::info!(%peer, "World client connected");
 
     // Step 1: Send ProtocolRequired
-    let proto_version: i32 = state.config.protocol_version.parse().unwrap_or(1966);
     session
         .send(&ProtocolRequired {
-            required_version: proto_version,
-            current_version: proto_version,
+            version: state.config.protocol_version.clone(),
         })
         .await?;
 

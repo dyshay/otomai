@@ -6,82 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 182
-#[derive(Debug, Clone, Default)]
-pub struct BasicPingMessage {
-    pub quiet: bool,
-}
-
-impl DofusSerialize for BasicPingMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.quiet);
-    }
-}
-
-impl DofusDeserialize for BasicPingMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quiet: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicPingMessage {
-    const MESSAGE_ID: u16 = 182;
-}
-
-/// Protocol message — ID: 183
-#[derive(Debug, Clone, Default)]
-pub struct BasicPongMessage {
-    pub quiet: bool,
-}
-
-impl DofusSerialize for BasicPongMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.quiet);
-    }
-}
-
-impl DofusDeserialize for BasicPongMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            quiet: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicPongMessage {
-    const MESSAGE_ID: u16 = 183;
-}
-
-/// Protocol message — ID: 6530
-#[derive(Debug, Clone, Default)]
-pub struct BasicStatMessage {
-    pub time_spent: f64,
-    pub stat_id: i16,
-}
-
-impl DofusSerialize for BasicStatMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.time_spent);
-        writer.write_var_short(self.stat_id);
-    }
-}
-
-impl DofusDeserialize for BasicStatMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            time_spent: reader.read_double()?,
-            stat_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicStatMessage {
-    const MESSAGE_ID: u16 = 6530;
-}
-
-/// Protocol message — ID: 6573
+/// Protocol message — ID: 6736
 #[derive(Debug, Clone, Default)]
 pub struct BasicStatWithDataMessage {
     pub time_spent: f64,
@@ -116,6 +41,81 @@ impl DofusDeserialize for BasicStatWithDataMessage {
 }
 
 impl DofusMessage for BasicStatWithDataMessage {
-    const MESSAGE_ID: u16 = 6573;
+    const MESSAGE_ID: u16 = 6736;
+}
+
+/// Protocol message — ID: 7506
+#[derive(Debug, Clone, Default)]
+pub struct BasicStatMessage {
+    pub time_spent: f64,
+    pub stat_id: i16,
+}
+
+impl DofusSerialize for BasicStatMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.time_spent);
+        writer.write_var_short(self.stat_id);
+    }
+}
+
+impl DofusDeserialize for BasicStatMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            time_spent: reader.read_double()?,
+            stat_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicStatMessage {
+    const MESSAGE_ID: u16 = 7506;
+}
+
+/// Protocol message — ID: 8820
+#[derive(Debug, Clone, Default)]
+pub struct BasicPongMessage {
+    pub quiet: bool,
+}
+
+impl DofusSerialize for BasicPongMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.quiet);
+    }
+}
+
+impl DofusDeserialize for BasicPongMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quiet: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicPongMessage {
+    const MESSAGE_ID: u16 = 8820;
+}
+
+/// Protocol message — ID: 9070
+#[derive(Debug, Clone, Default)]
+pub struct BasicPingMessage {
+    pub quiet: bool,
+}
+
+impl DofusSerialize for BasicPingMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.quiet);
+    }
+}
+
+impl DofusDeserialize for BasicPingMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            quiet: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicPingMessage {
+    const MESSAGE_ID: u16 = 9070;
 }
 

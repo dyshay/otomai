@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6740
+/// Protocol message — ID: 3493
 #[derive(Debug, Clone, Default)]
 pub struct AccountInformationsUpdateMessage {
     pub subscription_end_date: f64,
@@ -27,6 +27,6 @@ impl DofusDeserialize for AccountInformationsUpdateMessage {
 }
 
 impl DofusMessage for AccountInformationsUpdateMessage {
-    const MESSAGE_ID: u16 = 6740;
+    const MESSAGE_ID: u16 = 3493;
 }
 

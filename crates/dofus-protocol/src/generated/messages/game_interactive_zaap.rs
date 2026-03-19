@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5961
+/// Protocol message — ID: 657
 #[derive(Debug, Clone, Default)]
 pub struct TeleportRequestMessage {
     pub source_type: u8,
@@ -33,55 +33,10 @@ impl DofusDeserialize for TeleportRequestMessage {
 }
 
 impl DofusMessage for TeleportRequestMessage {
-    const MESSAGE_ID: u16 = 5961;
+    const MESSAGE_ID: u16 = 657;
 }
 
-/// Protocol message — ID: 6571
-#[derive(Debug, Clone, Default)]
-pub struct ZaapRespawnUpdatedMessage {
-    pub map_id: f64,
-}
-
-impl DofusSerialize for ZaapRespawnUpdatedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-    }
-}
-
-impl DofusDeserialize for ZaapRespawnUpdatedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for ZaapRespawnUpdatedMessage {
-    const MESSAGE_ID: u16 = 6571;
-}
-
-/// Protocol message — ID: 6572
-#[derive(Debug, Clone, Default)]
-pub struct ZaapRespawnSaveRequestMessage {
-}
-
-impl DofusSerialize for ZaapRespawnSaveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for ZaapRespawnSaveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for ZaapRespawnSaveRequestMessage {
-    const MESSAGE_ID: u16 = 6572;
-}
-
-/// Protocol message — ID: 6829
+/// Protocol message — ID: 5005
 #[derive(Debug, Clone, Default)]
 pub struct TeleportDestinationsMessage {
     pub r#type: u8,
@@ -115,10 +70,55 @@ impl DofusDeserialize for TeleportDestinationsMessage {
 }
 
 impl DofusMessage for TeleportDestinationsMessage {
-    const MESSAGE_ID: u16 = 6829;
+    const MESSAGE_ID: u16 = 5005;
 }
 
-/// Protocol message — ID: 6830
+/// Protocol message — ID: 7539
+#[derive(Debug, Clone, Default)]
+pub struct ZaapRespawnUpdatedMessage {
+    pub map_id: f64,
+}
+
+impl DofusSerialize for ZaapRespawnUpdatedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+    }
+}
+
+impl DofusDeserialize for ZaapRespawnUpdatedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for ZaapRespawnUpdatedMessage {
+    const MESSAGE_ID: u16 = 7539;
+}
+
+/// Protocol message — ID: 8078
+#[derive(Debug, Clone, Default)]
+pub struct ZaapRespawnSaveRequestMessage {
+}
+
+impl DofusSerialize for ZaapRespawnSaveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for ZaapRespawnSaveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for ZaapRespawnSaveRequestMessage {
+    const MESSAGE_ID: u16 = 8078;
+}
+
+/// Protocol message — ID: 8975
 #[derive(Debug, Clone, Default)]
 pub struct ZaapDestinationsMessage {
     pub r#type: u8,
@@ -155,6 +155,6 @@ impl DofusDeserialize for ZaapDestinationsMessage {
 }
 
 impl DofusMessage for ZaapDestinationsMessage {
-    const MESSAGE_ID: u16 = 6830;
+    const MESSAGE_ID: u16 = 8975;
 }
 

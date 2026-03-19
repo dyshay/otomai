@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 121
+/// Protocol type — ID: 7048
 #[derive(Debug, Clone, Default)]
 pub struct SellerBuyerDescriptor {
     pub quantities: Vec<i32>,
@@ -68,6 +68,6 @@ impl DofusDeserialize for SellerBuyerDescriptor {
 }
 
 impl DofusType for SellerBuyerDescriptor {
-    const TYPE_ID: u16 = 121;
+    const TYPE_ID: u16 = 7048;
 }
 

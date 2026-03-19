@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 461
+/// Protocol type — ID: 7951
 #[derive(Debug, Clone, Default)]
 pub struct TreasureHuntStepFollowDirectionToPOI {
     pub direction: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for TreasureHuntStepFollowDirectionToPOI {
 }
 
 impl DofusType for TreasureHuntStepFollowDirectionToPOI {
-    const TYPE_ID: u16 = 461;
+    const TYPE_ID: u16 = 7951;
 }
 

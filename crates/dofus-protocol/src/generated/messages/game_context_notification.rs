@@ -6,62 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6087
-#[derive(Debug, Clone, Default)]
-pub struct NotificationListMessage {
-    pub flags: Vec<i32>,
-}
-
-impl DofusSerialize for NotificationListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.flags.len() as _);
-        for item in &self.flags {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for NotificationListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            flags: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for NotificationListMessage {
-    const MESSAGE_ID: u16 = 6087;
-}
-
-/// Protocol message — ID: 6089
-#[derive(Debug, Clone, Default)]
-pub struct NotificationResetMessage {
-}
-
-impl DofusSerialize for NotificationResetMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for NotificationResetMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for NotificationResetMessage {
-    const MESSAGE_ID: u16 = 6089;
-}
-
-/// Protocol message — ID: 6090
+/// Protocol message — ID: 534
 #[derive(Debug, Clone, Default)]
 pub struct NotificationUpdateFlagMessage {
     pub index: i16,
@@ -82,10 +27,10 @@ impl DofusDeserialize for NotificationUpdateFlagMessage {
 }
 
 impl DofusMessage for NotificationUpdateFlagMessage {
-    const MESSAGE_ID: u16 = 6090;
+    const MESSAGE_ID: u16 = 534;
 }
 
-/// Protocol message — ID: 6103
+/// Protocol message — ID: 1287
 #[derive(Debug, Clone, Default)]
 pub struct NotificationByServerMessage {
     pub id: i16,
@@ -122,6 +67,61 @@ impl DofusDeserialize for NotificationByServerMessage {
 }
 
 impl DofusMessage for NotificationByServerMessage {
-    const MESSAGE_ID: u16 = 6103;
+    const MESSAGE_ID: u16 = 1287;
+}
+
+/// Protocol message — ID: 4711
+#[derive(Debug, Clone, Default)]
+pub struct NotificationListMessage {
+    pub flags: Vec<i32>,
+}
+
+impl DofusSerialize for NotificationListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.flags.len() as _);
+        for item in &self.flags {
+            writer.write_var_int(*item);
+        }
+    }
+}
+
+impl DofusDeserialize for NotificationListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            flags: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for NotificationListMessage {
+    const MESSAGE_ID: u16 = 4711;
+}
+
+/// Protocol message — ID: 9352
+#[derive(Debug, Clone, Default)]
+pub struct NotificationResetMessage {
+}
+
+impl DofusSerialize for NotificationResetMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for NotificationResetMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for NotificationResetMessage {
+    const MESSAGE_ID: u16 = 9352;
 }
 

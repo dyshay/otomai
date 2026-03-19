@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 410
+/// Protocol type — ID: 2856
 #[derive(Debug, Clone, Default)]
 pub struct HumanOptionFollowers {
     pub following_characters_look: Vec<IndexedEntityLook>,
@@ -37,6 +37,6 @@ impl DofusDeserialize for HumanOptionFollowers {
 }
 
 impl DofusType for HumanOptionFollowers {
-    const TYPE_ID: u16 = 410;
+    const TYPE_ID: u16 = 2856;
 }
 

@@ -6,31 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6505
-#[derive(Debug, Clone, Default)]
-pub struct GuestModeMessage {
-    pub active: bool,
-}
-
-impl DofusSerialize for GuestModeMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.active);
-    }
-}
-
-impl DofusDeserialize for GuestModeMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            active: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for GuestModeMessage {
-    const MESSAGE_ID: u16 = 6505;
-}
-
-/// Protocol message — ID: 6506
+/// Protocol message — ID: 5232
 #[derive(Debug, Clone, Default)]
 pub struct GuestLimitationMessage {
     pub reason: u8,
@@ -51,6 +27,30 @@ impl DofusDeserialize for GuestLimitationMessage {
 }
 
 impl DofusMessage for GuestLimitationMessage {
-    const MESSAGE_ID: u16 = 6506;
+    const MESSAGE_ID: u16 = 5232;
+}
+
+/// Protocol message — ID: 6071
+#[derive(Debug, Clone, Default)]
+pub struct GuestModeMessage {
+    pub active: bool,
+}
+
+impl DofusSerialize for GuestModeMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.active);
+    }
+}
+
+impl DofusDeserialize for GuestModeMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            active: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for GuestModeMessage {
+    const MESSAGE_ID: u16 = 6071;
 }
 

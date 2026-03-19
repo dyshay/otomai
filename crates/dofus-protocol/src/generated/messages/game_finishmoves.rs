@@ -6,55 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6702
-#[derive(Debug, Clone, Default)]
-pub struct FinishMoveListRequestMessage {
-}
-
-impl DofusSerialize for FinishMoveListRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for FinishMoveListRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for FinishMoveListRequestMessage {
-    const MESSAGE_ID: u16 = 6702;
-}
-
-/// Protocol message — ID: 6703
-#[derive(Debug, Clone, Default)]
-pub struct FinishMoveSetRequestMessage {
-    pub finish_move_id: i32,
-    pub finish_move_state: bool,
-}
-
-impl DofusSerialize for FinishMoveSetRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.finish_move_id);
-        writer.write_boolean(self.finish_move_state);
-    }
-}
-
-impl DofusDeserialize for FinishMoveSetRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            finish_move_id: reader.read_int()?,
-            finish_move_state: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for FinishMoveSetRequestMessage {
-    const MESSAGE_ID: u16 = 6703;
-}
-
-/// Protocol message — ID: 6704
+/// Protocol message — ID: 2694
 #[derive(Debug, Clone, Default)]
 pub struct FinishMoveListMessage {
     pub finish_moves: Vec<FinishMoveInformations>,
@@ -85,6 +37,54 @@ impl DofusDeserialize for FinishMoveListMessage {
 }
 
 impl DofusMessage for FinishMoveListMessage {
-    const MESSAGE_ID: u16 = 6704;
+    const MESSAGE_ID: u16 = 2694;
+}
+
+/// Protocol message — ID: 6091
+#[derive(Debug, Clone, Default)]
+pub struct FinishMoveListRequestMessage {
+}
+
+impl DofusSerialize for FinishMoveListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for FinishMoveListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for FinishMoveListRequestMessage {
+    const MESSAGE_ID: u16 = 6091;
+}
+
+/// Protocol message — ID: 8686
+#[derive(Debug, Clone, Default)]
+pub struct FinishMoveSetRequestMessage {
+    pub finish_move_id: i32,
+    pub finish_move_state: bool,
+}
+
+impl DofusSerialize for FinishMoveSetRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.finish_move_id);
+        writer.write_boolean(self.finish_move_state);
+    }
+}
+
+impl DofusDeserialize for FinishMoveSetRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            finish_move_id: reader.read_int()?,
+            finish_move_state: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for FinishMoveSetRequestMessage {
+    const MESSAGE_ID: u16 = 8686;
 }
 

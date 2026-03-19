@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 398
+/// Protocol type — ID: 1662
 #[derive(Debug, Clone, Default)]
 pub struct InteractiveElementWithAgeBonus {
     pub element_id: i32,
@@ -58,6 +58,6 @@ impl DofusDeserialize for InteractiveElementWithAgeBonus {
 }
 
 impl DofusType for InteractiveElementWithAgeBonus {
-    const TYPE_ID: u16 = 398;
+    const TYPE_ID: u16 = 1662;
 }
 

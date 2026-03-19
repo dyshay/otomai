@@ -6,34 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6275
-#[derive(Debug, Clone, Default)]
-pub struct MailStatusMessage {
-    pub unread: i16,
-    pub total: i16,
-}
-
-impl DofusSerialize for MailStatusMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.unread);
-        writer.write_var_short(self.total);
-    }
-}
-
-impl DofusDeserialize for MailStatusMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            unread: reader.read_var_short()?,
-            total: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for MailStatusMessage {
-    const MESSAGE_ID: u16 = 6275;
-}
-
-/// Protocol message — ID: 6292
+/// Protocol message — ID: 2732
 #[derive(Debug, Clone, Default)]
 pub struct NewMailMessage {
     pub unread: i16,
@@ -70,6 +43,33 @@ impl DofusDeserialize for NewMailMessage {
 }
 
 impl DofusMessage for NewMailMessage {
-    const MESSAGE_ID: u16 = 6292;
+    const MESSAGE_ID: u16 = 2732;
+}
+
+/// Protocol message — ID: 9985
+#[derive(Debug, Clone, Default)]
+pub struct MailStatusMessage {
+    pub unread: i16,
+    pub total: i16,
+}
+
+impl DofusSerialize for MailStatusMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.unread);
+        writer.write_var_short(self.total);
+    }
+}
+
+impl DofusDeserialize for MailStatusMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            unread: reader.read_var_short()?,
+            total: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for MailStatusMessage {
+    const MESSAGE_ID: u16 = 9985;
 }
 

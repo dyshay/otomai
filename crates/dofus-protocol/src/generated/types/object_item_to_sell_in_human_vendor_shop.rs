@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 359
+/// Protocol type — ID: 8040
 #[derive(Debug, Clone, Default)]
 pub struct ObjectItemToSellInHumanVendorShop {
     pub object_g_i_d: i16,
@@ -50,6 +50,6 @@ impl DofusDeserialize for ObjectItemToSellInHumanVendorShop {
 }
 
 impl DofusType for ObjectItemToSellInHumanVendorShop {
-    const TYPE_ID: u16 = 359;
+    const TYPE_ID: u16 = 8040;
 }
 

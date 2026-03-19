@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 1200
+/// Protocol message — ID: 3553
 #[derive(Debug, Clone, Default)]
 pub struct SpellListMessage {
     pub spell_previsualization: bool,
@@ -40,6 +40,6 @@ impl DofusDeserialize for SpellListMessage {
 }
 
 impl DofusMessage for SpellListMessage {
-    const MESSAGE_ID: u16 = 1200;
+    const MESSAGE_ID: u16 = 3553;
 }
 

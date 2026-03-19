@@ -6,55 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5649
-#[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryDefineSettingsMessage {
-    pub settings: JobCrafterDirectorySettings,
-}
-
-impl DofusSerialize for JobCrafterDirectoryDefineSettingsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.settings.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for JobCrafterDirectoryDefineSettingsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            settings: JobCrafterDirectorySettings::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for JobCrafterDirectoryDefineSettingsMessage {
-    const MESSAGE_ID: u16 = 5649;
-}
-
-/// Protocol message — ID: 5651
-#[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryAddMessage {
-    pub list_entry: JobCrafterDirectoryListEntry,
-}
-
-impl DofusSerialize for JobCrafterDirectoryAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.list_entry.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for JobCrafterDirectoryAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            list_entry: JobCrafterDirectoryListEntry::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for JobCrafterDirectoryAddMessage {
-    const MESSAGE_ID: u16 = 5651;
-}
-
-/// Protocol message — ID: 5652
+/// Protocol message — ID: 799
 #[derive(Debug, Clone, Default)]
 pub struct JobCrafterDirectorySettingsMessage {
     pub crafters_settings: Vec<JobCrafterDirectorySettings>,
@@ -85,37 +37,34 @@ impl DofusDeserialize for JobCrafterDirectorySettingsMessage {
 }
 
 impl DofusMessage for JobCrafterDirectorySettingsMessage {
-    const MESSAGE_ID: u16 = 5652;
+    const MESSAGE_ID: u16 = 799;
 }
 
-/// Protocol message — ID: 5653
+/// Protocol message — ID: 1484
 #[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryRemoveMessage {
-    pub job_id: u8,
-    pub player_id: i64,
+pub struct JobCrafterDirectoryAddMessage {
+    pub list_entry: JobCrafterDirectoryListEntry,
 }
 
-impl DofusSerialize for JobCrafterDirectoryRemoveMessage {
+impl DofusSerialize for JobCrafterDirectoryAddMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.job_id);
-        writer.write_var_long(self.player_id);
+        self.list_entry.serialize(writer);
     }
 }
 
-impl DofusDeserialize for JobCrafterDirectoryRemoveMessage {
+impl DofusDeserialize for JobCrafterDirectoryAddMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            job_id: reader.read_byte()?,
-            player_id: reader.read_var_long()?,
+            list_entry: JobCrafterDirectoryListEntry::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for JobCrafterDirectoryRemoveMessage {
-    const MESSAGE_ID: u16 = 5653;
+impl DofusMessage for JobCrafterDirectoryAddMessage {
+    const MESSAGE_ID: u16 = 1484;
 }
 
-/// Protocol message — ID: 5654
+/// Protocol message — ID: 1501
 #[derive(Debug, Clone, Default)]
 pub struct JobExperienceUpdateMessage {
     pub experiences_update: JobExperience,
@@ -136,193 +85,34 @@ impl DofusDeserialize for JobExperienceUpdateMessage {
 }
 
 impl DofusMessage for JobExperienceUpdateMessage {
-    const MESSAGE_ID: u16 = 5654;
+    const MESSAGE_ID: u16 = 1501;
 }
 
-/// Protocol message — ID: 5655
+/// Protocol message — ID: 3428
 #[derive(Debug, Clone, Default)]
-pub struct JobDescriptionMessage {
-    pub jobs_description: Vec<JobDescription>,
+pub struct JobCrafterDirectoryDefineSettingsMessage {
+    pub settings: JobCrafterDirectorySettings,
 }
 
-impl DofusSerialize for JobDescriptionMessage {
+impl DofusSerialize for JobCrafterDirectoryDefineSettingsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.jobs_description.len() as _);
-        for item in &self.jobs_description {
-            item.serialize(writer);
-        }
+        self.settings.serialize(writer);
     }
 }
 
-impl DofusDeserialize for JobDescriptionMessage {
+impl DofusDeserialize for JobCrafterDirectoryDefineSettingsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            jobs_description: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(JobDescription::deserialize(reader)?);
-                }
-                v
-            },
+            settings: JobCrafterDirectorySettings::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for JobDescriptionMessage {
-    const MESSAGE_ID: u16 = 5655;
+impl DofusMessage for JobCrafterDirectoryDefineSettingsMessage {
+    const MESSAGE_ID: u16 = 3428;
 }
 
-/// Protocol message — ID: 5656
-#[derive(Debug, Clone, Default)]
-pub struct JobLevelUpMessage {
-    pub new_level: u8,
-    pub jobs_description: JobDescription,
-}
-
-impl DofusSerialize for JobLevelUpMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.new_level);
-        self.jobs_description.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for JobLevelUpMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            new_level: reader.read_byte()?,
-            jobs_description: JobDescription::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for JobLevelUpMessage {
-    const MESSAGE_ID: u16 = 5656;
-}
-
-/// Protocol message — ID: 5747
-#[derive(Debug, Clone, Default)]
-pub struct JobMultiCraftAvailableSkillsMessage {
-    pub enabled: bool,
-    pub player_id: i64,
-    pub skills: Vec<i16>,
-}
-
-impl DofusSerialize for JobMultiCraftAvailableSkillsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enabled);
-        writer.write_var_long(self.player_id);
-        writer.write_short(self.skills.len() as _);
-        for item in &self.skills {
-            writer.write_var_short(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for JobMultiCraftAvailableSkillsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enabled: reader.read_boolean()?,
-            player_id: reader.read_var_long()?,
-            skills: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for JobMultiCraftAvailableSkillsMessage {
-    const MESSAGE_ID: u16 = 5747;
-}
-
-/// Protocol message — ID: 5748
-#[derive(Debug, Clone, Default)]
-pub struct JobAllowMultiCraftRequestMessage {
-    pub enabled: bool,
-}
-
-impl DofusSerialize for JobAllowMultiCraftRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.enabled);
-    }
-}
-
-impl DofusDeserialize for JobAllowMultiCraftRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            enabled: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for JobAllowMultiCraftRequestMessage {
-    const MESSAGE_ID: u16 = 5748;
-}
-
-/// Protocol message — ID: 5809
-#[derive(Debug, Clone, Default)]
-pub struct JobExperienceMultiUpdateMessage {
-    pub experiences_update: Vec<JobExperience>,
-}
-
-impl DofusSerialize for JobExperienceMultiUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.experiences_update.len() as _);
-        for item in &self.experiences_update {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for JobExperienceMultiUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            experiences_update: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(JobExperience::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for JobExperienceMultiUpdateMessage {
-    const MESSAGE_ID: u16 = 5809;
-}
-
-/// Protocol message — ID: 6043
-#[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryEntryRequestMessage {
-    pub player_id: i64,
-}
-
-impl DofusSerialize for JobCrafterDirectoryEntryRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for JobCrafterDirectoryEntryRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for JobCrafterDirectoryEntryRequestMessage {
-    const MESSAGE_ID: u16 = 6043;
-}
-
-/// Protocol message — ID: 6044
+/// Protocol message — ID: 3830
 #[derive(Debug, Clone, Default)]
 pub struct JobCrafterDirectoryEntryMessage {
     pub player_info: JobCrafterDirectoryEntryPlayerInfo,
@@ -359,32 +149,32 @@ impl DofusDeserialize for JobCrafterDirectoryEntryMessage {
 }
 
 impl DofusMessage for JobCrafterDirectoryEntryMessage {
-    const MESSAGE_ID: u16 = 6044;
+    const MESSAGE_ID: u16 = 3830;
 }
 
-/// Protocol message — ID: 6046
+/// Protocol message — ID: 3919
 #[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryListMessage {
-    pub list_entries: Vec<JobCrafterDirectoryListEntry>,
+pub struct JobDescriptionMessage {
+    pub jobs_description: Vec<JobDescription>,
 }
 
-impl DofusSerialize for JobCrafterDirectoryListMessage {
+impl DofusSerialize for JobDescriptionMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.list_entries.len() as _);
-        for item in &self.list_entries {
+        writer.write_short(self.jobs_description.len() as _);
+        for item in &self.jobs_description {
             item.serialize(writer);
         }
     }
 }
 
-impl DofusDeserialize for JobCrafterDirectoryListMessage {
+impl DofusDeserialize for JobDescriptionMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            list_entries: {
+            jobs_description: {
                 let count = reader.read_ushort()? as usize;
                 let mut v = Vec::with_capacity(count);
                 for _ in 0..count {
-                    v.push(JobCrafterDirectoryListEntry::deserialize(reader)?);
+                    v.push(JobDescription::deserialize(reader)?);
                 }
                 v
             },
@@ -392,35 +182,129 @@ impl DofusDeserialize for JobCrafterDirectoryListMessage {
     }
 }
 
-impl DofusMessage for JobCrafterDirectoryListMessage {
-    const MESSAGE_ID: u16 = 6046;
+impl DofusMessage for JobDescriptionMessage {
+    const MESSAGE_ID: u16 = 3919;
 }
 
-/// Protocol message — ID: 6047
+/// Protocol message — ID: 5801
 #[derive(Debug, Clone, Default)]
-pub struct JobCrafterDirectoryListRequestMessage {
-    pub job_id: u8,
+pub struct JobMultiCraftAvailableSkillsMessage {
+    pub enabled: bool,
+    pub player_id: i64,
+    pub skills: Vec<i16>,
 }
 
-impl DofusSerialize for JobCrafterDirectoryListRequestMessage {
+impl DofusSerialize for JobMultiCraftAvailableSkillsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.job_id);
+        writer.write_boolean(self.enabled);
+        writer.write_var_long(self.player_id);
+        writer.write_short(self.skills.len() as _);
+        for item in &self.skills {
+            writer.write_var_short(*item);
+        }
     }
 }
 
-impl DofusDeserialize for JobCrafterDirectoryListRequestMessage {
+impl DofusDeserialize for JobMultiCraftAvailableSkillsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            job_id: reader.read_byte()?,
+            enabled: reader.read_boolean()?,
+            player_id: reader.read_var_long()?,
+            skills: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for JobCrafterDirectoryListRequestMessage {
-    const MESSAGE_ID: u16 = 6047;
+impl DofusMessage for JobMultiCraftAvailableSkillsMessage {
+    const MESSAGE_ID: u16 = 5801;
 }
 
-/// Protocol message — ID: 6593
+/// Protocol message — ID: 6296
+#[derive(Debug, Clone, Default)]
+pub struct JobAllowMultiCraftRequestMessage {
+    pub enabled: bool,
+}
+
+impl DofusSerialize for JobAllowMultiCraftRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.enabled);
+    }
+}
+
+impl DofusDeserialize for JobAllowMultiCraftRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            enabled: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for JobAllowMultiCraftRequestMessage {
+    const MESSAGE_ID: u16 = 6296;
+}
+
+/// Protocol message — ID: 6469
+#[derive(Debug, Clone, Default)]
+pub struct JobExperienceOtherPlayerUpdateMessage {
+    pub experiences_update: JobExperience,
+    pub player_id: i64,
+}
+
+impl DofusSerialize for JobExperienceOtherPlayerUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.experiences_update.serialize(writer);
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for JobExperienceOtherPlayerUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            experiences_update: JobExperience::deserialize(reader)?,
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for JobExperienceOtherPlayerUpdateMessage {
+    const MESSAGE_ID: u16 = 6469;
+}
+
+/// Protocol message — ID: 7514
+#[derive(Debug, Clone, Default)]
+pub struct JobCrafterDirectoryRemoveMessage {
+    pub job_id: u8,
+    pub player_id: i64,
+}
+
+impl DofusSerialize for JobCrafterDirectoryRemoveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.job_id);
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for JobCrafterDirectoryRemoveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            job_id: reader.read_byte()?,
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for JobCrafterDirectoryRemoveMessage {
+    const MESSAGE_ID: u16 = 7514;
+}
+
+/// Protocol message — ID: 7522
 #[derive(Debug, Clone, Default)]
 pub struct JobBookSubscriptionMessage {
     pub subscriptions: Vec<JobBookSubscription>,
@@ -451,33 +335,149 @@ impl DofusDeserialize for JobBookSubscriptionMessage {
 }
 
 impl DofusMessage for JobBookSubscriptionMessage {
-    const MESSAGE_ID: u16 = 6593;
+    const MESSAGE_ID: u16 = 7522;
 }
 
-/// Protocol message — ID: 6599
+/// Protocol message — ID: 8052
 #[derive(Debug, Clone, Default)]
-pub struct JobExperienceOtherPlayerUpdateMessage {
-    pub experiences_update: JobExperience,
+pub struct JobLevelUpMessage {
+    pub new_level: u8,
+    pub jobs_description: JobDescription,
+}
+
+impl DofusSerialize for JobLevelUpMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.new_level);
+        self.jobs_description.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for JobLevelUpMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            new_level: reader.read_byte()?,
+            jobs_description: JobDescription::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for JobLevelUpMessage {
+    const MESSAGE_ID: u16 = 8052;
+}
+
+/// Protocol message — ID: 8538
+#[derive(Debug, Clone, Default)]
+pub struct JobExperienceMultiUpdateMessage {
+    pub experiences_update: Vec<JobExperience>,
+}
+
+impl DofusSerialize for JobExperienceMultiUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.experiences_update.len() as _);
+        for item in &self.experiences_update {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for JobExperienceMultiUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            experiences_update: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(JobExperience::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for JobExperienceMultiUpdateMessage {
+    const MESSAGE_ID: u16 = 8538;
+}
+
+/// Protocol message — ID: 9508
+#[derive(Debug, Clone, Default)]
+pub struct JobCrafterDirectoryListRequestMessage {
+    pub job_id: u8,
+}
+
+impl DofusSerialize for JobCrafterDirectoryListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.job_id);
+    }
+}
+
+impl DofusDeserialize for JobCrafterDirectoryListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            job_id: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for JobCrafterDirectoryListRequestMessage {
+    const MESSAGE_ID: u16 = 9508;
+}
+
+/// Protocol message — ID: 9607
+#[derive(Debug, Clone, Default)]
+pub struct JobCrafterDirectoryEntryRequestMessage {
     pub player_id: i64,
 }
 
-impl DofusSerialize for JobExperienceOtherPlayerUpdateMessage {
+impl DofusSerialize for JobCrafterDirectoryEntryRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.experiences_update.serialize(writer);
         writer.write_var_long(self.player_id);
     }
 }
 
-impl DofusDeserialize for JobExperienceOtherPlayerUpdateMessage {
+impl DofusDeserialize for JobCrafterDirectoryEntryRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            experiences_update: JobExperience::deserialize(reader)?,
             player_id: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for JobExperienceOtherPlayerUpdateMessage {
-    const MESSAGE_ID: u16 = 6599;
+impl DofusMessage for JobCrafterDirectoryEntryRequestMessage {
+    const MESSAGE_ID: u16 = 9607;
+}
+
+/// Protocol message — ID: 9887
+#[derive(Debug, Clone, Default)]
+pub struct JobCrafterDirectoryListMessage {
+    pub list_entries: Vec<JobCrafterDirectoryListEntry>,
+}
+
+impl DofusSerialize for JobCrafterDirectoryListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.list_entries.len() as _);
+        for item in &self.list_entries {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for JobCrafterDirectoryListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            list_entries: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(JobCrafterDirectoryListEntry::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for JobCrafterDirectoryListMessage {
+    const MESSAGE_ID: u16 = 9887;
 }
 

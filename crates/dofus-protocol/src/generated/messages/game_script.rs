@@ -6,31 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6053
-#[derive(Debug, Clone, Default)]
-pub struct CinematicMessage {
-    pub cinematic_id: i16,
-}
-
-impl DofusSerialize for CinematicMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.cinematic_id);
-    }
-}
-
-impl DofusDeserialize for CinematicMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            cinematic_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for CinematicMessage {
-    const MESSAGE_ID: u16 = 6053;
-}
-
-/// Protocol message — ID: 6266
+/// Protocol message — ID: 6945
 #[derive(Debug, Clone, Default)]
 pub struct URLOpenMessage {
     pub url_id: u8,
@@ -51,6 +27,30 @@ impl DofusDeserialize for URLOpenMessage {
 }
 
 impl DofusMessage for URLOpenMessage {
-    const MESSAGE_ID: u16 = 6266;
+    const MESSAGE_ID: u16 = 6945;
+}
+
+/// Protocol message — ID: 9796
+#[derive(Debug, Clone, Default)]
+pub struct CinematicMessage {
+    pub cinematic_id: i16,
+}
+
+impl DofusSerialize for CinematicMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.cinematic_id);
+    }
+}
+
+impl DofusDeserialize for CinematicMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            cinematic_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for CinematicMessage {
+    const MESSAGE_ID: u16 = 9796;
 }
 

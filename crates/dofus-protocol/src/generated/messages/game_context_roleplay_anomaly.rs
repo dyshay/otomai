@@ -6,7 +6,37 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6828
+/// Protocol message — ID: 5822
+#[derive(Debug, Clone, Default)]
+pub struct AnomalyStateMessage {
+    pub sub_area_id: i16,
+    pub open: bool,
+    pub closing_time: i64,
+}
+
+impl DofusSerialize for AnomalyStateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_boolean(self.open);
+        writer.write_var_long(self.closing_time);
+    }
+}
+
+impl DofusDeserialize for AnomalyStateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            open: reader.read_boolean()?,
+            closing_time: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for AnomalyStateMessage {
+    const MESSAGE_ID: u16 = 5822;
+}
+
+/// Protocol message — ID: 8604
 #[derive(Debug, Clone, Default)]
 pub struct MapComplementaryInformationsAnomalyMessage {
     pub sub_area_id: i16,
@@ -114,36 +144,6 @@ impl DofusDeserialize for MapComplementaryInformationsAnomalyMessage {
 }
 
 impl DofusMessage for MapComplementaryInformationsAnomalyMessage {
-    const MESSAGE_ID: u16 = 6828;
-}
-
-/// Protocol message — ID: 6831
-#[derive(Debug, Clone, Default)]
-pub struct AnomalyStateMessage {
-    pub sub_area_id: i16,
-    pub open: bool,
-    pub closing_time: i64,
-}
-
-impl DofusSerialize for AnomalyStateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_boolean(self.open);
-        writer.write_var_long(self.closing_time);
-    }
-}
-
-impl DofusDeserialize for AnomalyStateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            open: reader.read_boolean()?,
-            closing_time: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for AnomalyStateMessage {
-    const MESSAGE_ID: u16 = 6831;
+    const MESSAGE_ID: u16 = 8604;
 }
 

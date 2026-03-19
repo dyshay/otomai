@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 389
+/// Protocol type — ID: 702
 #[derive(Debug, Clone, Default)]
 pub struct ShortcutEmote {
     pub slot: u8,
@@ -30,6 +30,6 @@ impl DofusDeserialize for ShortcutEmote {
 }
 
 impl DofusType for ShortcutEmote {
-    const TYPE_ID: u16 = 389;
+    const TYPE_ID: u16 = 702;
 }
 

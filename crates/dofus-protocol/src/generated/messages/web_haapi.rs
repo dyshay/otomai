@@ -6,187 +6,34 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6648
+/// Protocol message — ID: 512
 #[derive(Debug, Clone, Default)]
-pub struct HaapiApiKeyRequestMessage {
-}
-
-impl DofusSerialize for HaapiApiKeyRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for HaapiApiKeyRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for HaapiApiKeyRequestMessage {
-    const MESSAGE_ID: u16 = 6648;
-}
-
-/// Protocol message — ID: 6649
-#[derive(Debug, Clone, Default)]
-pub struct HaapiApiKeyMessage {
-    pub token: String,
-}
-
-impl DofusSerialize for HaapiApiKeyMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.token);
-    }
-}
-
-impl DofusDeserialize for HaapiApiKeyMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            token: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for HaapiApiKeyMessage {
-    const MESSAGE_ID: u16 = 6649;
-}
-
-/// Protocol message — ID: 6767
-#[derive(Debug, Clone, Default)]
-pub struct HaapiTokenMessage {
-    pub token: String,
-}
-
-impl DofusSerialize for HaapiTokenMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.token);
-    }
-}
-
-impl DofusDeserialize for HaapiTokenMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            token: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for HaapiTokenMessage {
-    const MESSAGE_ID: u16 = 6767;
-}
-
-/// Protocol message — ID: 6768
-#[derive(Debug, Clone, Default)]
-pub struct HaapiAuthErrorMessage {
+pub struct HaapiCancelBidRequestMessage {
+    pub id: i64,
     pub r#type: u8,
 }
 
-impl DofusSerialize for HaapiAuthErrorMessage {
+impl DofusSerialize for HaapiCancelBidRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.id);
         writer.write_byte(self.r#type);
     }
 }
 
-impl DofusDeserialize for HaapiAuthErrorMessage {
+impl DofusDeserialize for HaapiCancelBidRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            id: reader.read_var_long()?,
             r#type: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for HaapiAuthErrorMessage {
-    const MESSAGE_ID: u16 = 6768;
+impl DofusMessage for HaapiCancelBidRequestMessage {
+    const MESSAGE_ID: u16 = 512;
 }
 
-/// Protocol message — ID: 6769
-#[derive(Debug, Clone, Default)]
-pub struct HaapiSessionMessage {
-    pub key: String,
-    pub r#type: u8,
-}
-
-impl DofusSerialize for HaapiSessionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.key);
-        writer.write_byte(self.r#type);
-    }
-}
-
-impl DofusDeserialize for HaapiSessionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            key: reader.read_utf()?,
-            r#type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for HaapiSessionMessage {
-    const MESSAGE_ID: u16 = 6769;
-}
-
-/// Protocol message — ID: 6841
-#[derive(Debug, Clone, Default)]
-pub struct HaapiBuyValidationMessage {
-    pub action: u8,
-    pub code: u8,
-    pub amount: i64,
-    pub email: String,
-}
-
-impl DofusSerialize for HaapiBuyValidationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.action);
-        writer.write_byte(self.code);
-        writer.write_var_long(self.amount);
-        writer.write_utf(&self.email);
-    }
-}
-
-impl DofusDeserialize for HaapiBuyValidationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action: reader.read_byte()?,
-            code: reader.read_byte()?,
-            amount: reader.read_var_long()?,
-            email: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for HaapiBuyValidationMessage {
-    const MESSAGE_ID: u16 = 6841;
-}
-
-/// Protocol message — ID: 6844
-#[derive(Debug, Clone, Default)]
-pub struct HaapiValidationMessage {
-    pub action: u8,
-    pub code: u8,
-}
-
-impl DofusSerialize for HaapiValidationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.action);
-        writer.write_byte(self.code);
-    }
-}
-
-impl DofusDeserialize for HaapiValidationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            action: reader.read_byte()?,
-            code: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for HaapiValidationMessage {
-    const MESSAGE_ID: u16 = 6844;
-}
-
-/// Protocol message — ID: 6845
+/// Protocol message — ID: 875
 #[derive(Debug, Clone, Default)]
 pub struct HaapiBufferListMessage {
     pub buffers: Vec<BufferInformation>,
@@ -217,10 +64,31 @@ impl DofusDeserialize for HaapiBufferListMessage {
 }
 
 impl DofusMessage for HaapiBufferListMessage {
-    const MESSAGE_ID: u16 = 6845;
+    const MESSAGE_ID: u16 = 875;
 }
 
-/// Protocol message — ID: 6848
+/// Protocol message — ID: 1761
+#[derive(Debug, Clone, Default)]
+pub struct HaapiApiKeyRequestMessage {
+}
+
+impl DofusSerialize for HaapiApiKeyRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for HaapiApiKeyRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for HaapiApiKeyRequestMessage {
+    const MESSAGE_ID: u16 = 1761;
+}
+
+/// Protocol message — ID: 2667
 #[derive(Debug, Clone, Default)]
 pub struct HaapiConfirmationMessage {
     pub kamas: i64,
@@ -253,10 +121,10 @@ impl DofusDeserialize for HaapiConfirmationMessage {
 }
 
 impl DofusMessage for HaapiConfirmationMessage {
-    const MESSAGE_ID: u16 = 6848;
+    const MESSAGE_ID: u16 = 2667;
 }
 
-/// Protocol message — ID: 6858
+/// Protocol message — ID: 2762
 #[derive(Debug, Clone, Default)]
 pub struct HaapiShopApiKeyMessage {
     pub token: String,
@@ -277,10 +145,130 @@ impl DofusDeserialize for HaapiShopApiKeyMessage {
 }
 
 impl DofusMessage for HaapiShopApiKeyMessage {
-    const MESSAGE_ID: u16 = 6858;
+    const MESSAGE_ID: u16 = 2762;
 }
 
-/// Protocol message — ID: 6859
+/// Protocol message — ID: 3058
+#[derive(Debug, Clone, Default)]
+pub struct HaapiTokenMessage {
+    pub token: String,
+}
+
+impl DofusSerialize for HaapiTokenMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.token);
+    }
+}
+
+impl DofusDeserialize for HaapiTokenMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            token: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiTokenMessage {
+    const MESSAGE_ID: u16 = 3058;
+}
+
+/// Protocol message — ID: 3174
+#[derive(Debug, Clone, Default)]
+pub struct HaapiTokenRequestMessage {
+}
+
+impl DofusSerialize for HaapiTokenRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for HaapiTokenRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for HaapiTokenRequestMessage {
+    const MESSAGE_ID: u16 = 3174;
+}
+
+/// Protocol message — ID: 3180
+#[derive(Debug, Clone, Default)]
+pub struct HaapiSessionMessage {
+    pub key: String,
+    pub r#type: u8,
+}
+
+impl DofusSerialize for HaapiSessionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.key);
+        writer.write_byte(self.r#type);
+    }
+}
+
+impl DofusDeserialize for HaapiSessionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            key: reader.read_utf()?,
+            r#type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiSessionMessage {
+    const MESSAGE_ID: u16 = 3180;
+}
+
+/// Protocol message — ID: 3277
+#[derive(Debug, Clone, Default)]
+pub struct HaapiValidationRequestMessage {
+    pub transaction: String,
+}
+
+impl DofusSerialize for HaapiValidationRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.transaction);
+    }
+}
+
+impl DofusDeserialize for HaapiValidationRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            transaction: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiValidationRequestMessage {
+    const MESSAGE_ID: u16 = 3277;
+}
+
+/// Protocol message — ID: 4210
+#[derive(Debug, Clone, Default)]
+pub struct HaapiAuthErrorMessage {
+    pub r#type: u8,
+}
+
+impl DofusSerialize for HaapiAuthErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.r#type);
+    }
+}
+
+impl DofusDeserialize for HaapiAuthErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            r#type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiAuthErrorMessage {
+    const MESSAGE_ID: u16 = 4210;
+}
+
+/// Protocol message — ID: 6567
 #[derive(Debug, Clone, Default)]
 pub struct HaapiShopApiKeyRequestMessage {
 }
@@ -298,6 +286,165 @@ impl DofusDeserialize for HaapiShopApiKeyRequestMessage {
 }
 
 impl DofusMessage for HaapiShopApiKeyRequestMessage {
-    const MESSAGE_ID: u16 = 6859;
+    const MESSAGE_ID: u16 = 6567;
+}
+
+/// Protocol message — ID: 6974
+#[derive(Debug, Clone, Default)]
+pub struct HaapiApiKeyMessage {
+    pub token: String,
+}
+
+impl DofusSerialize for HaapiApiKeyMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.token);
+    }
+}
+
+impl DofusDeserialize for HaapiApiKeyMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            token: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiApiKeyMessage {
+    const MESSAGE_ID: u16 = 6974;
+}
+
+/// Protocol message — ID: 7398
+#[derive(Debug, Clone, Default)]
+pub struct HaapiConsumeBufferRequestMessage {
+}
+
+impl DofusSerialize for HaapiConsumeBufferRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for HaapiConsumeBufferRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for HaapiConsumeBufferRequestMessage {
+    const MESSAGE_ID: u16 = 7398;
+}
+
+/// Protocol message — ID: 7918
+#[derive(Debug, Clone, Default)]
+pub struct HaapiConfirmationRequestMessage {
+    pub kamas: i64,
+    pub ogrines: i64,
+    pub rate: i16,
+    pub action: u8,
+}
+
+impl DofusSerialize for HaapiConfirmationRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.kamas);
+        writer.write_var_long(self.ogrines);
+        writer.write_var_short(self.rate);
+        writer.write_byte(self.action);
+    }
+}
+
+impl DofusDeserialize for HaapiConfirmationRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            kamas: reader.read_var_long()?,
+            ogrines: reader.read_var_long()?,
+            rate: reader.read_var_short()?,
+            action: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiConfirmationRequestMessage {
+    const MESSAGE_ID: u16 = 7918;
+}
+
+/// Protocol message — ID: 8126
+#[derive(Debug, Clone, Default)]
+pub struct HaapiBufferListRequestMessage {
+}
+
+impl DofusSerialize for HaapiBufferListRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for HaapiBufferListRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for HaapiBufferListRequestMessage {
+    const MESSAGE_ID: u16 = 8126;
+}
+
+/// Protocol message — ID: 8381
+#[derive(Debug, Clone, Default)]
+pub struct HaapiValidationMessage {
+    pub action: u8,
+    pub code: u8,
+}
+
+impl DofusSerialize for HaapiValidationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.action);
+        writer.write_byte(self.code);
+    }
+}
+
+impl DofusDeserialize for HaapiValidationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action: reader.read_byte()?,
+            code: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiValidationMessage {
+    const MESSAGE_ID: u16 = 8381;
+}
+
+/// Protocol message — ID: 8752
+#[derive(Debug, Clone, Default)]
+pub struct HaapiBuyValidationMessage {
+    pub action: u8,
+    pub code: u8,
+    pub amount: i64,
+    pub email: String,
+}
+
+impl DofusSerialize for HaapiBuyValidationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.action);
+        writer.write_byte(self.code);
+        writer.write_var_long(self.amount);
+        writer.write_utf(&self.email);
+    }
+}
+
+impl DofusDeserialize for HaapiBuyValidationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            action: reader.read_byte()?,
+            code: reader.read_byte()?,
+            amount: reader.read_var_long()?,
+            email: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for HaapiBuyValidationMessage {
+    const MESSAGE_ID: u16 = 8752;
 }
 

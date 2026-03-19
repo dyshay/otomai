@@ -6,85 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6390
-#[derive(Debug, Clone, Default)]
-pub struct AllianceMembershipMessage {
-    pub alliance_info: AllianceInformations,
-    pub enabled: bool,
-    pub leading_guild_id: i32,
-}
-
-impl DofusSerialize for AllianceMembershipMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.alliance_info.serialize(writer);
-        writer.write_boolean(self.enabled);
-        writer.write_var_int(self.leading_guild_id);
-    }
-}
-
-impl DofusDeserialize for AllianceMembershipMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_info: AllianceInformations::deserialize(reader)?,
-            enabled: reader.read_boolean()?,
-            leading_guild_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceMembershipMessage {
-    const MESSAGE_ID: u16 = 6390;
-}
-
-/// Protocol message — ID: 6391
-#[derive(Debug, Clone, Default)]
-pub struct AllianceCreationResultMessage {
-    pub result: u8,
-}
-
-impl DofusSerialize for AllianceCreationResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.result);
-    }
-}
-
-impl DofusDeserialize for AllianceCreationResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            result: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceCreationResultMessage {
-    const MESSAGE_ID: u16 = 6391;
-}
-
-/// Protocol message — ID: 6392
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInvitationStateRecrutedMessage {
-    pub invitation_state: u8,
-}
-
-impl DofusSerialize for AllianceInvitationStateRecrutedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.invitation_state);
-    }
-}
-
-impl DofusDeserialize for AllianceInvitationStateRecrutedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            invitation_state: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceInvitationStateRecrutedMessage {
-    const MESSAGE_ID: u16 = 6392;
-}
-
-/// Protocol message — ID: 6393
+/// Protocol message — ID: 813
 #[derive(Debug, Clone, Default)]
 pub struct AllianceCreationValidMessage {
     pub alliance_name: String,
@@ -111,510 +33,10 @@ impl DofusDeserialize for AllianceCreationValidMessage {
 }
 
 impl DofusMessage for AllianceCreationValidMessage {
-    const MESSAGE_ID: u16 = 6393;
+    const MESSAGE_ID: u16 = 813;
 }
 
-/// Protocol message — ID: 6394
-#[derive(Debug, Clone, Default)]
-pub struct AllianceCreationStartedMessage {
-}
-
-impl DofusSerialize for AllianceCreationStartedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for AllianceCreationStartedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for AllianceCreationStartedMessage {
-    const MESSAGE_ID: u16 = 6394;
-}
-
-/// Protocol message — ID: 6395
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInvitationMessage {
-    pub target_id: i64,
-}
-
-impl DofusSerialize for AllianceInvitationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.target_id);
-    }
-}
-
-impl DofusDeserialize for AllianceInvitationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            target_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceInvitationMessage {
-    const MESSAGE_ID: u16 = 6395;
-}
-
-/// Protocol message — ID: 6396
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInvitationStateRecruterMessage {
-    pub recruted_name: String,
-    pub invitation_state: u8,
-}
-
-impl DofusSerialize for AllianceInvitationStateRecruterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.recruted_name);
-        writer.write_byte(self.invitation_state);
-    }
-}
-
-impl DofusDeserialize for AllianceInvitationStateRecruterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            recruted_name: reader.read_utf()?,
-            invitation_state: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceInvitationStateRecruterMessage {
-    const MESSAGE_ID: u16 = 6396;
-}
-
-/// Protocol message — ID: 6397
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInvitedMessage {
-    pub recruter_id: i64,
-    pub recruter_name: String,
-    pub alliance_info: BasicNamedAllianceInformations,
-}
-
-impl DofusSerialize for AllianceInvitedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.recruter_id);
-        writer.write_utf(&self.recruter_name);
-        self.alliance_info.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AllianceInvitedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            recruter_id: reader.read_var_long()?,
-            recruter_name: reader.read_utf()?,
-            alliance_info: BasicNamedAllianceInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceInvitedMessage {
-    const MESSAGE_ID: u16 = 6397;
-}
-
-/// Protocol message — ID: 6398
-#[derive(Debug, Clone, Default)]
-pub struct AllianceLeftMessage {
-}
-
-impl DofusSerialize for AllianceLeftMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for AllianceLeftMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for AllianceLeftMessage {
-    const MESSAGE_ID: u16 = 6398;
-}
-
-/// Protocol message — ID: 6399
-#[derive(Debug, Clone, Default)]
-pub struct AllianceGuildLeavingMessage {
-    pub kicked: bool,
-    pub guild_id: i32,
-}
-
-impl DofusSerialize for AllianceGuildLeavingMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.kicked);
-        writer.write_var_int(self.guild_id);
-    }
-}
-
-impl DofusDeserialize for AllianceGuildLeavingMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            kicked: reader.read_boolean()?,
-            guild_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceGuildLeavingMessage {
-    const MESSAGE_ID: u16 = 6399;
-}
-
-/// Protocol message — ID: 6400
-#[derive(Debug, Clone, Default)]
-pub struct AllianceKickRequestMessage {
-    pub kicked_id: i32,
-}
-
-impl DofusSerialize for AllianceKickRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.kicked_id);
-    }
-}
-
-impl DofusDeserialize for AllianceKickRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            kicked_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceKickRequestMessage {
-    const MESSAGE_ID: u16 = 6400;
-}
-
-/// Protocol message — ID: 6401
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInvitationAnswerMessage {
-    pub accept: bool,
-}
-
-impl DofusSerialize for AllianceInvitationAnswerMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.accept);
-    }
-}
-
-impl DofusDeserialize for AllianceInvitationAnswerMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            accept: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceInvitationAnswerMessage {
-    const MESSAGE_ID: u16 = 6401;
-}
-
-/// Protocol message — ID: 6402
-#[derive(Debug, Clone, Default)]
-pub struct AllianceJoinedMessage {
-    pub alliance_info: AllianceInformations,
-    pub enabled: bool,
-    pub leading_guild_id: i32,
-}
-
-impl DofusSerialize for AllianceJoinedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.alliance_info.serialize(writer);
-        writer.write_boolean(self.enabled);
-        writer.write_var_int(self.leading_guild_id);
-    }
-}
-
-impl DofusDeserialize for AllianceJoinedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_info: AllianceInformations::deserialize(reader)?,
-            enabled: reader.read_boolean()?,
-            leading_guild_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceJoinedMessage {
-    const MESSAGE_ID: u16 = 6402;
-}
-
-/// Protocol message — ID: 6403
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInsiderInfoMessage {
-    pub alliance_infos: AllianceFactSheetInformations,
-    pub guilds: Vec<GuildInsiderFactSheetInformations>,
-    pub prisms: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for AllianceInsiderInfoMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.alliance_infos.serialize(writer);
-        writer.write_short(self.guilds.len() as _);
-        for item in &self.guilds {
-            item.serialize(writer);
-        }
-        writer.write_short(self.prisms.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for AllianceInsiderInfoMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_infos: AllianceFactSheetInformations::deserialize(reader)?,
-            guilds: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GuildInsiderFactSheetInformations::deserialize(reader)?);
-                }
-                v
-            },
-            prisms: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for AllianceInsiderInfoMessage {
-    const MESSAGE_ID: u16 = 6403;
-}
-
-/// Protocol message — ID: 6408
-#[derive(Debug, Clone, Default)]
-pub struct AllianceListMessage {
-    pub alliances: Vec<AllianceFactSheetInformations>,
-}
-
-impl DofusSerialize for AllianceListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.alliances.len() as _);
-        for item in &self.alliances {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for AllianceListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliances: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(AllianceFactSheetInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for AllianceListMessage {
-    const MESSAGE_ID: u16 = 6408;
-}
-
-/// Protocol message — ID: 6409
-#[derive(Debug, Clone, Default)]
-pub struct AllianceFactsRequestMessage {
-    pub alliance_id: i32,
-}
-
-impl DofusSerialize for AllianceFactsRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.alliance_id);
-    }
-}
-
-impl DofusDeserialize for AllianceFactsRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceFactsRequestMessage {
-    const MESSAGE_ID: u16 = 6409;
-}
-
-/// Protocol message — ID: 6414
-#[derive(Debug, Clone, Default)]
-pub struct AllianceFactsMessage {
-    pub infos: Box<AllianceFactSheetInformationsVariant>,
-    pub guilds: Vec<GuildInAllianceInformations>,
-    pub controlled_subarea_ids: Vec<i16>,
-    pub leader_character_id: i64,
-    pub leader_character_name: String,
-}
-
-impl DofusSerialize for AllianceFactsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.infos.get_type_id());
-        (*self.infos).serialize(writer);
-        writer.write_short(self.guilds.len() as _);
-        for item in &self.guilds {
-            item.serialize(writer);
-        }
-        writer.write_short(self.controlled_subarea_ids.len() as _);
-        for item in &self.controlled_subarea_ids {
-            writer.write_var_short(*item);
-        }
-        writer.write_var_long(self.leader_character_id);
-        writer.write_utf(&self.leader_character_name);
-    }
-}
-
-impl DofusDeserialize for AllianceFactsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            infos: {
-                let type_id = reader.read_ushort()?;
-                Box::new(AllianceFactSheetInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-            guilds: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(GuildInAllianceInformations::deserialize(reader)?);
-                }
-                v
-            },
-            controlled_subarea_ids: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_short()?);
-                }
-                v
-            },
-            leader_character_id: reader.read_var_long()?,
-            leader_character_name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceFactsMessage {
-    const MESSAGE_ID: u16 = 6414;
-}
-
-/// Protocol message — ID: 6417
-#[derive(Debug, Clone, Default)]
-pub struct AllianceInsiderInfoRequestMessage {
-}
-
-impl DofusSerialize for AllianceInsiderInfoRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for AllianceInsiderInfoRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for AllianceInsiderInfoRequestMessage {
-    const MESSAGE_ID: u16 = 6417;
-}
-
-/// Protocol message — ID: 6423
-#[derive(Debug, Clone, Default)]
-pub struct AllianceFactsErrorMessage {
-    pub alliance_id: i32,
-}
-
-impl DofusSerialize for AllianceFactsErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.alliance_id);
-    }
-}
-
-impl DofusDeserialize for AllianceFactsErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_id: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceFactsErrorMessage {
-    const MESSAGE_ID: u16 = 6423;
-}
-
-/// Protocol message — ID: 6426
-#[derive(Debug, Clone, Default)]
-pub struct AllianceChangeGuildRightsMessage {
-    pub guild_id: i32,
-    pub rights: u8,
-}
-
-impl DofusSerialize for AllianceChangeGuildRightsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.guild_id);
-        writer.write_byte(self.rights);
-    }
-}
-
-impl DofusDeserialize for AllianceChangeGuildRightsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            guild_id: reader.read_var_int()?,
-            rights: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceChangeGuildRightsMessage {
-    const MESSAGE_ID: u16 = 6426;
-}
-
-/// Protocol message — ID: 6427
-#[derive(Debug, Clone, Default)]
-pub struct AlliancePartialListMessage {
-    pub alliances: Vec<AllianceFactSheetInformations>,
-}
-
-impl DofusSerialize for AlliancePartialListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.alliances.len() as _);
-        for item in &self.alliances {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for AlliancePartialListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliances: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(AllianceFactSheetInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for AlliancePartialListMessage {
-    const MESSAGE_ID: u16 = 6427;
-}
-
-/// Protocol message — ID: 6436
+/// Protocol message — ID: 815
 #[derive(Debug, Clone, Default)]
 pub struct AllianceVersatileInfoListMessage {
     pub alliances: Vec<AllianceVersatileInformations>,
@@ -645,10 +67,398 @@ impl DofusDeserialize for AllianceVersatileInfoListMessage {
 }
 
 impl DofusMessage for AllianceVersatileInfoListMessage {
-    const MESSAGE_ID: u16 = 6436;
+    const MESSAGE_ID: u16 = 815;
 }
 
-/// Protocol message — ID: 6439
+/// Protocol message — ID: 1115
+#[derive(Debug, Clone, Default)]
+pub struct AllianceJoinedMessage {
+    pub alliance_info: AllianceInformations,
+    pub enabled: bool,
+    pub leading_guild_id: i32,
+}
+
+impl DofusSerialize for AllianceJoinedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.alliance_info.serialize(writer);
+        writer.write_boolean(self.enabled);
+        writer.write_var_int(self.leading_guild_id);
+    }
+}
+
+impl DofusDeserialize for AllianceJoinedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_info: AllianceInformations::deserialize(reader)?,
+            enabled: reader.read_boolean()?,
+            leading_guild_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceJoinedMessage {
+    const MESSAGE_ID: u16 = 1115;
+}
+
+/// Protocol message — ID: 1433
+#[derive(Debug, Clone, Default)]
+pub struct AllianceModificationEmblemValidMessage {
+    pub alliancemblem: GuildEmblem,
+}
+
+impl DofusSerialize for AllianceModificationEmblemValidMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.alliancemblem.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AllianceModificationEmblemValidMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliancemblem: GuildEmblem::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceModificationEmblemValidMessage {
+    const MESSAGE_ID: u16 = 1433;
+}
+
+/// Protocol message — ID: 1594
+#[derive(Debug, Clone, Default)]
+pub struct AllianceCreationResultMessage {
+    pub result: u8,
+}
+
+impl DofusSerialize for AllianceCreationResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.result);
+    }
+}
+
+impl DofusDeserialize for AllianceCreationResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceCreationResultMessage {
+    const MESSAGE_ID: u16 = 1594;
+}
+
+/// Protocol message — ID: 1682
+#[derive(Debug, Clone, Default)]
+pub struct AllianceMembershipMessage {
+    pub alliance_info: AllianceInformations,
+    pub enabled: bool,
+    pub leading_guild_id: i32,
+}
+
+impl DofusSerialize for AllianceMembershipMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.alliance_info.serialize(writer);
+        writer.write_boolean(self.enabled);
+        writer.write_var_int(self.leading_guild_id);
+    }
+}
+
+impl DofusDeserialize for AllianceMembershipMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_info: AllianceInformations::deserialize(reader)?,
+            enabled: reader.read_boolean()?,
+            leading_guild_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceMembershipMessage {
+    const MESSAGE_ID: u16 = 1682;
+}
+
+/// Protocol message — ID: 1729
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInsiderInfoRequestMessage {
+}
+
+impl DofusSerialize for AllianceInsiderInfoRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AllianceInsiderInfoRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AllianceInsiderInfoRequestMessage {
+    const MESSAGE_ID: u16 = 1729;
+}
+
+/// Protocol message — ID: 2111
+#[derive(Debug, Clone, Default)]
+pub struct AllianceMotdSetErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for AllianceMotdSetErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for AllianceMotdSetErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceMotdSetErrorMessage {
+    const MESSAGE_ID: u16 = 2111;
+}
+
+/// Protocol message — ID: 2353
+#[derive(Debug, Clone, Default)]
+pub struct AllianceGuildLeavingMessage {
+    pub kicked: bool,
+    pub guild_id: i32,
+}
+
+impl DofusSerialize for AllianceGuildLeavingMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.kicked);
+        writer.write_var_int(self.guild_id);
+    }
+}
+
+impl DofusDeserialize for AllianceGuildLeavingMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            kicked: reader.read_boolean()?,
+            guild_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceGuildLeavingMessage {
+    const MESSAGE_ID: u16 = 2353;
+}
+
+/// Protocol message — ID: 3392
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInvitedMessage {
+    pub recruter_id: i64,
+    pub recruter_name: String,
+    pub alliance_info: BasicNamedAllianceInformations,
+}
+
+impl DofusSerialize for AllianceInvitedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.recruter_id);
+        writer.write_utf(&self.recruter_name);
+        self.alliance_info.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AllianceInvitedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            recruter_id: reader.read_var_long()?,
+            recruter_name: reader.read_utf()?,
+            alliance_info: BasicNamedAllianceInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceInvitedMessage {
+    const MESSAGE_ID: u16 = 3392;
+}
+
+/// Protocol message — ID: 3584
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInvitationStateRecruterMessage {
+    pub recruted_name: String,
+    pub invitation_state: u8,
+}
+
+impl DofusSerialize for AllianceInvitationStateRecruterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.recruted_name);
+        writer.write_byte(self.invitation_state);
+    }
+}
+
+impl DofusDeserialize for AllianceInvitationStateRecruterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            recruted_name: reader.read_utf()?,
+            invitation_state: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceInvitationStateRecruterMessage {
+    const MESSAGE_ID: u16 = 3584;
+}
+
+/// Protocol message — ID: 3716
+#[derive(Debug, Clone, Default)]
+pub struct AllianceBulletinSetErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for AllianceBulletinSetErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for AllianceBulletinSetErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceBulletinSetErrorMessage {
+    const MESSAGE_ID: u16 = 3716;
+}
+
+/// Protocol message — ID: 4020
+#[derive(Debug, Clone, Default)]
+pub struct AllianceCreationStartedMessage {
+}
+
+impl DofusSerialize for AllianceCreationStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AllianceCreationStartedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AllianceCreationStartedMessage {
+    const MESSAGE_ID: u16 = 4020;
+}
+
+/// Protocol message — ID: 4229
+#[derive(Debug, Clone, Default)]
+pub struct AllianceFactsRequestMessage {
+    pub alliance_id: i32,
+}
+
+impl DofusSerialize for AllianceFactsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.alliance_id);
+    }
+}
+
+impl DofusDeserialize for AllianceFactsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceFactsRequestMessage {
+    const MESSAGE_ID: u16 = 4229;
+}
+
+/// Protocol message — ID: 4368
+#[derive(Debug, Clone, Default)]
+pub struct AlliancePartialListMessage {
+    pub alliances: Vec<AllianceFactSheetInformations>,
+}
+
+impl DofusSerialize for AlliancePartialListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.alliances.len() as _);
+        for item in &self.alliances {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for AlliancePartialListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliances: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(AllianceFactSheetInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for AlliancePartialListMessage {
+    const MESSAGE_ID: u16 = 4368;
+}
+
+/// Protocol message — ID: 4464
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInvitationAnswerMessage {
+    pub accept: bool,
+}
+
+impl DofusSerialize for AllianceInvitationAnswerMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.accept);
+    }
+}
+
+impl DofusDeserialize for AllianceInvitationAnswerMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            accept: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceInvitationAnswerMessage {
+    const MESSAGE_ID: u16 = 4464;
+}
+
+/// Protocol message — ID: 4475
+#[derive(Debug, Clone, Default)]
+pub struct AllianceKickRequestMessage {
+    pub kicked_id: i32,
+}
+
+impl DofusSerialize for AllianceKickRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.kicked_id);
+    }
+}
+
+impl DofusDeserialize for AllianceKickRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            kicked_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceKickRequestMessage {
+    const MESSAGE_ID: u16 = 4475;
+}
+
+/// Protocol message — ID: 5197
 #[derive(Debug, Clone, Default)]
 pub struct KohUpdateMessage {
     pub alliances: Vec<AllianceInformations>,
@@ -740,205 +550,10 @@ impl DofusDeserialize for KohUpdateMessage {
 }
 
 impl DofusMessage for KohUpdateMessage {
-    const MESSAGE_ID: u16 = 6439;
+    const MESSAGE_ID: u16 = 5197;
 }
 
-/// Protocol message — ID: 6444
-#[derive(Debug, Clone, Default)]
-pub struct AllianceModificationStartedMessage {
-    pub can_change_name: bool,
-    pub can_change_tag: bool,
-    pub can_change_emblem: bool,
-}
-
-impl DofusSerialize for AllianceModificationStartedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        let mut _flag: u8 = 0;
-        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.can_change_name).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.can_change_tag).unwrap();
-        _flag = boolean_byte_wrapper::set_flag(_flag, 2, self.can_change_emblem).unwrap();
-        writer.write_byte(_flag);
-    }
-}
-
-impl DofusDeserialize for AllianceModificationStartedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        let _flag0 = reader.read_byte()?;
-        Ok(Self {
-            can_change_name: boolean_byte_wrapper::get_flag(_flag0, 0)?,
-            can_change_tag: boolean_byte_wrapper::get_flag(_flag0, 1)?,
-            can_change_emblem: boolean_byte_wrapper::get_flag(_flag0, 2)?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceModificationStartedMessage {
-    const MESSAGE_ID: u16 = 6444;
-}
-
-/// Protocol message — ID: 6447
-#[derive(Debug, Clone, Default)]
-pub struct AllianceModificationEmblemValidMessage {
-    pub alliancemblem: GuildEmblem,
-}
-
-impl DofusSerialize for AllianceModificationEmblemValidMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.alliancemblem.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AllianceModificationEmblemValidMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliancemblem: GuildEmblem::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceModificationEmblemValidMessage {
-    const MESSAGE_ID: u16 = 6447;
-}
-
-/// Protocol message — ID: 6449
-#[derive(Debug, Clone, Default)]
-pub struct AllianceModificationNameAndTagValidMessage {
-    pub alliance_name: String,
-    pub alliance_tag: String,
-}
-
-impl DofusSerialize for AllianceModificationNameAndTagValidMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.alliance_name);
-        writer.write_utf(&self.alliance_tag);
-    }
-}
-
-impl DofusDeserialize for AllianceModificationNameAndTagValidMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_name: reader.read_utf()?,
-            alliance_tag: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceModificationNameAndTagValidMessage {
-    const MESSAGE_ID: u16 = 6449;
-}
-
-/// Protocol message — ID: 6450
-#[derive(Debug, Clone, Default)]
-pub struct AllianceModificationValidMessage {
-    pub alliance_name: String,
-    pub alliance_tag: String,
-    pub alliancemblem: GuildEmblem,
-}
-
-impl DofusSerialize for AllianceModificationValidMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.alliance_name);
-        writer.write_utf(&self.alliance_tag);
-        self.alliancemblem.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for AllianceModificationValidMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            alliance_name: reader.read_utf()?,
-            alliance_tag: reader.read_utf()?,
-            alliancemblem: GuildEmblem::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceModificationValidMessage {
-    const MESSAGE_ID: u16 = 6450;
-}
-
-/// Protocol message — ID: 6683
-#[derive(Debug, Clone, Default)]
-pub struct AllianceMotdSetErrorMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for AllianceMotdSetErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for AllianceMotdSetErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceMotdSetErrorMessage {
-    const MESSAGE_ID: u16 = 6683;
-}
-
-/// Protocol message — ID: 6685
-#[derive(Debug, Clone, Default)]
-pub struct AllianceMotdMessage {
-    pub content: String,
-    pub timestamp: i32,
-    pub member_id: i64,
-    pub member_name: String,
-}
-
-impl DofusSerialize for AllianceMotdMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.content);
-        writer.write_int(self.timestamp);
-        writer.write_var_long(self.member_id);
-        writer.write_utf(&self.member_name);
-    }
-}
-
-impl DofusDeserialize for AllianceMotdMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            content: reader.read_utf()?,
-            timestamp: reader.read_int()?,
-            member_id: reader.read_var_long()?,
-            member_name: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceMotdMessage {
-    const MESSAGE_ID: u16 = 6685;
-}
-
-/// Protocol message — ID: 6687
-#[derive(Debug, Clone, Default)]
-pub struct AllianceMotdSetRequestMessage {
-    pub content: String,
-}
-
-impl DofusSerialize for AllianceMotdSetRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.content);
-    }
-}
-
-impl DofusDeserialize for AllianceMotdSetRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            content: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for AllianceMotdSetRequestMessage {
-    const MESSAGE_ID: u16 = 6687;
-}
-
-/// Protocol message — ID: 6690
+/// Protocol message — ID: 5460
 #[derive(Debug, Clone, Default)]
 pub struct AllianceBulletinMessage {
     pub content: String,
@@ -971,34 +586,197 @@ impl DofusDeserialize for AllianceBulletinMessage {
 }
 
 impl DofusMessage for AllianceBulletinMessage {
-    const MESSAGE_ID: u16 = 6690;
+    const MESSAGE_ID: u16 = 5460;
 }
 
-/// Protocol message — ID: 6692
+/// Protocol message — ID: 5789
 #[derive(Debug, Clone, Default)]
-pub struct AllianceBulletinSetErrorMessage {
-    pub reason: u8,
+pub struct AllianceModificationNameAndTagValidMessage {
+    pub alliance_name: String,
+    pub alliance_tag: String,
 }
 
-impl DofusSerialize for AllianceBulletinSetErrorMessage {
+impl DofusSerialize for AllianceModificationNameAndTagValidMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
+        writer.write_utf(&self.alliance_name);
+        writer.write_utf(&self.alliance_tag);
     }
 }
 
-impl DofusDeserialize for AllianceBulletinSetErrorMessage {
+impl DofusDeserialize for AllianceModificationNameAndTagValidMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            reason: reader.read_byte()?,
+            alliance_name: reader.read_utf()?,
+            alliance_tag: reader.read_utf()?,
         })
     }
 }
 
-impl DofusMessage for AllianceBulletinSetErrorMessage {
-    const MESSAGE_ID: u16 = 6692;
+impl DofusMessage for AllianceModificationNameAndTagValidMessage {
+    const MESSAGE_ID: u16 = 5789;
 }
 
-/// Protocol message — ID: 6693
+/// Protocol message — ID: 5865
+#[derive(Debug, Clone, Default)]
+pub struct AllianceListMessage {
+    pub alliances: Vec<AllianceFactSheetInformations>,
+}
+
+impl DofusSerialize for AllianceListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.alliances.len() as _);
+        for item in &self.alliances {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for AllianceListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliances: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(AllianceFactSheetInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for AllianceListMessage {
+    const MESSAGE_ID: u16 = 5865;
+}
+
+/// Protocol message — ID: 6551
+#[derive(Debug, Clone, Default)]
+pub struct AllianceMotdMessage {
+    pub content: String,
+    pub timestamp: i32,
+    pub member_id: i64,
+    pub member_name: String,
+}
+
+impl DofusSerialize for AllianceMotdMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.content);
+        writer.write_int(self.timestamp);
+        writer.write_var_long(self.member_id);
+        writer.write_utf(&self.member_name);
+    }
+}
+
+impl DofusDeserialize for AllianceMotdMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            content: reader.read_utf()?,
+            timestamp: reader.read_int()?,
+            member_id: reader.read_var_long()?,
+            member_name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceMotdMessage {
+    const MESSAGE_ID: u16 = 6551;
+}
+
+/// Protocol message — ID: 6628
+#[derive(Debug, Clone, Default)]
+pub struct AllianceModificationStartedMessage {
+    pub can_change_name: bool,
+    pub can_change_tag: bool,
+    pub can_change_emblem: bool,
+}
+
+impl DofusSerialize for AllianceModificationStartedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        let mut _flag: u8 = 0;
+        _flag = boolean_byte_wrapper::set_flag(_flag, 0, self.can_change_name).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 1, self.can_change_tag).unwrap();
+        _flag = boolean_byte_wrapper::set_flag(_flag, 2, self.can_change_emblem).unwrap();
+        writer.write_byte(_flag);
+    }
+}
+
+impl DofusDeserialize for AllianceModificationStartedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        let _flag0 = reader.read_byte()?;
+        Ok(Self {
+            can_change_name: boolean_byte_wrapper::get_flag(_flag0, 0)?,
+            can_change_tag: boolean_byte_wrapper::get_flag(_flag0, 1)?,
+            can_change_emblem: boolean_byte_wrapper::get_flag(_flag0, 2)?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceModificationStartedMessage {
+    const MESSAGE_ID: u16 = 6628;
+}
+
+/// Protocol message — ID: 6638
+#[derive(Debug, Clone, Default)]
+pub struct AllianceFactsMessage {
+    pub infos: Box<AllianceFactSheetInformationsVariant>,
+    pub guilds: Vec<GuildInAllianceInformations>,
+    pub controlled_subarea_ids: Vec<i16>,
+    pub leader_character_id: i64,
+    pub leader_character_name: String,
+}
+
+impl DofusSerialize for AllianceFactsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.infos.get_type_id());
+        (*self.infos).serialize(writer);
+        writer.write_short(self.guilds.len() as _);
+        for item in &self.guilds {
+            item.serialize(writer);
+        }
+        writer.write_short(self.controlled_subarea_ids.len() as _);
+        for item in &self.controlled_subarea_ids {
+            writer.write_var_short(*item);
+        }
+        writer.write_var_long(self.leader_character_id);
+        writer.write_utf(&self.leader_character_name);
+    }
+}
+
+impl DofusDeserialize for AllianceFactsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            infos: {
+                let type_id = reader.read_ushort()?;
+                Box::new(AllianceFactSheetInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+            guilds: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GuildInAllianceInformations::deserialize(reader)?);
+                }
+                v
+            },
+            controlled_subarea_ids: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_short()?);
+                }
+                v
+            },
+            leader_character_id: reader.read_var_long()?,
+            leader_character_name: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceFactsMessage {
+    const MESSAGE_ID: u16 = 6638;
+}
+
+/// Protocol message — ID: 7301
 #[derive(Debug, Clone, Default)]
 pub struct AllianceBulletinSetRequestMessage {
     pub content: String,
@@ -1022,6 +800,228 @@ impl DofusDeserialize for AllianceBulletinSetRequestMessage {
 }
 
 impl DofusMessage for AllianceBulletinSetRequestMessage {
-    const MESSAGE_ID: u16 = 6693;
+    const MESSAGE_ID: u16 = 7301;
+}
+
+/// Protocol message — ID: 7315
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInvitationStateRecrutedMessage {
+    pub invitation_state: u8,
+}
+
+impl DofusSerialize for AllianceInvitationStateRecrutedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.invitation_state);
+    }
+}
+
+impl DofusDeserialize for AllianceInvitationStateRecrutedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            invitation_state: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceInvitationStateRecrutedMessage {
+    const MESSAGE_ID: u16 = 7315;
+}
+
+/// Protocol message — ID: 7582
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInsiderInfoMessage {
+    pub alliance_infos: AllianceFactSheetInformations,
+    pub guilds: Vec<GuildInsiderFactSheetInformations>,
+    pub prisms: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for AllianceInsiderInfoMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.alliance_infos.serialize(writer);
+        writer.write_short(self.guilds.len() as _);
+        for item in &self.guilds {
+            item.serialize(writer);
+        }
+        writer.write_short(self.prisms.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for AllianceInsiderInfoMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_infos: AllianceFactSheetInformations::deserialize(reader)?,
+            guilds: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(GuildInsiderFactSheetInformations::deserialize(reader)?);
+                }
+                v
+            },
+            prisms: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for AllianceInsiderInfoMessage {
+    const MESSAGE_ID: u16 = 7582;
+}
+
+/// Protocol message — ID: 8124
+#[derive(Debug, Clone, Default)]
+pub struct AllianceModificationValidMessage {
+    pub alliance_name: String,
+    pub alliance_tag: String,
+    pub alliancemblem: GuildEmblem,
+}
+
+impl DofusSerialize for AllianceModificationValidMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.alliance_name);
+        writer.write_utf(&self.alliance_tag);
+        self.alliancemblem.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for AllianceModificationValidMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_name: reader.read_utf()?,
+            alliance_tag: reader.read_utf()?,
+            alliancemblem: GuildEmblem::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceModificationValidMessage {
+    const MESSAGE_ID: u16 = 8124;
+}
+
+/// Protocol message — ID: 8973
+#[derive(Debug, Clone, Default)]
+pub struct AllianceChangeGuildRightsMessage {
+    pub guild_id: i32,
+    pub rights: u8,
+}
+
+impl DofusSerialize for AllianceChangeGuildRightsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.guild_id);
+        writer.write_byte(self.rights);
+    }
+}
+
+impl DofusDeserialize for AllianceChangeGuildRightsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            guild_id: reader.read_var_int()?,
+            rights: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceChangeGuildRightsMessage {
+    const MESSAGE_ID: u16 = 8973;
+}
+
+/// Protocol message — ID: 9138
+#[derive(Debug, Clone, Default)]
+pub struct AllianceMotdSetRequestMessage {
+    pub content: String,
+}
+
+impl DofusSerialize for AllianceMotdSetRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.content);
+    }
+}
+
+impl DofusDeserialize for AllianceMotdSetRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            content: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceMotdSetRequestMessage {
+    const MESSAGE_ID: u16 = 9138;
+}
+
+/// Protocol message — ID: 9299
+#[derive(Debug, Clone, Default)]
+pub struct AllianceFactsErrorMessage {
+    pub alliance_id: i32,
+}
+
+impl DofusSerialize for AllianceFactsErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.alliance_id);
+    }
+}
+
+impl DofusDeserialize for AllianceFactsErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            alliance_id: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceFactsErrorMessage {
+    const MESSAGE_ID: u16 = 9299;
+}
+
+/// Protocol message — ID: 9560
+#[derive(Debug, Clone, Default)]
+pub struct AllianceLeftMessage {
+}
+
+impl DofusSerialize for AllianceLeftMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AllianceLeftMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AllianceLeftMessage {
+    const MESSAGE_ID: u16 = 9560;
+}
+
+/// Protocol message — ID: 9978
+#[derive(Debug, Clone, Default)]
+pub struct AllianceInvitationMessage {
+    pub target_id: i64,
+}
+
+impl DofusSerialize for AllianceInvitationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.target_id);
+    }
+}
+
+impl DofusDeserialize for AllianceInvitationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            target_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for AllianceInvitationMessage {
+    const MESSAGE_ID: u16 = 9978;
 }
 

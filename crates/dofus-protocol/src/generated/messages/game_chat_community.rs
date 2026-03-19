@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6729
+/// Protocol message — ID: 43
 #[derive(Debug, Clone, Default)]
 pub struct ChatCommunityChannelSetCommunityRequestMessage {
     pub community_id: i16,
@@ -27,10 +27,10 @@ impl DofusDeserialize for ChatCommunityChannelSetCommunityRequestMessage {
 }
 
 impl DofusMessage for ChatCommunityChannelSetCommunityRequestMessage {
-    const MESSAGE_ID: u16 = 6729;
+    const MESSAGE_ID: u16 = 43;
 }
 
-/// Protocol message — ID: 6730
+/// Protocol message — ID: 5438
 #[derive(Debug, Clone, Default)]
 pub struct ChatCommunityChannelCommunityMessage {
     pub community_id: i16,
@@ -51,6 +51,6 @@ impl DofusDeserialize for ChatCommunityChannelCommunityMessage {
 }
 
 impl DofusMessage for ChatCommunityChannelCommunityMessage {
-    const MESSAGE_ID: u16 = 6730;
+    const MESSAGE_ID: u16 = 5438;
 }
 

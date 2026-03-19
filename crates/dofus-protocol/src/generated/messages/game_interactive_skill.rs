@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6715
+/// Protocol message — ID: 2661
 #[derive(Debug, Clone, Default)]
 pub struct InteractiveUseWithParamRequestMessage {
     pub elem_id: i32,
@@ -33,6 +33,6 @@ impl DofusDeserialize for InteractiveUseWithParamRequestMessage {
 }
 
 impl DofusMessage for InteractiveUseWithParamRequestMessage {
-    const MESSAGE_ID: u16 = 6715;
+    const MESSAGE_ID: u16 = 2661;
 }
 

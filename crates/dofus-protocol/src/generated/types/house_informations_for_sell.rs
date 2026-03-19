@@ -6,14 +6,15 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 221
+/// Protocol type — ID: 8489
 #[derive(Debug, Clone, Default)]
 pub struct HouseInformationsForSell {
     pub instance_id: i32,
     pub second_hand: bool,
     pub model_id: i32,
+    pub owner_account_id: i32,
     pub owner_name: String,
-    pub owner_connected: bool,
+    pub owner_character_name: String,
     pub world_x: i16,
     pub world_y: i16,
     pub sub_area_id: i16,
@@ -29,8 +30,9 @@ impl DofusSerialize for HouseInformationsForSell {
         writer.write_int(self.instance_id);
         writer.write_boolean(self.second_hand);
         writer.write_var_int(self.model_id);
+        writer.write_int(self.owner_account_id);
         writer.write_utf(&self.owner_name);
-        writer.write_boolean(self.owner_connected);
+        writer.write_utf(&self.owner_character_name);
         writer.write_short(self.world_x);
         writer.write_short(self.world_y);
         writer.write_var_short(self.sub_area_id);
@@ -51,8 +53,9 @@ impl DofusDeserialize for HouseInformationsForSell {
             instance_id: reader.read_int()?,
             second_hand: reader.read_boolean()?,
             model_id: reader.read_var_int()?,
+            owner_account_id: reader.read_int()?,
             owner_name: reader.read_utf()?,
-            owner_connected: reader.read_boolean()?,
+            owner_character_name: reader.read_utf()?,
             world_x: reader.read_short()?,
             world_y: reader.read_short()?,
             sub_area_id: reader.read_var_short()?,
@@ -73,6 +76,6 @@ impl DofusDeserialize for HouseInformationsForSell {
 }
 
 impl DofusType for HouseInformationsForSell {
-    const TYPE_ID: u16 = 221;
+    const TYPE_ID: u16 = 8489;
 }
 

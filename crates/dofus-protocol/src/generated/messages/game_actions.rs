@@ -6,7 +6,28 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 957
+/// Protocol message — ID: 3464
+#[derive(Debug, Clone, Default)]
+pub struct GameActionNoopMessage {
+}
+
+impl DofusSerialize for GameActionNoopMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for GameActionNoopMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for GameActionNoopMessage {
+    const MESSAGE_ID: u16 = 3464;
+}
+
+/// Protocol message — ID: 3790
 #[derive(Debug, Clone, Default)]
 pub struct GameActionAcknowledgementMessage {
     pub valid: bool,
@@ -30,37 +51,44 @@ impl DofusDeserialize for GameActionAcknowledgementMessage {
 }
 
 impl DofusMessage for GameActionAcknowledgementMessage {
-    const MESSAGE_ID: u16 = 957;
+    const MESSAGE_ID: u16 = 3790;
 }
 
-/// Protocol message — ID: 1000
+/// Protocol message — ID: 5912
 #[derive(Debug, Clone, Default)]
-pub struct AbstractGameActionMessage {
-    pub action_id: i16,
-    pub source_id: f64,
+pub struct GameActionSpamMessage {
+    pub cells: Vec<i16>,
 }
 
-impl DofusSerialize for AbstractGameActionMessage {
+impl DofusSerialize for GameActionSpamMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.action_id);
-        writer.write_double(self.source_id);
+        writer.write_short(self.cells.len() as _);
+        for item in &self.cells {
+            writer.write_short(*item);
+        }
     }
 }
 
-impl DofusDeserialize for AbstractGameActionMessage {
+impl DofusDeserialize for GameActionSpamMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            action_id: reader.read_var_short()?,
-            source_id: reader.read_double()?,
+            cells: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_short()?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for AbstractGameActionMessage {
-    const MESSAGE_ID: u16 = 1000;
+impl DofusMessage for GameActionSpamMessage {
+    const MESSAGE_ID: u16 = 5912;
 }
 
-/// Protocol message — ID: 1001
+/// Protocol message — ID: 7030
 #[derive(Debug, Clone, Default)]
 pub struct AbstractGameActionWithAckMessage {
     pub action_id: i16,
@@ -87,27 +115,33 @@ impl DofusDeserialize for AbstractGameActionWithAckMessage {
 }
 
 impl DofusMessage for AbstractGameActionWithAckMessage {
-    const MESSAGE_ID: u16 = 1001;
+    const MESSAGE_ID: u16 = 7030;
 }
 
-/// Protocol message — ID: 1002
+/// Protocol message — ID: 8791
 #[derive(Debug, Clone, Default)]
-pub struct GameActionNoopMessage {
+pub struct AbstractGameActionMessage {
+    pub action_id: i16,
+    pub source_id: f64,
 }
 
-impl DofusSerialize for GameActionNoopMessage {
+impl DofusSerialize for AbstractGameActionMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.action_id);
+        writer.write_double(self.source_id);
     }
 }
 
-impl DofusDeserialize for GameActionNoopMessage {
+impl DofusDeserialize for AbstractGameActionMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            action_id: reader.read_var_short()?,
+            source_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for GameActionNoopMessage {
-    const MESSAGE_ID: u16 = 1002;
+impl DofusMessage for AbstractGameActionMessage {
+    const MESSAGE_ID: u16 = 8791;
 }
 

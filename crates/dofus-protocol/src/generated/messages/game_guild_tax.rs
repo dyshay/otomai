@@ -6,7 +6,257 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5633
+/// Protocol message — ID: 1261
+#[derive(Debug, Clone, Default)]
+pub struct TaxCollectorAttackedResultMessage {
+    pub dead_or_alive: bool,
+    pub basic_infos: TaxCollectorBasicInformations,
+    pub guild: BasicGuildInformations,
+}
+
+impl DofusSerialize for TaxCollectorAttackedResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.dead_or_alive);
+        self.basic_infos.serialize(writer);
+        self.guild.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for TaxCollectorAttackedResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dead_or_alive: reader.read_boolean()?,
+            basic_infos: TaxCollectorBasicInformations::deserialize(reader)?,
+            guild: BasicGuildInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for TaxCollectorAttackedResultMessage {
+    const MESSAGE_ID: u16 = 1261;
+}
+
+/// Protocol message — ID: 1328
+#[derive(Debug, Clone, Default)]
+pub struct GuildFightLeaveRequestMessage {
+    pub tax_collector_id: f64,
+    pub character_id: i64,
+}
+
+impl DofusSerialize for GuildFightLeaveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.tax_collector_id);
+        writer.write_var_long(self.character_id);
+    }
+}
+
+impl DofusDeserialize for GuildFightLeaveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            tax_collector_id: reader.read_double()?,
+            character_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for GuildFightLeaveRequestMessage {
+    const MESSAGE_ID: u16 = 1328;
+}
+
+/// Protocol message — ID: 1653
+#[derive(Debug, Clone, Default)]
+pub struct AbstractTaxCollectorListMessage {
+    pub informations: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for AbstractTaxCollectorListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.informations.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for AbstractTaxCollectorListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for AbstractTaxCollectorListMessage {
+    const MESSAGE_ID: u16 = 1653;
+}
+
+/// Protocol message — ID: 1779
+#[derive(Debug, Clone, Default)]
+pub struct TopTaxCollectorListMessage {
+    pub informations: Vec<Vec<u8>>,
+    pub is_dungeon: bool,
+}
+
+impl DofusSerialize for TopTaxCollectorListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.informations.len() as _);
+        // polymorphic vector (unresolved base type)
+        writer.write_boolean(self.is_dungeon);
+    }
+}
+
+impl DofusDeserialize for TopTaxCollectorListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+            is_dungeon: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for TopTaxCollectorListMessage {
+    const MESSAGE_ID: u16 = 1779;
+}
+
+/// Protocol message — ID: 2027
+#[derive(Debug, Clone, Default)]
+pub struct GuildFightTakePlaceRequestMessage {
+    pub tax_collector_id: f64,
+    pub replaced_character_id: i32,
+}
+
+impl DofusSerialize for GuildFightTakePlaceRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.tax_collector_id);
+        writer.write_int(self.replaced_character_id);
+    }
+}
+
+impl DofusDeserialize for GuildFightTakePlaceRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            tax_collector_id: reader.read_double()?,
+            replaced_character_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for GuildFightTakePlaceRequestMessage {
+    const MESSAGE_ID: u16 = 2027;
+}
+
+/// Protocol message — ID: 2079
+#[derive(Debug, Clone, Default)]
+pub struct GuildFightPlayersEnemiesListMessage {
+    pub fight_id: f64,
+    pub player_info: Vec<CharacterMinimalPlusLookInformations>,
+}
+
+impl DofusSerialize for GuildFightPlayersEnemiesListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.fight_id);
+        writer.write_short(self.player_info.len() as _);
+        for item in &self.player_info {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for GuildFightPlayersEnemiesListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            fight_id: reader.read_double()?,
+            player_info: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(CharacterMinimalPlusLookInformations::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for GuildFightPlayersEnemiesListMessage {
+    const MESSAGE_ID: u16 = 2079;
+}
+
+/// Protocol message — ID: 3252
+#[derive(Debug, Clone, Default)]
+pub struct TaxCollectorMovementAddMessage {
+    pub informations: Box<TaxCollectorInformationsVariant>,
+}
+
+impl DofusSerialize for TaxCollectorMovementAddMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.informations.get_type_id());
+        (*self.informations).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for TaxCollectorMovementAddMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            informations: {
+                let type_id = reader.read_ushort()?;
+                Box::new(TaxCollectorInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for TaxCollectorMovementAddMessage {
+    const MESSAGE_ID: u16 = 3252;
+}
+
+/// Protocol message — ID: 3995
+#[derive(Debug, Clone, Default)]
+pub struct TaxCollectorMovementsOfflineMessage {
+    pub movements: Vec<TaxCollectorMovement>,
+}
+
+impl DofusSerialize for TaxCollectorMovementsOfflineMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.movements.len() as _);
+        for item in &self.movements {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for TaxCollectorMovementsOfflineMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            movements: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(TaxCollectorMovement::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for TaxCollectorMovementsOfflineMessage {
+    const MESSAGE_ID: u16 = 3995;
+}
+
+/// Protocol message — ID: 5525
 #[derive(Debug, Clone, Default)]
 pub struct TaxCollectorMovementMessage {
     pub movement_type: u8,
@@ -36,142 +286,10 @@ impl DofusDeserialize for TaxCollectorMovementMessage {
 }
 
 impl DofusMessage for TaxCollectorMovementMessage {
-    const MESSAGE_ID: u16 = 5633;
+    const MESSAGE_ID: u16 = 5525;
 }
 
-/// Protocol message — ID: 5634
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorErrorMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for TaxCollectorErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for TaxCollectorErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorErrorMessage {
-    const MESSAGE_ID: u16 = 5634;
-}
-
-/// Protocol message — ID: 5635
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorAttackedResultMessage {
-    pub dead_or_alive: bool,
-    pub basic_infos: TaxCollectorBasicInformations,
-    pub guild: BasicGuildInformations,
-}
-
-impl DofusSerialize for TaxCollectorAttackedResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.dead_or_alive);
-        self.basic_infos.serialize(writer);
-        self.guild.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for TaxCollectorAttackedResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dead_or_alive: reader.read_boolean()?,
-            basic_infos: TaxCollectorBasicInformations::deserialize(reader)?,
-            guild: BasicGuildInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorAttackedResultMessage {
-    const MESSAGE_ID: u16 = 5635;
-}
-
-/// Protocol message — ID: 5715
-#[derive(Debug, Clone, Default)]
-pub struct GuildFightLeaveRequestMessage {
-    pub tax_collector_id: f64,
-    pub character_id: i64,
-}
-
-impl DofusSerialize for GuildFightLeaveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.tax_collector_id);
-        writer.write_var_long(self.character_id);
-    }
-}
-
-impl DofusDeserialize for GuildFightLeaveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            tax_collector_id: reader.read_double()?,
-            character_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for GuildFightLeaveRequestMessage {
-    const MESSAGE_ID: u16 = 5715;
-}
-
-/// Protocol message — ID: 5717
-#[derive(Debug, Clone, Default)]
-pub struct GuildFightJoinRequestMessage {
-    pub tax_collector_id: f64,
-}
-
-impl DofusSerialize for GuildFightJoinRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.tax_collector_id);
-    }
-}
-
-impl DofusDeserialize for GuildFightJoinRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            tax_collector_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for GuildFightJoinRequestMessage {
-    const MESSAGE_ID: u16 = 5717;
-}
-
-/// Protocol message — ID: 5719
-#[derive(Debug, Clone, Default)]
-pub struct GuildFightPlayersHelpersLeaveMessage {
-    pub fight_id: f64,
-    pub player_id: i64,
-}
-
-impl DofusSerialize for GuildFightPlayersHelpersLeaveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.fight_id);
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for GuildFightPlayersHelpersLeaveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_double()?,
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for GuildFightPlayersHelpersLeaveMessage {
-    const MESSAGE_ID: u16 = 5719;
-}
-
-/// Protocol message — ID: 5720
+/// Protocol message — ID: 5722
 #[derive(Debug, Clone, Default)]
 pub struct GuildFightPlayersHelpersJoinMessage {
     pub fight_id: f64,
@@ -195,62 +313,10 @@ impl DofusDeserialize for GuildFightPlayersHelpersJoinMessage {
 }
 
 impl DofusMessage for GuildFightPlayersHelpersJoinMessage {
-    const MESSAGE_ID: u16 = 5720;
+    const MESSAGE_ID: u16 = 5722;
 }
 
-/// Protocol message — ID: 5915
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorMovementRemoveMessage {
-    pub collector_id: f64,
-}
-
-impl DofusSerialize for TaxCollectorMovementRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.collector_id);
-    }
-}
-
-impl DofusDeserialize for TaxCollectorMovementRemoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            collector_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorMovementRemoveMessage {
-    const MESSAGE_ID: u16 = 5915;
-}
-
-/// Protocol message — ID: 5917
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorMovementAddMessage {
-    pub informations: Box<TaxCollectorInformationsVariant>,
-}
-
-impl DofusSerialize for TaxCollectorMovementAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.informations.get_type_id());
-        (*self.informations).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for TaxCollectorMovementAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            informations: {
-                let type_id = reader.read_ushort()?;
-                Box::new(TaxCollectorInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorMovementAddMessage {
-    const MESSAGE_ID: u16 = 5917;
-}
-
-/// Protocol message — ID: 5918
+/// Protocol message — ID: 5749
 #[derive(Debug, Clone, Default)]
 pub struct TaxCollectorAttackedMessage {
     pub first_name_id: i16,
@@ -289,61 +355,24 @@ impl DofusDeserialize for TaxCollectorAttackedMessage {
 }
 
 impl DofusMessage for TaxCollectorAttackedMessage {
-    const MESSAGE_ID: u16 = 5918;
+    const MESSAGE_ID: u16 = 5749;
 }
 
-/// Protocol message — ID: 5928
+/// Protocol message — ID: 6675
 #[derive(Debug, Clone, Default)]
-pub struct GuildFightPlayersEnemiesListMessage {
-    pub fight_id: f64,
-    pub player_info: Vec<CharacterMinimalPlusLookInformations>,
-}
-
-impl DofusSerialize for GuildFightPlayersEnemiesListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.fight_id);
-        writer.write_short(self.player_info.len() as _);
-        for item in &self.player_info {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for GuildFightPlayersEnemiesListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            fight_id: reader.read_double()?,
-            player_info: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(CharacterMinimalPlusLookInformations::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for GuildFightPlayersEnemiesListMessage {
-    const MESSAGE_ID: u16 = 5928;
-}
-
-/// Protocol message — ID: 5929
-#[derive(Debug, Clone, Default)]
-pub struct GuildFightPlayersEnemyRemoveMessage {
+pub struct GuildFightPlayersHelpersLeaveMessage {
     pub fight_id: f64,
     pub player_id: i64,
 }
 
-impl DofusSerialize for GuildFightPlayersEnemyRemoveMessage {
+impl DofusSerialize for GuildFightPlayersHelpersLeaveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_double(self.fight_id);
         writer.write_var_long(self.player_id);
     }
 }
 
-impl DofusDeserialize for GuildFightPlayersEnemyRemoveMessage {
+impl DofusDeserialize for GuildFightPlayersHelpersLeaveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             fight_id: reader.read_double()?,
@@ -352,11 +381,11 @@ impl DofusDeserialize for GuildFightPlayersEnemyRemoveMessage {
     }
 }
 
-impl DofusMessage for GuildFightPlayersEnemyRemoveMessage {
-    const MESSAGE_ID: u16 = 5929;
+impl DofusMessage for GuildFightPlayersHelpersLeaveMessage {
+    const MESSAGE_ID: u16 = 6675;
 }
 
-/// Protocol message — ID: 5930
+/// Protocol message — ID: 6709
 #[derive(Debug, Clone, Default)]
 pub struct TaxCollectorListMessage {
     pub informations: Vec<Vec<u8>>,
@@ -404,10 +433,10 @@ impl DofusDeserialize for TaxCollectorListMessage {
 }
 
 impl DofusMessage for TaxCollectorListMessage {
-    const MESSAGE_ID: u16 = 5930;
+    const MESSAGE_ID: u16 = 6709;
 }
 
-/// Protocol message — ID: 5954
+/// Protocol message — ID: 7175
 #[derive(Debug, Clone, Default)]
 pub struct GameRolePlayTaxCollectorFightRequestMessage {
 }
@@ -425,37 +454,58 @@ impl DofusDeserialize for GameRolePlayTaxCollectorFightRequestMessage {
 }
 
 impl DofusMessage for GameRolePlayTaxCollectorFightRequestMessage {
-    const MESSAGE_ID: u16 = 5954;
+    const MESSAGE_ID: u16 = 7175;
 }
 
-/// Protocol message — ID: 6235
+/// Protocol message — ID: 7195
 #[derive(Debug, Clone, Default)]
-pub struct GuildFightTakePlaceRequestMessage {
+pub struct GuildFightJoinRequestMessage {
     pub tax_collector_id: f64,
-    pub replaced_character_id: i32,
 }
 
-impl DofusSerialize for GuildFightTakePlaceRequestMessage {
+impl DofusSerialize for GuildFightJoinRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_double(self.tax_collector_id);
-        writer.write_int(self.replaced_character_id);
     }
 }
 
-impl DofusDeserialize for GuildFightTakePlaceRequestMessage {
+impl DofusDeserialize for GuildFightJoinRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             tax_collector_id: reader.read_double()?,
-            replaced_character_id: reader.read_int()?,
         })
     }
 }
 
-impl DofusMessage for GuildFightTakePlaceRequestMessage {
-    const MESSAGE_ID: u16 = 6235;
+impl DofusMessage for GuildFightJoinRequestMessage {
+    const MESSAGE_ID: u16 = 7195;
 }
 
-/// Protocol message — ID: 6455
+/// Protocol message — ID: 8117
+#[derive(Debug, Clone, Default)]
+pub struct TaxCollectorErrorMessage {
+    pub reason: u8,
+}
+
+impl DofusSerialize for TaxCollectorErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for TaxCollectorErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for TaxCollectorErrorMessage {
+    const MESSAGE_ID: u16 = 8117;
+}
+
+/// Protocol message — ID: 8589
 #[derive(Debug, Clone, Default)]
 pub struct TaxCollectorStateUpdateMessage {
     pub unique_id: f64,
@@ -479,107 +529,57 @@ impl DofusDeserialize for TaxCollectorStateUpdateMessage {
 }
 
 impl DofusMessage for TaxCollectorStateUpdateMessage {
-    const MESSAGE_ID: u16 = 6455;
+    const MESSAGE_ID: u16 = 8589;
 }
 
-/// Protocol message — ID: 6565
+/// Protocol message — ID: 9096
 #[derive(Debug, Clone, Default)]
-pub struct TopTaxCollectorListMessage {
-    pub informations: Vec<Vec<u8>>,
-    pub is_dungeon: bool,
+pub struct GuildFightPlayersEnemyRemoveMessage {
+    pub fight_id: f64,
+    pub player_id: i64,
 }
 
-impl DofusSerialize for TopTaxCollectorListMessage {
+impl DofusSerialize for GuildFightPlayersEnemyRemoveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.informations.len() as _);
-        // polymorphic vector (unresolved base type)
-        writer.write_boolean(self.is_dungeon);
+        writer.write_double(self.fight_id);
+        writer.write_var_long(self.player_id);
     }
 }
 
-impl DofusDeserialize for TopTaxCollectorListMessage {
+impl DofusDeserialize for GuildFightPlayersEnemyRemoveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            informations: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-            is_dungeon: reader.read_boolean()?,
+            fight_id: reader.read_double()?,
+            player_id: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for TopTaxCollectorListMessage {
-    const MESSAGE_ID: u16 = 6565;
+impl DofusMessage for GuildFightPlayersEnemyRemoveMessage {
+    const MESSAGE_ID: u16 = 9096;
 }
 
-/// Protocol message — ID: 6568
+/// Protocol message — ID: 9648
 #[derive(Debug, Clone, Default)]
-pub struct AbstractTaxCollectorListMessage {
-    pub informations: Vec<Vec<u8>>,
+pub struct TaxCollectorMovementRemoveMessage {
+    pub collector_id: f64,
 }
 
-impl DofusSerialize for AbstractTaxCollectorListMessage {
+impl DofusSerialize for TaxCollectorMovementRemoveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.informations.len() as _);
-        // polymorphic vector (unresolved base type)
+        writer.write_double(self.collector_id);
     }
 }
 
-impl DofusDeserialize for AbstractTaxCollectorListMessage {
+impl DofusDeserialize for TaxCollectorMovementRemoveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            informations: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
+            collector_id: reader.read_double()?,
         })
     }
 }
 
-impl DofusMessage for AbstractTaxCollectorListMessage {
-    const MESSAGE_ID: u16 = 6568;
-}
-
-/// Protocol message — ID: 6611
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorMovementsOfflineMessage {
-    pub movements: Vec<TaxCollectorMovement>,
-}
-
-impl DofusSerialize for TaxCollectorMovementsOfflineMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.movements.len() as _);
-        for item in &self.movements {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for TaxCollectorMovementsOfflineMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            movements: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(TaxCollectorMovement::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorMovementsOfflineMessage {
-    const MESSAGE_ID: u16 = 6611;
+impl DofusMessage for TaxCollectorMovementRemoveMessage {
+    const MESSAGE_ID: u16 = 9648;
 }
 

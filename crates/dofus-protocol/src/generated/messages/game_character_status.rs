@@ -6,28 +6,35 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6385
+/// Protocol message — ID: 5133
 #[derive(Debug, Clone, Default)]
-pub struct PlayerStatusUpdateErrorMessage {
+pub struct PlayerStatusUpdateRequestMessage {
+    pub status: Box<PlayerStatusVariant>,
 }
 
-impl DofusSerialize for PlayerStatusUpdateErrorMessage {
+impl DofusSerialize for PlayerStatusUpdateRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_ushort(self.status.get_type_id());
+        (*self.status).serialize(writer);
     }
 }
 
-impl DofusDeserialize for PlayerStatusUpdateErrorMessage {
+impl DofusDeserialize for PlayerStatusUpdateRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            status: {
+                let type_id = reader.read_ushort()?;
+                Box::new(PlayerStatusVariant::deserialize_with_id(type_id, reader)?)
+            },
         })
     }
 }
 
-impl DofusMessage for PlayerStatusUpdateErrorMessage {
-    const MESSAGE_ID: u16 = 6385;
+impl DofusMessage for PlayerStatusUpdateRequestMessage {
+    const MESSAGE_ID: u16 = 5133;
 }
 
-/// Protocol message — ID: 6386
+/// Protocol message — ID: 9099
 #[derive(Debug, Clone, Default)]
 pub struct PlayerStatusUpdateMessage {
     pub account_id: i32,
@@ -58,34 +65,27 @@ impl DofusDeserialize for PlayerStatusUpdateMessage {
 }
 
 impl DofusMessage for PlayerStatusUpdateMessage {
-    const MESSAGE_ID: u16 = 6386;
+    const MESSAGE_ID: u16 = 9099;
 }
 
-/// Protocol message — ID: 6387
+/// Protocol message — ID: 9276
 #[derive(Debug, Clone, Default)]
-pub struct PlayerStatusUpdateRequestMessage {
-    pub status: Box<PlayerStatusVariant>,
+pub struct PlayerStatusUpdateErrorMessage {
 }
 
-impl DofusSerialize for PlayerStatusUpdateRequestMessage {
+impl DofusSerialize for PlayerStatusUpdateErrorMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_ushort(self.status.get_type_id());
-        (*self.status).serialize(writer);
     }
 }
 
-impl DofusDeserialize for PlayerStatusUpdateRequestMessage {
+impl DofusDeserialize for PlayerStatusUpdateErrorMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            status: {
-                let type_id = reader.read_ushort()?;
-                Box::new(PlayerStatusVariant::deserialize_with_id(type_id, reader)?)
-            },
         })
     }
 }
 
-impl DofusMessage for PlayerStatusUpdateRequestMessage {
-    const MESSAGE_ID: u16 = 6387;
+impl DofusMessage for PlayerStatusUpdateErrorMessage {
+    const MESSAGE_ID: u16 = 9276;
 }
 

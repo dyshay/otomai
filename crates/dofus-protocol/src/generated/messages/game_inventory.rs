@@ -6,31 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5537
-#[derive(Debug, Clone, Default)]
-pub struct KamasUpdateMessage {
-    pub kamas_total: i64,
-}
-
-impl DofusSerialize for KamasUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.kamas_total);
-    }
-}
-
-impl DofusDeserialize for KamasUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            kamas_total: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for KamasUpdateMessage {
-    const MESSAGE_ID: u16 = 5537;
-}
-
-/// Protocol message — ID: 6334
+/// Protocol message — ID: 809
 #[derive(Debug, Clone, Default)]
 pub struct ObjectAveragePricesGetMessage {
 }
@@ -48,10 +24,10 @@ impl DofusDeserialize for ObjectAveragePricesGetMessage {
 }
 
 impl DofusMessage for ObjectAveragePricesGetMessage {
-    const MESSAGE_ID: u16 = 6334;
+    const MESSAGE_ID: u16 = 809;
 }
 
-/// Protocol message — ID: 6335
+/// Protocol message — ID: 3534
 #[derive(Debug, Clone, Default)]
 pub struct ObjectAveragePricesMessage {
     pub ids: Vec<i16>,
@@ -95,10 +71,10 @@ impl DofusDeserialize for ObjectAveragePricesMessage {
 }
 
 impl DofusMessage for ObjectAveragePricesMessage {
-    const MESSAGE_ID: u16 = 6335;
+    const MESSAGE_ID: u16 = 3534;
 }
 
-/// Protocol message — ID: 6336
+/// Protocol message — ID: 4399
 #[derive(Debug, Clone, Default)]
 pub struct ObjectAveragePricesErrorMessage {
 }
@@ -116,6 +92,30 @@ impl DofusDeserialize for ObjectAveragePricesErrorMessage {
 }
 
 impl DofusMessage for ObjectAveragePricesErrorMessage {
-    const MESSAGE_ID: u16 = 6336;
+    const MESSAGE_ID: u16 = 4399;
+}
+
+/// Protocol message — ID: 7707
+#[derive(Debug, Clone, Default)]
+pub struct KamasUpdateMessage {
+    pub kamas_total: i64,
+}
+
+impl DofusSerialize for KamasUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.kamas_total);
+    }
+}
+
+impl DofusDeserialize for KamasUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            kamas_total: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for KamasUpdateMessage {
+    const MESSAGE_ID: u16 = 7707;
 }
 

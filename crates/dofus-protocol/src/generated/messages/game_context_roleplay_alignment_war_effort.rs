@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6852
+/// Protocol message — ID: 1424
 #[derive(Debug, Clone, Default)]
 pub struct AlignmentWarEffortProgressionMessage {
     pub effort_progressions: Vec<AlignmentWarEffortInformation>,
@@ -37,10 +37,10 @@ impl DofusDeserialize for AlignmentWarEffortProgressionMessage {
 }
 
 impl DofusMessage for AlignmentWarEffortProgressionMessage {
-    const MESSAGE_ID: u16 = 6852;
+    const MESSAGE_ID: u16 = 1424;
 }
 
-/// Protocol message — ID: 6854
+/// Protocol message — ID: 8769
 #[derive(Debug, Clone, Default)]
 pub struct AlignmentWarEffortProgressionRequestMessage {
 }
@@ -58,6 +58,6 @@ impl DofusDeserialize for AlignmentWarEffortProgressionRequestMessage {
 }
 
 impl DofusMessage for AlignmentWarEffortProgressionRequestMessage {
-    const MESSAGE_ID: u16 = 6854;
+    const MESSAGE_ID: u16 = 8769;
 }
 

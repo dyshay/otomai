@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 60
+/// Protocol type — ID: 7114
 #[derive(Debug, Clone, Default)]
 pub struct EntityDispositionInformations {
     pub cell_id: i16,
@@ -30,6 +30,6 @@ impl DofusDeserialize for EntityDispositionInformations {
 }
 
 impl DofusType for EntityDispositionInformations {
-    const TYPE_ID: u16 = 60;
+    const TYPE_ID: u16 = 7114;
 }
 

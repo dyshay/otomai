@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5956
+/// Protocol message — ID: 2529
 #[derive(Debug, Clone, Default)]
 pub struct AtlasPointInformationsMessage {
     pub r#type: AtlasPointsInformations,
@@ -27,6 +27,6 @@ impl DofusDeserialize for AtlasPointInformationsMessage {
 }
 
 impl DofusMessage for AtlasPointInformationsMessage {
-    const MESSAGE_ID: u16 = 5956;
+    const MESSAGE_ID: u16 = 2529;
 }
 

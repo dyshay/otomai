@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 54
+/// Protocol type — ID: 5174
 #[derive(Debug, Clone, Default)]
 pub struct SubEntity {
     pub binding_point_category: u8,
@@ -33,6 +33,6 @@ impl DofusDeserialize for SubEntity {
 }
 
 impl DofusType for SubEntity {
-    const TYPE_ID: u16 = 54;
+    const TYPE_ID: u16 = 5174;
 }
 

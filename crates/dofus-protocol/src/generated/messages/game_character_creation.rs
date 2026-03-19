@@ -6,7 +6,52 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 160
+/// Protocol message — ID: 709
+#[derive(Debug, Clone, Default)]
+pub struct CharacterCanBeCreatedRequestMessage {
+}
+
+impl DofusSerialize for CharacterCanBeCreatedRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for CharacterCanBeCreatedRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for CharacterCanBeCreatedRequestMessage {
+    const MESSAGE_ID: u16 = 709;
+}
+
+/// Protocol message — ID: 1146
+#[derive(Debug, Clone, Default)]
+pub struct CharacterCreationResultMessage {
+    pub result: u8,
+}
+
+impl DofusSerialize for CharacterCreationResultMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.result);
+    }
+}
+
+impl DofusDeserialize for CharacterCreationResultMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            result: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for CharacterCreationResultMessage {
+    const MESSAGE_ID: u16 = 1146;
+}
+
+/// Protocol message — ID: 1738
 #[derive(Debug, Clone, Default)]
 pub struct CharacterCreationRequestMessage {
     pub name: String,
@@ -47,34 +92,10 @@ impl DofusDeserialize for CharacterCreationRequestMessage {
 }
 
 impl DofusMessage for CharacterCreationRequestMessage {
-    const MESSAGE_ID: u16 = 160;
+    const MESSAGE_ID: u16 = 1738;
 }
 
-/// Protocol message — ID: 161
-#[derive(Debug, Clone, Default)]
-pub struct CharacterCreationResultMessage {
-    pub result: u8,
-}
-
-impl DofusSerialize for CharacterCreationResultMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.result);
-    }
-}
-
-impl DofusDeserialize for CharacterCreationResultMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            result: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterCreationResultMessage {
-    const MESSAGE_ID: u16 = 161;
-}
-
-/// Protocol message — ID: 162
+/// Protocol message — ID: 2144
 #[derive(Debug, Clone, Default)]
 pub struct CharacterNameSuggestionRequestMessage {
 }
@@ -92,34 +113,10 @@ impl DofusDeserialize for CharacterNameSuggestionRequestMessage {
 }
 
 impl DofusMessage for CharacterNameSuggestionRequestMessage {
-    const MESSAGE_ID: u16 = 162;
+    const MESSAGE_ID: u16 = 2144;
 }
 
-/// Protocol message — ID: 164
-#[derive(Debug, Clone, Default)]
-pub struct CharacterNameSuggestionFailureMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for CharacterNameSuggestionFailureMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for CharacterNameSuggestionFailureMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for CharacterNameSuggestionFailureMessage {
-    const MESSAGE_ID: u16 = 164;
-}
-
-/// Protocol message — ID: 5544
+/// Protocol message — ID: 3457
 #[derive(Debug, Clone, Default)]
 pub struct CharacterNameSuggestionSuccessMessage {
     pub suggestion: String,
@@ -140,31 +137,34 @@ impl DofusDeserialize for CharacterNameSuggestionSuccessMessage {
 }
 
 impl DofusMessage for CharacterNameSuggestionSuccessMessage {
-    const MESSAGE_ID: u16 = 5544;
+    const MESSAGE_ID: u16 = 3457;
 }
 
-/// Protocol message — ID: 6732
+/// Protocol message — ID: 5079
 #[derive(Debug, Clone, Default)]
-pub struct CharacterCanBeCreatedRequestMessage {
+pub struct CharacterNameSuggestionFailureMessage {
+    pub reason: u8,
 }
 
-impl DofusSerialize for CharacterCanBeCreatedRequestMessage {
+impl DofusSerialize for CharacterNameSuggestionFailureMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.reason);
     }
 }
 
-impl DofusDeserialize for CharacterCanBeCreatedRequestMessage {
+impl DofusDeserialize for CharacterNameSuggestionFailureMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            reason: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for CharacterCanBeCreatedRequestMessage {
-    const MESSAGE_ID: u16 = 6732;
+impl DofusMessage for CharacterNameSuggestionFailureMessage {
+    const MESSAGE_ID: u16 = 5079;
 }
 
-/// Protocol message — ID: 6733
+/// Protocol message — ID: 9261
 #[derive(Debug, Clone, Default)]
 pub struct CharacterCanBeCreatedResultMessage {
     pub yes_you_can: bool,
@@ -185,6 +185,6 @@ impl DofusDeserialize for CharacterCanBeCreatedResultMessage {
 }
 
 impl DofusMessage for CharacterCanBeCreatedResultMessage {
-    const MESSAGE_ID: u16 = 6733;
+    const MESSAGE_ID: u16 = 9261;
 }
 

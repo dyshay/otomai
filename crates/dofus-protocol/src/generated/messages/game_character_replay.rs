@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 167
+/// Protocol message — ID: 9005
 #[derive(Debug, Clone, Default)]
 pub struct CharacterReplayRequestMessage {
     pub character_id: i64,
@@ -27,6 +27,6 @@ impl DofusDeserialize for CharacterReplayRequestMessage {
 }
 
 impl DofusMessage for CharacterReplayRequestMessage {
-    const MESSAGE_ID: u16 = 167;
+    const MESSAGE_ID: u16 = 9005;
 }
 

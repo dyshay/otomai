@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 411
+/// Protocol type — ID: 5651
 #[derive(Debug, Clone, Default)]
 pub struct HumanOptionOrnament {
     pub ornament_id: i16,
@@ -36,6 +36,6 @@ impl DofusDeserialize for HumanOptionOrnament {
 }
 
 impl DofusType for HumanOptionOrnament {
-    const TYPE_ID: u16 = 411;
+    const TYPE_ID: u16 = 5651;
 }
 

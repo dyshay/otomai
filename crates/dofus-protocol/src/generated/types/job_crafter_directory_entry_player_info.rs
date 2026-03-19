@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 194
+/// Protocol type — ID: 8534
 #[derive(Debug, Clone, Default)]
 pub struct JobCrafterDirectoryEntryPlayerInfo {
     pub player_id: i64,
@@ -19,6 +19,7 @@ pub struct JobCrafterDirectoryEntryPlayerInfo {
     pub world_y: i16,
     pub map_id: f64,
     pub sub_area_id: i16,
+    pub can_craft_legendary: bool,
     pub status: Box<PlayerStatusVariant>,
 }
 
@@ -34,6 +35,7 @@ impl DofusSerialize for JobCrafterDirectoryEntryPlayerInfo {
         writer.write_short(self.world_y);
         writer.write_double(self.map_id);
         writer.write_var_short(self.sub_area_id);
+        writer.write_boolean(self.can_craft_legendary);
         writer.write_ushort(self.status.get_type_id());
         (*self.status).serialize(writer);
     }
@@ -52,6 +54,7 @@ impl DofusDeserialize for JobCrafterDirectoryEntryPlayerInfo {
             world_y: reader.read_short()?,
             map_id: reader.read_double()?,
             sub_area_id: reader.read_var_short()?,
+            can_craft_legendary: reader.read_boolean()?,
             status: {
                 let type_id = reader.read_ushort()?;
                 Box::new(PlayerStatusVariant::deserialize_with_id(type_id, reader)?)
@@ -61,6 +64,6 @@ impl DofusDeserialize for JobCrafterDirectoryEntryPlayerInfo {
 }
 
 impl DofusType for JobCrafterDirectoryEntryPlayerInfo {
-    const TYPE_ID: u16 = 194;
+    const TYPE_ID: u16 = 8534;
 }
 

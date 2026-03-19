@@ -6,109 +6,76 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 175
+/// Protocol message — ID: 1218
 #[derive(Debug, Clone, Default)]
-pub struct BasicTimeMessage {
-    pub timestamp: f64,
-    pub timezone_offset: i16,
+pub struct CurrentServerStatusUpdateMessage {
+    pub status: u8,
 }
 
-impl DofusSerialize for BasicTimeMessage {
+impl DofusSerialize for CurrentServerStatusUpdateMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.timestamp);
-        writer.write_short(self.timezone_offset);
+        writer.write_byte(self.status);
     }
 }
 
-impl DofusDeserialize for BasicTimeMessage {
+impl DofusDeserialize for CurrentServerStatusUpdateMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            timestamp: reader.read_double()?,
-            timezone_offset: reader.read_short()?,
+            status: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for BasicTimeMessage {
-    const MESSAGE_ID: u16 = 175;
+impl DofusMessage for CurrentServerStatusUpdateMessage {
+    const MESSAGE_ID: u16 = 1218;
 }
 
-/// Protocol message — ID: 176
+/// Protocol message — ID: 1244
 #[derive(Debug, Clone, Default)]
-pub struct BasicNoOperationMessage {
+pub struct NumericWhoIsRequestMessage {
+    pub player_id: i64,
 }
 
-impl DofusSerialize for BasicNoOperationMessage {
+impl DofusSerialize for NumericWhoIsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.player_id);
+    }
+}
+
+impl DofusDeserialize for NumericWhoIsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            player_id: reader.read_var_long()?,
+        })
+    }
+}
+
+impl DofusMessage for NumericWhoIsRequestMessage {
+    const MESSAGE_ID: u16 = 1244;
+}
+
+/// Protocol message — ID: 2340
+#[derive(Debug, Clone, Default)]
+pub struct BasicLatencyStatsRequestMessage {
+}
+
+impl DofusSerialize for BasicLatencyStatsRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
     }
 }
 
-impl DofusDeserialize for BasicNoOperationMessage {
+impl DofusDeserialize for BasicLatencyStatsRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
         })
     }
 }
 
-impl DofusMessage for BasicNoOperationMessage {
-    const MESSAGE_ID: u16 = 176;
+impl DofusMessage for BasicLatencyStatsRequestMessage {
+    const MESSAGE_ID: u16 = 2340;
 }
 
-/// Protocol message — ID: 177
-#[derive(Debug, Clone, Default)]
-pub struct BasicDateMessage {
-    pub day: u8,
-    pub month: u8,
-    pub year: i16,
-}
-
-impl DofusSerialize for BasicDateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.day);
-        writer.write_byte(self.month);
-        writer.write_short(self.year);
-    }
-}
-
-impl DofusDeserialize for BasicDateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            day: reader.read_byte()?,
-            month: reader.read_byte()?,
-            year: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicDateMessage {
-    const MESSAGE_ID: u16 = 177;
-}
-
-/// Protocol message — ID: 179
-#[derive(Debug, Clone, Default)]
-pub struct BasicWhoIsNoMatchMessage {
-    pub search: String,
-}
-
-impl DofusSerialize for BasicWhoIsNoMatchMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_utf(&self.search);
-    }
-}
-
-impl DofusDeserialize for BasicWhoIsNoMatchMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            search: reader.read_utf()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicWhoIsNoMatchMessage {
-    const MESSAGE_ID: u16 = 179;
-}
-
-/// Protocol message — ID: 180
+/// Protocol message — ID: 4158
 #[derive(Debug, Clone, Default)]
 pub struct BasicWhoIsMessage {
     pub self_: bool,
@@ -173,10 +140,106 @@ impl DofusDeserialize for BasicWhoIsMessage {
 }
 
 impl DofusMessage for BasicWhoIsMessage {
-    const MESSAGE_ID: u16 = 180;
+    const MESSAGE_ID: u16 = 4158;
 }
 
-/// Protocol message — ID: 181
+/// Protocol message — ID: 4792
+#[derive(Debug, Clone, Default)]
+pub struct BasicWhoAmIRequestMessage {
+    pub verbose: bool,
+}
+
+impl DofusSerialize for BasicWhoAmIRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.verbose);
+    }
+}
+
+impl DofusDeserialize for BasicWhoAmIRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            verbose: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicWhoAmIRequestMessage {
+    const MESSAGE_ID: u16 = 4792;
+}
+
+/// Protocol message — ID: 5131
+#[derive(Debug, Clone, Default)]
+pub struct SequenceNumberMessage {
+    pub number: i16,
+}
+
+impl DofusSerialize for SequenceNumberMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.number);
+    }
+}
+
+impl DofusDeserialize for SequenceNumberMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            number: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for SequenceNumberMessage {
+    const MESSAGE_ID: u16 = 5131;
+}
+
+/// Protocol message — ID: 5238
+#[derive(Debug, Clone, Default)]
+pub struct SequenceNumberRequestMessage {
+}
+
+impl DofusSerialize for SequenceNumberRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for SequenceNumberRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for SequenceNumberRequestMessage {
+    const MESSAGE_ID: u16 = 5238;
+}
+
+/// Protocol message — ID: 5521
+#[derive(Debug, Clone, Default)]
+pub struct NumericWhoIsMessage {
+    pub player_id: i64,
+    pub account_id: i32,
+}
+
+impl DofusSerialize for NumericWhoIsMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_long(self.player_id);
+        writer.write_int(self.account_id);
+    }
+}
+
+impl DofusDeserialize for NumericWhoIsMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            player_id: reader.read_var_long()?,
+            account_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for NumericWhoIsMessage {
+    const MESSAGE_ID: u16 = 5521;
+}
+
+/// Protocol message — ID: 6558
 #[derive(Debug, Clone, Default)]
 pub struct BasicWhoIsRequestMessage {
     pub verbose: bool,
@@ -200,10 +263,88 @@ impl DofusDeserialize for BasicWhoIsRequestMessage {
 }
 
 impl DofusMessage for BasicWhoIsRequestMessage {
-    const MESSAGE_ID: u16 = 181;
+    const MESSAGE_ID: u16 = 6558;
 }
 
-/// Protocol message — ID: 780
+/// Protocol message — ID: 7123
+#[derive(Debug, Clone, Default)]
+pub struct BasicDateMessage {
+    pub day: u8,
+    pub month: u8,
+    pub year: i16,
+}
+
+impl DofusSerialize for BasicDateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.day);
+        writer.write_byte(self.month);
+        writer.write_short(self.year);
+    }
+}
+
+impl DofusDeserialize for BasicDateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            day: reader.read_byte()?,
+            month: reader.read_byte()?,
+            year: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicDateMessage {
+    const MESSAGE_ID: u16 = 7123;
+}
+
+/// Protocol message — ID: 8108
+#[derive(Debug, Clone, Default)]
+pub struct BasicNoOperationMessage {
+}
+
+impl DofusSerialize for BasicNoOperationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for BasicNoOperationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for BasicNoOperationMessage {
+    const MESSAGE_ID: u16 = 8108;
+}
+
+/// Protocol message — ID: 8259
+#[derive(Debug, Clone, Default)]
+pub struct BasicAckMessage {
+    pub seq: i32,
+    pub last_packet_id: i16,
+}
+
+impl DofusSerialize for BasicAckMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.seq);
+        writer.write_var_short(self.last_packet_id);
+    }
+}
+
+impl DofusDeserialize for BasicAckMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            seq: reader.read_var_int()?,
+            last_packet_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicAckMessage {
+    const MESSAGE_ID: u16 = 8259;
+}
+
+/// Protocol message — ID: 8868
 #[derive(Debug, Clone, Default)]
 pub struct TextInformationMessage {
     pub msg_type: u8,
@@ -240,10 +381,34 @@ impl DofusDeserialize for TextInformationMessage {
 }
 
 impl DofusMessage for TextInformationMessage {
-    const MESSAGE_ID: u16 = 780;
+    const MESSAGE_ID: u16 = 8868;
 }
 
-/// Protocol message — ID: 5663
+/// Protocol message — ID: 9329
+#[derive(Debug, Clone, Default)]
+pub struct BasicWhoIsNoMatchMessage {
+    pub search: String,
+}
+
+impl DofusSerialize for BasicWhoIsNoMatchMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_utf(&self.search);
+    }
+}
+
+impl DofusDeserialize for BasicWhoIsNoMatchMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            search: reader.read_utf()?,
+        })
+    }
+}
+
+impl DofusMessage for BasicWhoIsNoMatchMessage {
+    const MESSAGE_ID: u16 = 9329;
+}
+
+/// Protocol message — ID: 9646
 #[derive(Debug, Clone, Default)]
 pub struct BasicLatencyStatsMessage {
     pub latency: i16,
@@ -270,198 +435,33 @@ impl DofusDeserialize for BasicLatencyStatsMessage {
 }
 
 impl DofusMessage for BasicLatencyStatsMessage {
-    const MESSAGE_ID: u16 = 5663;
+    const MESSAGE_ID: u16 = 9646;
 }
 
-/// Protocol message — ID: 5664
+/// Protocol message — ID: 9776
 #[derive(Debug, Clone, Default)]
-pub struct BasicWhoAmIRequestMessage {
-    pub verbose: bool,
+pub struct BasicTimeMessage {
+    pub timestamp: f64,
+    pub timezone_offset: i16,
 }
 
-impl DofusSerialize for BasicWhoAmIRequestMessage {
+impl DofusSerialize for BasicTimeMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.verbose);
+        writer.write_double(self.timestamp);
+        writer.write_short(self.timezone_offset);
     }
 }
 
-impl DofusDeserialize for BasicWhoAmIRequestMessage {
+impl DofusDeserialize for BasicTimeMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            verbose: reader.read_boolean()?,
+            timestamp: reader.read_double()?,
+            timezone_offset: reader.read_short()?,
         })
     }
 }
 
-impl DofusMessage for BasicWhoAmIRequestMessage {
-    const MESSAGE_ID: u16 = 5664;
-}
-
-/// Protocol message — ID: 5816
-#[derive(Debug, Clone, Default)]
-pub struct BasicLatencyStatsRequestMessage {
-}
-
-impl DofusSerialize for BasicLatencyStatsRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for BasicLatencyStatsRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for BasicLatencyStatsRequestMessage {
-    const MESSAGE_ID: u16 = 5816;
-}
-
-/// Protocol message — ID: 6297
-#[derive(Debug, Clone, Default)]
-pub struct NumericWhoIsMessage {
-    pub player_id: i64,
-    pub account_id: i32,
-}
-
-impl DofusSerialize for NumericWhoIsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.player_id);
-        writer.write_int(self.account_id);
-    }
-}
-
-impl DofusDeserialize for NumericWhoIsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            player_id: reader.read_var_long()?,
-            account_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for NumericWhoIsMessage {
-    const MESSAGE_ID: u16 = 6297;
-}
-
-/// Protocol message — ID: 6298
-#[derive(Debug, Clone, Default)]
-pub struct NumericWhoIsRequestMessage {
-    pub player_id: i64,
-}
-
-impl DofusSerialize for NumericWhoIsRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.player_id);
-    }
-}
-
-impl DofusDeserialize for NumericWhoIsRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            player_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for NumericWhoIsRequestMessage {
-    const MESSAGE_ID: u16 = 6298;
-}
-
-/// Protocol message — ID: 6316
-#[derive(Debug, Clone, Default)]
-pub struct SequenceNumberRequestMessage {
-}
-
-impl DofusSerialize for SequenceNumberRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for SequenceNumberRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for SequenceNumberRequestMessage {
-    const MESSAGE_ID: u16 = 6316;
-}
-
-/// Protocol message — ID: 6317
-#[derive(Debug, Clone, Default)]
-pub struct SequenceNumberMessage {
-    pub number: i16,
-}
-
-impl DofusSerialize for SequenceNumberMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.number);
-    }
-}
-
-impl DofusDeserialize for SequenceNumberMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            number: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for SequenceNumberMessage {
-    const MESSAGE_ID: u16 = 6317;
-}
-
-/// Protocol message — ID: 6362
-#[derive(Debug, Clone, Default)]
-pub struct BasicAckMessage {
-    pub seq: i32,
-    pub last_packet_id: i16,
-}
-
-impl DofusSerialize for BasicAckMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.seq);
-        writer.write_var_short(self.last_packet_id);
-    }
-}
-
-impl DofusDeserialize for BasicAckMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            seq: reader.read_var_int()?,
-            last_packet_id: reader.read_var_short()?,
-        })
-    }
-}
-
-impl DofusMessage for BasicAckMessage {
-    const MESSAGE_ID: u16 = 6362;
-}
-
-/// Protocol message — ID: 6525
-#[derive(Debug, Clone, Default)]
-pub struct CurrentServerStatusUpdateMessage {
-    pub status: u8,
-}
-
-impl DofusSerialize for CurrentServerStatusUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.status);
-    }
-}
-
-impl DofusDeserialize for CurrentServerStatusUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            status: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for CurrentServerStatusUpdateMessage {
-    const MESSAGE_ID: u16 = 6525;
+impl DofusMessage for BasicTimeMessage {
+    const MESSAGE_ID: u16 = 9776;
 }
 

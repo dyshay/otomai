@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6267
+/// Protocol message — ID: 6289
 #[derive(Debug, Clone, Default)]
 pub struct TrustStatusMessage {
     pub trusted: bool,
@@ -33,6 +33,6 @@ impl DofusDeserialize for TrustStatusMessage {
 }
 
 impl DofusMessage for TrustStatusMessage {
-    const MESSAGE_ID: u16 = 6267;
+    const MESSAGE_ID: u16 = 6289;
 }
 

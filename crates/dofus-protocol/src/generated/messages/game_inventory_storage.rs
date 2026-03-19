@@ -6,31 +6,123 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5645
+/// Protocol message — ID: 3869
 #[derive(Debug, Clone, Default)]
-pub struct StorageKamasUpdateMessage {
-    pub kamas_total: i64,
+pub struct StorageObjectsRemoveMessage {
+    pub object_u_i_d_list: Vec<i32>,
 }
 
-impl DofusSerialize for StorageKamasUpdateMessage {
+impl DofusSerialize for StorageObjectsRemoveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_long(self.kamas_total);
+        writer.write_short(self.object_u_i_d_list.len() as _);
+        for item in &self.object_u_i_d_list {
+            writer.write_var_int(*item);
+        }
     }
 }
 
-impl DofusDeserialize for StorageKamasUpdateMessage {
+impl DofusDeserialize for StorageObjectsRemoveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            kamas_total: reader.read_var_long()?,
+            object_u_i_d_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_var_int()?);
+                }
+                v
+            },
         })
     }
 }
 
-impl DofusMessage for StorageKamasUpdateMessage {
-    const MESSAGE_ID: u16 = 5645;
+impl DofusMessage for StorageObjectsRemoveMessage {
+    const MESSAGE_ID: u16 = 3869;
 }
 
-/// Protocol message — ID: 5646
+/// Protocol message — ID: 7292
+#[derive(Debug, Clone, Default)]
+pub struct StorageObjectsUpdateMessage {
+    pub object_list: Vec<ObjectItem>,
+}
+
+impl DofusSerialize for StorageObjectsUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.object_list.len() as _);
+        for item in &self.object_list {
+            item.serialize(writer);
+        }
+    }
+}
+
+impl DofusDeserialize for StorageObjectsUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_list: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(ObjectItem::deserialize(reader)?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for StorageObjectsUpdateMessage {
+    const MESSAGE_ID: u16 = 7292;
+}
+
+/// Protocol message — ID: 7419
+#[derive(Debug, Clone, Default)]
+pub struct StorageObjectRemoveMessage {
+    pub object_u_i_d: i32,
+}
+
+impl DofusSerialize for StorageObjectRemoveMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_int(self.object_u_i_d);
+    }
+}
+
+impl DofusDeserialize for StorageObjectRemoveMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object_u_i_d: reader.read_var_int()?,
+        })
+    }
+}
+
+impl DofusMessage for StorageObjectRemoveMessage {
+    const MESSAGE_ID: u16 = 7419;
+}
+
+/// Protocol message — ID: 7486
+#[derive(Debug, Clone, Default)]
+pub struct StorageObjectUpdateMessage {
+    pub object: ObjectItem,
+}
+
+impl DofusSerialize for StorageObjectUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.object.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for StorageObjectUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            object: ObjectItem::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for StorageObjectUpdateMessage {
+    const MESSAGE_ID: u16 = 7486;
+}
+
+/// Protocol message — ID: 8231
 #[derive(Debug, Clone, Default)]
 pub struct StorageInventoryContentMessage {
     pub objects: Vec<ObjectItem>,
@@ -64,122 +156,30 @@ impl DofusDeserialize for StorageInventoryContentMessage {
 }
 
 impl DofusMessage for StorageInventoryContentMessage {
-    const MESSAGE_ID: u16 = 5646;
+    const MESSAGE_ID: u16 = 8231;
 }
 
-/// Protocol message — ID: 5647
+/// Protocol message — ID: 9471
 #[derive(Debug, Clone, Default)]
-pub struct StorageObjectUpdateMessage {
-    pub object: ObjectItem,
+pub struct StorageKamasUpdateMessage {
+    pub kamas_total: i64,
 }
 
-impl DofusSerialize for StorageObjectUpdateMessage {
+impl DofusSerialize for StorageKamasUpdateMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.object.serialize(writer);
+        writer.write_var_long(self.kamas_total);
     }
 }
 
-impl DofusDeserialize for StorageObjectUpdateMessage {
+impl DofusDeserialize for StorageKamasUpdateMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            object: ObjectItem::deserialize(reader)?,
+            kamas_total: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for StorageObjectUpdateMessage {
-    const MESSAGE_ID: u16 = 5647;
-}
-
-/// Protocol message — ID: 5648
-#[derive(Debug, Clone, Default)]
-pub struct StorageObjectRemoveMessage {
-    pub object_u_i_d: i32,
-}
-
-impl DofusSerialize for StorageObjectRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_int(self.object_u_i_d);
-    }
-}
-
-impl DofusDeserialize for StorageObjectRemoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d: reader.read_var_int()?,
-        })
-    }
-}
-
-impl DofusMessage for StorageObjectRemoveMessage {
-    const MESSAGE_ID: u16 = 5648;
-}
-
-/// Protocol message — ID: 6035
-#[derive(Debug, Clone, Default)]
-pub struct StorageObjectsRemoveMessage {
-    pub object_u_i_d_list: Vec<i32>,
-}
-
-impl DofusSerialize for StorageObjectsRemoveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.object_u_i_d_list.len() as _);
-        for item in &self.object_u_i_d_list {
-            writer.write_var_int(*item);
-        }
-    }
-}
-
-impl DofusDeserialize for StorageObjectsRemoveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_u_i_d_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_var_int()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for StorageObjectsRemoveMessage {
-    const MESSAGE_ID: u16 = 6035;
-}
-
-/// Protocol message — ID: 6036
-#[derive(Debug, Clone, Default)]
-pub struct StorageObjectsUpdateMessage {
-    pub object_list: Vec<ObjectItem>,
-}
-
-impl DofusSerialize for StorageObjectsUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.object_list.len() as _);
-        for item in &self.object_list {
-            item.serialize(writer);
-        }
-    }
-}
-
-impl DofusDeserialize for StorageObjectsUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            object_list: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(ObjectItem::deserialize(reader)?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for StorageObjectsUpdateMessage {
-    const MESSAGE_ID: u16 = 6036;
+impl DofusMessage for StorageKamasUpdateMessage {
+    const MESSAGE_ID: u16 = 9471;
 }
 

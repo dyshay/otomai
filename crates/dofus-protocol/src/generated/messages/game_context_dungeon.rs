@@ -6,34 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6296
-#[derive(Debug, Clone, Default)]
-pub struct DungeonKeyRingUpdateMessage {
-    pub dungeon_id: i16,
-    pub available: bool,
-}
-
-impl DofusSerialize for DungeonKeyRingUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.dungeon_id);
-        writer.write_boolean(self.available);
-    }
-}
-
-impl DofusDeserialize for DungeonKeyRingUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            dungeon_id: reader.read_var_short()?,
-            available: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for DungeonKeyRingUpdateMessage {
-    const MESSAGE_ID: u16 = 6296;
-}
-
-/// Protocol message — ID: 6299
+/// Protocol message — ID: 4148
 #[derive(Debug, Clone, Default)]
 pub struct DungeonKeyRingMessage {
     pub availables: Vec<i16>,
@@ -77,6 +50,33 @@ impl DofusDeserialize for DungeonKeyRingMessage {
 }
 
 impl DofusMessage for DungeonKeyRingMessage {
-    const MESSAGE_ID: u16 = 6299;
+    const MESSAGE_ID: u16 = 4148;
+}
+
+/// Protocol message — ID: 4979
+#[derive(Debug, Clone, Default)]
+pub struct DungeonKeyRingUpdateMessage {
+    pub dungeon_id: i16,
+    pub available: bool,
+}
+
+impl DofusSerialize for DungeonKeyRingUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.dungeon_id);
+        writer.write_boolean(self.available);
+    }
+}
+
+impl DofusDeserialize for DungeonKeyRingUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            dungeon_id: reader.read_var_short()?,
+            available: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for DungeonKeyRingUpdateMessage {
+    const MESSAGE_ID: u16 = 4979;
 }
 

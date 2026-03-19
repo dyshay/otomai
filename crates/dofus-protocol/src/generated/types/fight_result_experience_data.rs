@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 192
+/// Protocol type — ID: 2135
 #[derive(Debug, Clone, Default)]
 pub struct FightResultExperienceData {
     pub show_experience: bool,
@@ -69,6 +69,6 @@ impl DofusDeserialize for FightResultExperienceData {
 }
 
 impl DofusType for FightResultExperienceData {
-    const TYPE_ID: u16 = 192;
+    const TYPE_ID: u16 = 2135;
 }
 

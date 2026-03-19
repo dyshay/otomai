@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 157
+/// Protocol type — ID: 5831
 #[derive(Debug, Clone, Default)]
 pub struct HumanInformations {
     pub restrictions: ActorRestrictionsInformations,
@@ -41,6 +41,6 @@ impl DofusDeserialize for HumanInformations {
 }
 
 impl DofusType for HumanInformations {
-    const TYPE_ID: u16 = 157;
+    const TYPE_ID: u16 = 5831;
 }
 

@@ -6,167 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5843
-#[derive(Debug, Clone, Default)]
-pub struct PrismFightJoinLeaveRequestMessage {
-    pub sub_area_id: i16,
-    pub join: bool,
-}
-
-impl DofusSerialize for PrismFightJoinLeaveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_boolean(self.join);
-    }
-}
-
-impl DofusDeserialize for PrismFightJoinLeaveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            join: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for PrismFightJoinLeaveRequestMessage {
-    const MESSAGE_ID: u16 = 5843;
-}
-
-/// Protocol message — ID: 5844
-#[derive(Debug, Clone, Default)]
-pub struct PrismInfoJoinLeaveRequestMessage {
-    pub join: bool,
-}
-
-impl DofusSerialize for PrismInfoJoinLeaveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_boolean(self.join);
-    }
-}
-
-impl DofusDeserialize for PrismInfoJoinLeaveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            join: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for PrismInfoJoinLeaveRequestMessage {
-    const MESSAGE_ID: u16 = 5844;
-}
-
-/// Protocol message — ID: 5853
-#[derive(Debug, Clone, Default)]
-pub struct PrismInfoCloseMessage {
-}
-
-impl DofusSerialize for PrismInfoCloseMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for PrismInfoCloseMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for PrismInfoCloseMessage {
-    const MESSAGE_ID: u16 = 5853;
-}
-
-/// Protocol message — ID: 5859
-#[derive(Debug, Clone, Default)]
-pub struct PrismInfoInValidMessage {
-    pub reason: u8,
-}
-
-impl DofusSerialize for PrismInfoInValidMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.reason);
-    }
-}
-
-impl DofusDeserialize for PrismInfoInValidMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            reason: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for PrismInfoInValidMessage {
-    const MESSAGE_ID: u16 = 5859;
-}
-
-/// Protocol message — ID: 5892
-#[derive(Debug, Clone, Default)]
-pub struct PrismFightDefenderLeaveMessage {
-    pub sub_area_id: i16,
-    pub fight_id: i16,
-    pub fighter_to_remove_id: i64,
-}
-
-impl DofusSerialize for PrismFightDefenderLeaveMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_var_short(self.fight_id);
-        writer.write_var_long(self.fighter_to_remove_id);
-    }
-}
-
-impl DofusDeserialize for PrismFightDefenderLeaveMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            fight_id: reader.read_var_short()?,
-            fighter_to_remove_id: reader.read_var_long()?,
-        })
-    }
-}
-
-impl DofusMessage for PrismFightDefenderLeaveMessage {
-    const MESSAGE_ID: u16 = 5892;
-}
-
-/// Protocol message — ID: 5893
-#[derive(Debug, Clone, Default)]
-pub struct PrismFightAttackerAddMessage {
-    pub sub_area_id: i16,
-    pub fight_id: i16,
-    pub attacker: Box<CharacterMinimalPlusLookInformationsVariant>,
-}
-
-impl DofusSerialize for PrismFightAttackerAddMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
-        writer.write_var_short(self.fight_id);
-        writer.write_ushort(self.attacker.get_type_id());
-        (*self.attacker).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for PrismFightAttackerAddMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            sub_area_id: reader.read_var_short()?,
-            fight_id: reader.read_var_short()?,
-            attacker: {
-                let type_id = reader.read_ushort()?;
-                Box::new(CharacterMinimalPlusLookInformationsVariant::deserialize_with_id(type_id, reader)?)
-            },
-        })
-    }
-}
-
-impl DofusMessage for PrismFightAttackerAddMessage {
-    const MESSAGE_ID: u16 = 5893;
-}
-
-/// Protocol message — ID: 5895
+/// Protocol message — ID: 873
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightDefenderAddMessage {
     pub sub_area_id: i16,
@@ -197,10 +37,31 @@ impl DofusDeserialize for PrismFightDefenderAddMessage {
 }
 
 impl DofusMessage for PrismFightDefenderAddMessage {
-    const MESSAGE_ID: u16 = 5895;
+    const MESSAGE_ID: u16 = 873;
 }
 
-/// Protocol message — ID: 5897
+/// Protocol message — ID: 972
+#[derive(Debug, Clone, Default)]
+pub struct PrismAttackRequestMessage {
+}
+
+impl DofusSerialize for PrismAttackRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for PrismAttackRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for PrismAttackRequestMessage {
+    const MESSAGE_ID: u16 = 972;
+}
+
+/// Protocol message — ID: 1307
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightAttackerRemoveMessage {
     pub sub_area_id: i16,
@@ -227,37 +88,95 @@ impl DofusDeserialize for PrismFightAttackerRemoveMessage {
 }
 
 impl DofusMessage for PrismFightAttackerRemoveMessage {
-    const MESSAGE_ID: u16 = 5897;
+    const MESSAGE_ID: u16 = 1307;
 }
 
-/// Protocol message — ID: 5901
+/// Protocol message — ID: 1719
 #[derive(Debug, Clone, Default)]
-pub struct PrismFightSwapRequestMessage {
+pub struct PrismFightAttackerAddMessage {
     pub sub_area_id: i16,
-    pub target_id: i64,
+    pub fight_id: i16,
+    pub attacker: Box<CharacterMinimalPlusLookInformationsVariant>,
 }
 
-impl DofusSerialize for PrismFightSwapRequestMessage {
+impl DofusSerialize for PrismFightAttackerAddMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.sub_area_id);
-        writer.write_var_long(self.target_id);
+        writer.write_var_short(self.fight_id);
+        writer.write_ushort(self.attacker.get_type_id());
+        (*self.attacker).serialize(writer);
     }
 }
 
-impl DofusDeserialize for PrismFightSwapRequestMessage {
+impl DofusDeserialize for PrismFightAttackerAddMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             sub_area_id: reader.read_var_short()?,
-            target_id: reader.read_var_long()?,
+            fight_id: reader.read_var_short()?,
+            attacker: {
+                let type_id = reader.read_ushort()?;
+                Box::new(CharacterMinimalPlusLookInformationsVariant::deserialize_with_id(type_id, reader)?)
+            },
         })
     }
 }
 
-impl DofusMessage for PrismFightSwapRequestMessage {
-    const MESSAGE_ID: u16 = 5901;
+impl DofusMessage for PrismFightAttackerAddMessage {
+    const MESSAGE_ID: u16 = 1719;
 }
 
-/// Protocol message — ID: 6040
+/// Protocol message — ID: 1806
+#[derive(Debug, Clone, Default)]
+pub struct PrismSetSabotagedRequestMessage {
+    pub sub_area_id: i16,
+}
+
+impl DofusSerialize for PrismSetSabotagedRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+    }
+}
+
+impl DofusDeserialize for PrismSetSabotagedRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+        })
+    }
+}
+
+impl DofusMessage for PrismSetSabotagedRequestMessage {
+    const MESSAGE_ID: u16 = 1806;
+}
+
+/// Protocol message — ID: 2267
+#[derive(Debug, Clone, Default)]
+pub struct PrismSetSabotagedRefusedMessage {
+    pub sub_area_id: i16,
+    pub reason: u8,
+}
+
+impl DofusSerialize for PrismSetSabotagedRefusedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_byte(self.reason);
+    }
+}
+
+impl DofusDeserialize for PrismSetSabotagedRefusedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            reason: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PrismSetSabotagedRefusedMessage {
+    const MESSAGE_ID: u16 = 2267;
+}
+
+/// Protocol message — ID: 2395
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightStateUpdateMessage {
     pub state: u8,
@@ -278,191 +197,85 @@ impl DofusDeserialize for PrismFightStateUpdateMessage {
 }
 
 impl DofusMessage for PrismFightStateUpdateMessage {
-    const MESSAGE_ID: u16 = 6040;
+    const MESSAGE_ID: u16 = 2395;
 }
 
-/// Protocol message — ID: 6041
+/// Protocol message — ID: 2678
 #[derive(Debug, Clone, Default)]
-pub struct PrismUseRequestMessage {
-    pub module_to_use: u8,
+pub struct PrismInfoInValidMessage {
+    pub reason: u8,
 }
 
-impl DofusSerialize for PrismUseRequestMessage {
+impl DofusSerialize for PrismInfoInValidMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.module_to_use);
+        writer.write_byte(self.reason);
     }
 }
 
-impl DofusDeserialize for PrismUseRequestMessage {
+impl DofusDeserialize for PrismInfoInValidMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            module_to_use: reader.read_byte()?,
+            reason: reader.read_byte()?,
         })
     }
 }
 
-impl DofusMessage for PrismUseRequestMessage {
-    const MESSAGE_ID: u16 = 6041;
+impl DofusMessage for PrismInfoInValidMessage {
+    const MESSAGE_ID: u16 = 2678;
 }
 
-/// Protocol message — ID: 6042
+/// Protocol message — ID: 3077
 #[derive(Debug, Clone, Default)]
-pub struct PrismAttackRequestMessage {
-}
-
-impl DofusSerialize for PrismAttackRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for PrismAttackRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for PrismAttackRequestMessage {
-    const MESSAGE_ID: u16 = 6042;
-}
-
-/// Protocol message — ID: 6437
-#[derive(Debug, Clone, Default)]
-pub struct PrismSettingsRequestMessage {
+pub struct PrismFightDefenderLeaveMessage {
     pub sub_area_id: i16,
-    pub start_defense_time: u8,
+    pub fight_id: i16,
+    pub fighter_to_remove_id: i64,
 }
 
-impl DofusSerialize for PrismSettingsRequestMessage {
+impl DofusSerialize for PrismFightDefenderLeaveMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.sub_area_id);
-        writer.write_byte(self.start_defense_time);
+        writer.write_var_short(self.fight_id);
+        writer.write_var_long(self.fighter_to_remove_id);
     }
 }
 
-impl DofusDeserialize for PrismSettingsRequestMessage {
+impl DofusDeserialize for PrismFightDefenderLeaveMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             sub_area_id: reader.read_var_short()?,
-            start_defense_time: reader.read_byte()?,
+            fight_id: reader.read_var_short()?,
+            fighter_to_remove_id: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for PrismSettingsRequestMessage {
-    const MESSAGE_ID: u16 = 6437;
+impl DofusMessage for PrismFightDefenderLeaveMessage {
+    const MESSAGE_ID: u16 = 3077;
 }
 
-/// Protocol message — ID: 6438
+/// Protocol message — ID: 4413
 #[derive(Debug, Clone, Default)]
-pub struct PrismsListUpdateMessage {
-    pub prisms: Vec<Vec<u8>>,
+pub struct PrismModuleExchangeRequestMessage {
 }
 
-impl DofusSerialize for PrismsListUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.prisms.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for PrismsListUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            prisms: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for PrismsListUpdateMessage {
-    const MESSAGE_ID: u16 = 6438;
-}
-
-/// Protocol message — ID: 6440
-#[derive(Debug, Clone, Default)]
-pub struct PrismsListMessage {
-    pub prisms: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for PrismsListMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.prisms.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for PrismsListMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            prisms: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for PrismsListMessage {
-    const MESSAGE_ID: u16 = 6440;
-}
-
-/// Protocol message — ID: 6441
-#[derive(Debug, Clone, Default)]
-pub struct PrismsListRegisterMessage {
-    pub listen: u8,
-}
-
-impl DofusSerialize for PrismsListRegisterMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.listen);
-    }
-}
-
-impl DofusDeserialize for PrismsListRegisterMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            listen: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for PrismsListRegisterMessage {
-    const MESSAGE_ID: u16 = 6441;
-}
-
-/// Protocol message — ID: 6442
-#[derive(Debug, Clone, Default)]
-pub struct PrismSettingsErrorMessage {
-}
-
-impl DofusSerialize for PrismSettingsErrorMessage {
+impl DofusSerialize for PrismModuleExchangeRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
     }
 }
 
-impl DofusDeserialize for PrismSettingsErrorMessage {
+impl DofusDeserialize for PrismModuleExchangeRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
         })
     }
 }
 
-impl DofusMessage for PrismSettingsErrorMessage {
-    const MESSAGE_ID: u16 = 6442;
+impl DofusMessage for PrismModuleExchangeRequestMessage {
+    const MESSAGE_ID: u16 = 4413;
 }
 
-/// Protocol message — ID: 6451
+/// Protocol message — ID: 4624
 #[derive(Debug, Clone, Default)]
 pub struct PrismsInfoValidMessage {
     pub fights: Vec<PrismFightersInformation>,
@@ -493,10 +306,93 @@ impl DofusDeserialize for PrismsInfoValidMessage {
 }
 
 impl DofusMessage for PrismsInfoValidMessage {
-    const MESSAGE_ID: u16 = 6451;
+    const MESSAGE_ID: u16 = 4624;
 }
 
-/// Protocol message — ID: 6452
+/// Protocol message — ID: 4815
+#[derive(Debug, Clone, Default)]
+pub struct PrismsListMessage {
+    pub prisms: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for PrismsListMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.prisms.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for PrismsListMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            prisms: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for PrismsListMessage {
+    const MESSAGE_ID: u16 = 4815;
+}
+
+/// Protocol message — ID: 5140
+#[derive(Debug, Clone, Default)]
+pub struct PrismsListRegisterMessage {
+    pub listen: u8,
+}
+
+impl DofusSerialize for PrismsListRegisterMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.listen);
+    }
+}
+
+impl DofusDeserialize for PrismsListRegisterMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            listen: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PrismsListRegisterMessage {
+    const MESSAGE_ID: u16 = 5140;
+}
+
+/// Protocol message — ID: 5624
+#[derive(Debug, Clone, Default)]
+pub struct PrismSettingsRequestMessage {
+    pub sub_area_id: i16,
+    pub start_defense_time: u8,
+}
+
+impl DofusSerialize for PrismSettingsRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_byte(self.start_defense_time);
+    }
+}
+
+impl DofusDeserialize for PrismSettingsRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            sub_area_id: reader.read_var_short()?,
+            start_defense_time: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PrismSettingsRequestMessage {
+    const MESSAGE_ID: u16 = 5624;
+}
+
+/// Protocol message — ID: 5640
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightAddedMessage {
     pub fight: PrismFightersInformation,
@@ -517,10 +413,31 @@ impl DofusDeserialize for PrismFightAddedMessage {
 }
 
 impl DofusMessage for PrismFightAddedMessage {
-    const MESSAGE_ID: u16 = 6452;
+    const MESSAGE_ID: u16 = 5640;
 }
 
-/// Protocol message — ID: 6453
+/// Protocol message — ID: 6258
+#[derive(Debug, Clone, Default)]
+pub struct PrismSettingsErrorMessage {
+}
+
+impl DofusSerialize for PrismSettingsErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for PrismSettingsErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for PrismSettingsErrorMessage {
+    const MESSAGE_ID: u16 = 6258;
+}
+
+/// Protocol message — ID: 6447
 #[derive(Debug, Clone, Default)]
 pub struct PrismFightRemovedMessage {
     pub sub_area_id: i16,
@@ -541,78 +458,161 @@ impl DofusDeserialize for PrismFightRemovedMessage {
 }
 
 impl DofusMessage for PrismFightRemovedMessage {
-    const MESSAGE_ID: u16 = 6453;
+    const MESSAGE_ID: u16 = 6447;
 }
 
-/// Protocol message — ID: 6466
+/// Protocol message — ID: 6578
 #[derive(Debug, Clone, Default)]
-pub struct PrismSetSabotagedRefusedMessage {
+pub struct PrismFightJoinLeaveRequestMessage {
     pub sub_area_id: i16,
-    pub reason: u8,
+    pub join: bool,
 }
 
-impl DofusSerialize for PrismSetSabotagedRefusedMessage {
+impl DofusSerialize for PrismFightJoinLeaveRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         writer.write_var_short(self.sub_area_id);
-        writer.write_byte(self.reason);
+        writer.write_boolean(self.join);
     }
 }
 
-impl DofusDeserialize for PrismSetSabotagedRefusedMessage {
+impl DofusDeserialize for PrismFightJoinLeaveRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             sub_area_id: reader.read_var_short()?,
-            reason: reader.read_byte()?,
+            join: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for PrismSetSabotagedRefusedMessage {
-    const MESSAGE_ID: u16 = 6466;
+impl DofusMessage for PrismFightJoinLeaveRequestMessage {
+    const MESSAGE_ID: u16 = 6578;
 }
 
-/// Protocol message — ID: 6468
+/// Protocol message — ID: 6760
 #[derive(Debug, Clone, Default)]
-pub struct PrismSetSabotagedRequestMessage {
-    pub sub_area_id: i16,
+pub struct PrismInfoCloseMessage {
 }
 
-impl DofusSerialize for PrismSetSabotagedRequestMessage {
+impl DofusSerialize for PrismInfoCloseMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_var_short(self.sub_area_id);
     }
 }
 
-impl DofusDeserialize for PrismSetSabotagedRequestMessage {
+impl DofusDeserialize for PrismInfoCloseMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for PrismInfoCloseMessage {
+    const MESSAGE_ID: u16 = 6760;
+}
+
+/// Protocol message — ID: 7833
+#[derive(Debug, Clone, Default)]
+pub struct PrismFightSwapRequestMessage {
+    pub sub_area_id: i16,
+    pub target_id: i64,
+}
+
+impl DofusSerialize for PrismFightSwapRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_var_short(self.sub_area_id);
+        writer.write_var_long(self.target_id);
+    }
+}
+
+impl DofusDeserialize for PrismFightSwapRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             sub_area_id: reader.read_var_short()?,
+            target_id: reader.read_var_long()?,
         })
     }
 }
 
-impl DofusMessage for PrismSetSabotagedRequestMessage {
-    const MESSAGE_ID: u16 = 6468;
+impl DofusMessage for PrismFightSwapRequestMessage {
+    const MESSAGE_ID: u16 = 7833;
 }
 
-/// Protocol message — ID: 6531
+/// Protocol message — ID: 9455
 #[derive(Debug, Clone, Default)]
-pub struct PrismModuleExchangeRequestMessage {
+pub struct PrismInfoJoinLeaveRequestMessage {
+    pub join: bool,
 }
 
-impl DofusSerialize for PrismModuleExchangeRequestMessage {
+impl DofusSerialize for PrismInfoJoinLeaveRequestMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_boolean(self.join);
     }
 }
 
-impl DofusDeserialize for PrismModuleExchangeRequestMessage {
+impl DofusDeserialize for PrismInfoJoinLeaveRequestMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
+            join: reader.read_boolean()?,
         })
     }
 }
 
-impl DofusMessage for PrismModuleExchangeRequestMessage {
-    const MESSAGE_ID: u16 = 6531;
+impl DofusMessage for PrismInfoJoinLeaveRequestMessage {
+    const MESSAGE_ID: u16 = 9455;
+}
+
+/// Protocol message — ID: 9551
+#[derive(Debug, Clone, Default)]
+pub struct PrismUseRequestMessage {
+    pub module_to_use: u8,
+}
+
+impl DofusSerialize for PrismUseRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.module_to_use);
+    }
+}
+
+impl DofusDeserialize for PrismUseRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            module_to_use: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PrismUseRequestMessage {
+    const MESSAGE_ID: u16 = 9551;
+}
+
+/// Protocol message — ID: 9870
+#[derive(Debug, Clone, Default)]
+pub struct PrismsListUpdateMessage {
+    pub prisms: Vec<Vec<u8>>,
+}
+
+impl DofusSerialize for PrismsListUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.prisms.len() as _);
+        // polymorphic vector (unresolved base type)
+    }
+}
+
+impl DofusDeserialize for PrismsListUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            prisms: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for PrismsListUpdateMessage {
+    const MESSAGE_ID: u16 = 9870;
 }
 

@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 563
+/// Protocol type — ID: 3911
 #[derive(Debug, Clone, Default)]
 pub struct TeleportDestination {
     pub r#type: u8,
@@ -39,6 +39,6 @@ impl DofusDeserialize for TeleportDestination {
 }
 
 impl DofusType for TeleportDestination {
-    const TYPE_ID: u16 = 563;
+    const TYPE_ID: u16 = 3911;
 }
 

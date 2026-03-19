@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::*;
 use anyhow::Result;
 
-/// Protocol type — ID: 367
+/// Protocol type — ID: 5832
 #[derive(Debug, Clone, Default)]
 pub struct ShortcutObject {
     pub slot: u8,
@@ -27,6 +27,6 @@ impl DofusDeserialize for ShortcutObject {
 }
 
 impl DofusType for ShortcutObject {
-    const TYPE_ID: u16 = 367;
+    const TYPE_ID: u16 = 5832;
 }
 

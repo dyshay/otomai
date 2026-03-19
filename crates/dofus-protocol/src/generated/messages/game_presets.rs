@@ -6,7 +6,65 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 6747
+/// Protocol message — ID: 810
+#[derive(Debug, Clone, Default)]
+pub struct PresetSaveErrorMessage {
+    pub preset_id: i16,
+    pub code: u8,
+}
+
+impl DofusSerialize for PresetSaveErrorMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+        writer.write_byte(self.code);
+    }
+}
+
+impl DofusDeserialize for PresetSaveErrorMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+            code: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for PresetSaveErrorMessage {
+    const MESSAGE_ID: u16 = 810;
+}
+
+/// Protocol message — ID: 2420
+#[derive(Debug, Clone, Default)]
+pub struct PresetSavedMessage {
+    pub preset_id: i16,
+    pub preset: Box<PresetVariant>,
+}
+
+impl DofusSerialize for PresetSavedMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+        writer.write_ushort(self.preset.get_type_id());
+        (*self.preset).serialize(writer);
+    }
+}
+
+impl DofusDeserialize for PresetSavedMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+            preset: {
+                let type_id = reader.read_ushort()?;
+                Box::new(PresetVariant::deserialize_with_id(type_id, reader)?)
+            },
+        })
+    }
+}
+
+impl DofusMessage for PresetSavedMessage {
+    const MESSAGE_ID: u16 = 2420;
+}
+
+/// Protocol message — ID: 2621
 #[derive(Debug, Clone, Default)]
 pub struct PresetUseResultMessage {
     pub preset_id: i16,
@@ -30,10 +88,10 @@ impl DofusDeserialize for PresetUseResultMessage {
 }
 
 impl DofusMessage for PresetUseResultMessage {
-    const MESSAGE_ID: u16 = 6747;
+    const MESSAGE_ID: u16 = 2621;
 }
 
-/// Protocol message — ID: 6748
+/// Protocol message — ID: 2952
 #[derive(Debug, Clone, Default)]
 pub struct PresetDeleteResultMessage {
     pub preset_id: i16,
@@ -57,66 +115,10 @@ impl DofusDeserialize for PresetDeleteResultMessage {
 }
 
 impl DofusMessage for PresetDeleteResultMessage {
-    const MESSAGE_ID: u16 = 6748;
+    const MESSAGE_ID: u16 = 2952;
 }
 
-/// Protocol message — ID: 6750
-#[derive(Debug, Clone, Default)]
-pub struct PresetsMessage {
-    pub presets: Vec<Vec<u8>>,
-}
-
-impl DofusSerialize for PresetsMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.presets.len() as _);
-        // polymorphic vector (unresolved base type)
-    }
-}
-
-impl DofusDeserialize for PresetsMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            presets: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(Default::default());
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for PresetsMessage {
-    const MESSAGE_ID: u16 = 6750;
-}
-
-/// Protocol message — ID: 6755
-#[derive(Debug, Clone, Default)]
-pub struct PresetDeleteRequestMessage {
-    pub preset_id: i16,
-}
-
-impl DofusSerialize for PresetDeleteRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-    }
-}
-
-impl DofusDeserialize for PresetDeleteRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for PresetDeleteRequestMessage {
-    const MESSAGE_ID: u16 = 6755;
-}
-
-/// Protocol message — ID: 6757
+/// Protocol message — ID: 2959
 #[derive(Debug, Clone, Default)]
 pub struct PresetUseResultWithMissingIdsMessage {
     pub preset_id: i16,
@@ -153,149 +155,42 @@ impl DofusDeserialize for PresetUseResultWithMissingIdsMessage {
 }
 
 impl DofusMessage for PresetUseResultWithMissingIdsMessage {
-    const MESSAGE_ID: u16 = 6757;
+    const MESSAGE_ID: u16 = 2959;
 }
 
-/// Protocol message — ID: 6758
+/// Protocol message — ID: 3014
 #[derive(Debug, Clone, Default)]
-pub struct IdolsPresetSaveRequestMessage {
-    pub preset_id: i16,
-    pub symbol_id: u8,
-    pub update_data: bool,
+pub struct PresetsMessage {
+    pub presets: Vec<Vec<u8>>,
 }
 
-impl DofusSerialize for IdolsPresetSaveRequestMessage {
+impl DofusSerialize for PresetsMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-        writer.write_byte(self.symbol_id);
-        writer.write_boolean(self.update_data);
+        writer.write_short(self.presets.len() as _);
+        // polymorphic vector (unresolved base type)
     }
 }
 
-impl DofusDeserialize for IdolsPresetSaveRequestMessage {
+impl DofusDeserialize for PresetsMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
-            preset_id: reader.read_short()?,
-            symbol_id: reader.read_byte()?,
-            update_data: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for IdolsPresetSaveRequestMessage {
-    const MESSAGE_ID: u16 = 6758;
-}
-
-/// Protocol message — ID: 6759
-#[derive(Debug, Clone, Default)]
-pub struct PresetUseRequestMessage {
-    pub preset_id: i16,
-}
-
-impl DofusSerialize for PresetUseRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-    }
-}
-
-impl DofusDeserialize for PresetUseRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-        })
-    }
-}
-
-impl DofusMessage for PresetUseRequestMessage {
-    const MESSAGE_ID: u16 = 6759;
-}
-
-/// Protocol message — ID: 6760
-#[derive(Debug, Clone, Default)]
-pub struct ItemForPresetUpdateMessage {
-    pub preset_id: i16,
-    pub preset_item: ItemForPreset,
-}
-
-impl DofusSerialize for ItemForPresetUpdateMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-        self.preset_item.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for ItemForPresetUpdateMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-            preset_item: ItemForPreset::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for ItemForPresetUpdateMessage {
-    const MESSAGE_ID: u16 = 6760;
-}
-
-/// Protocol message — ID: 6762
-#[derive(Debug, Clone, Default)]
-pub struct PresetSaveErrorMessage {
-    pub preset_id: i16,
-    pub code: u8,
-}
-
-impl DofusSerialize for PresetSaveErrorMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-        writer.write_byte(self.code);
-    }
-}
-
-impl DofusDeserialize for PresetSaveErrorMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-            code: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for PresetSaveErrorMessage {
-    const MESSAGE_ID: u16 = 6762;
-}
-
-/// Protocol message — ID: 6763
-#[derive(Debug, Clone, Default)]
-pub struct PresetSavedMessage {
-    pub preset_id: i16,
-    pub preset: Box<PresetVariant>,
-}
-
-impl DofusSerialize for PresetSavedMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-        writer.write_ushort(self.preset.get_type_id());
-        (*self.preset).serialize(writer);
-    }
-}
-
-impl DofusDeserialize for PresetSavedMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-            preset: {
-                let type_id = reader.read_ushort()?;
-                Box::new(PresetVariant::deserialize_with_id(type_id, reader)?)
+            presets: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(Default::default());
+                }
+                v
             },
         })
     }
 }
 
-impl DofusMessage for PresetSavedMessage {
-    const MESSAGE_ID: u16 = 6763;
+impl DofusMessage for PresetsMessage {
+    const MESSAGE_ID: u16 = 3014;
 }
 
-/// Protocol message — ID: 6839
+/// Protocol message — ID: 4221
 #[derive(Debug, Clone, Default)]
 pub struct InvalidPresetsMessage {
     pub preset_ids: Vec<i16>,
@@ -326,10 +221,145 @@ impl DofusDeserialize for InvalidPresetsMessage {
 }
 
 impl DofusMessage for InvalidPresetsMessage {
-    const MESSAGE_ID: u16 = 6839;
+    const MESSAGE_ID: u16 = 4221;
 }
 
-/// Protocol message — ID: 6871
+/// Protocol message — ID: 5015
+#[derive(Debug, Clone, Default)]
+pub struct IconPresetSaveRequestMessage {
+    pub preset_id: i16,
+    pub symbol_id: u8,
+    pub update_data: bool,
+}
+
+impl DofusSerialize for IconPresetSaveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+        writer.write_byte(self.symbol_id);
+        writer.write_boolean(self.update_data);
+    }
+}
+
+impl DofusDeserialize for IconPresetSaveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+            symbol_id: reader.read_byte()?,
+            update_data: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for IconPresetSaveRequestMessage {
+    const MESSAGE_ID: u16 = 5015;
+}
+
+/// Protocol message — ID: 5636
+#[derive(Debug, Clone, Default)]
+pub struct IdolsPresetSaveRequestMessage {
+    pub preset_id: i16,
+    pub symbol_id: u8,
+    pub update_data: bool,
+}
+
+impl DofusSerialize for IdolsPresetSaveRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+        writer.write_byte(self.symbol_id);
+        writer.write_boolean(self.update_data);
+    }
+}
+
+impl DofusDeserialize for IdolsPresetSaveRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+            symbol_id: reader.read_byte()?,
+            update_data: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for IdolsPresetSaveRequestMessage {
+    const MESSAGE_ID: u16 = 5636;
+}
+
+/// Protocol message — ID: 6150
+#[derive(Debug, Clone, Default)]
+pub struct ItemForPresetUpdateMessage {
+    pub preset_id: i16,
+    pub preset_item: ItemForPreset,
+}
+
+impl DofusSerialize for ItemForPresetUpdateMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+        self.preset_item.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for ItemForPresetUpdateMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+            preset_item: ItemForPreset::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for ItemForPresetUpdateMessage {
+    const MESSAGE_ID: u16 = 6150;
+}
+
+/// Protocol message — ID: 6757
+#[derive(Debug, Clone, Default)]
+pub struct PresetUseRequestMessage {
+    pub preset_id: i16,
+}
+
+impl DofusSerialize for PresetUseRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+    }
+}
+
+impl DofusDeserialize for PresetUseRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for PresetUseRequestMessage {
+    const MESSAGE_ID: u16 = 6757;
+}
+
+/// Protocol message — ID: 8718
+#[derive(Debug, Clone, Default)]
+pub struct PresetDeleteRequestMessage {
+    pub preset_id: i16,
+}
+
+impl DofusSerialize for PresetDeleteRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_short(self.preset_id);
+    }
+}
+
+impl DofusDeserialize for PresetDeleteRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            preset_id: reader.read_short()?,
+        })
+    }
+}
+
+impl DofusMessage for PresetDeleteRequestMessage {
+    const MESSAGE_ID: u16 = 8718;
+}
+
+/// Protocol message — ID: 9163
 #[derive(Debug, Clone, Default)]
 pub struct IconNamedPresetSaveRequestMessage {
     pub preset_id: i16,
@@ -362,36 +392,6 @@ impl DofusDeserialize for IconNamedPresetSaveRequestMessage {
 }
 
 impl DofusMessage for IconNamedPresetSaveRequestMessage {
-    const MESSAGE_ID: u16 = 6871;
-}
-
-/// Protocol message — ID: 6872
-#[derive(Debug, Clone, Default)]
-pub struct IconPresetSaveRequestMessage {
-    pub preset_id: i16,
-    pub symbol_id: u8,
-    pub update_data: bool,
-}
-
-impl DofusSerialize for IconPresetSaveRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_short(self.preset_id);
-        writer.write_byte(self.symbol_id);
-        writer.write_boolean(self.update_data);
-    }
-}
-
-impl DofusDeserialize for IconPresetSaveRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            preset_id: reader.read_short()?,
-            symbol_id: reader.read_byte()?,
-            update_data: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for IconPresetSaveRequestMessage {
-    const MESSAGE_ID: u16 = 6872;
+    const MESSAGE_ID: u16 = 9163;
 }
 

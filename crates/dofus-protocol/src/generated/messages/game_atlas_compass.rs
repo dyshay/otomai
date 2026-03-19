@@ -6,68 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5584
-#[derive(Debug, Clone, Default)]
-pub struct CompassResetMessage {
-    pub r#type: u8,
-}
-
-impl DofusSerialize for CompassResetMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.r#type);
-    }
-}
-
-impl DofusDeserialize for CompassResetMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            r#type: reader.read_byte()?,
-        })
-    }
-}
-
-impl DofusMessage for CompassResetMessage {
-    const MESSAGE_ID: u16 = 5584;
-}
-
-/// Protocol message — ID: 5589
-#[derive(Debug, Clone, Default)]
-pub struct CompassUpdatePartyMemberMessage {
-    pub r#type: u8,
-    pub coords: Box<MapCoordinatesVariant>,
-    pub member_id: i64,
-    pub active: bool,
-}
-
-impl DofusSerialize for CompassUpdatePartyMemberMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_byte(self.r#type);
-        writer.write_ushort(self.coords.get_type_id());
-        (*self.coords).serialize(writer);
-        writer.write_var_long(self.member_id);
-        writer.write_boolean(self.active);
-    }
-}
-
-impl DofusDeserialize for CompassUpdatePartyMemberMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            r#type: reader.read_byte()?,
-            coords: {
-                let type_id = reader.read_ushort()?;
-                Box::new(MapCoordinatesVariant::deserialize_with_id(type_id, reader)?)
-            },
-            member_id: reader.read_var_long()?,
-            active: reader.read_boolean()?,
-        })
-    }
-}
-
-impl DofusMessage for CompassUpdatePartyMemberMessage {
-    const MESSAGE_ID: u16 = 5589;
-}
-
-/// Protocol message — ID: 5591
+/// Protocol message — ID: 476
 #[derive(Debug, Clone, Default)]
 pub struct CompassUpdateMessage {
     pub r#type: u8,
@@ -95,10 +34,10 @@ impl DofusDeserialize for CompassUpdateMessage {
 }
 
 impl DofusMessage for CompassUpdateMessage {
-    const MESSAGE_ID: u16 = 5591;
+    const MESSAGE_ID: u16 = 476;
 }
 
-/// Protocol message — ID: 6013
+/// Protocol message — ID: 4417
 #[derive(Debug, Clone, Default)]
 pub struct CompassUpdatePvpSeekMessage {
     pub r#type: u8,
@@ -132,6 +71,67 @@ impl DofusDeserialize for CompassUpdatePvpSeekMessage {
 }
 
 impl DofusMessage for CompassUpdatePvpSeekMessage {
-    const MESSAGE_ID: u16 = 6013;
+    const MESSAGE_ID: u16 = 4417;
+}
+
+/// Protocol message — ID: 5095
+#[derive(Debug, Clone, Default)]
+pub struct CompassResetMessage {
+    pub r#type: u8,
+}
+
+impl DofusSerialize for CompassResetMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.r#type);
+    }
+}
+
+impl DofusDeserialize for CompassResetMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            r#type: reader.read_byte()?,
+        })
+    }
+}
+
+impl DofusMessage for CompassResetMessage {
+    const MESSAGE_ID: u16 = 5095;
+}
+
+/// Protocol message — ID: 5594
+#[derive(Debug, Clone, Default)]
+pub struct CompassUpdatePartyMemberMessage {
+    pub r#type: u8,
+    pub coords: Box<MapCoordinatesVariant>,
+    pub member_id: i64,
+    pub active: bool,
+}
+
+impl DofusSerialize for CompassUpdatePartyMemberMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_byte(self.r#type);
+        writer.write_ushort(self.coords.get_type_id());
+        (*self.coords).serialize(writer);
+        writer.write_var_long(self.member_id);
+        writer.write_boolean(self.active);
+    }
+}
+
+impl DofusDeserialize for CompassUpdatePartyMemberMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            r#type: reader.read_byte()?,
+            coords: {
+                let type_id = reader.read_ushort()?;
+                Box::new(MapCoordinatesVariant::deserialize_with_id(type_id, reader)?)
+            },
+            member_id: reader.read_var_long()?,
+            active: reader.read_boolean()?,
+        })
+    }
+}
+
+impl DofusMessage for CompassUpdatePartyMemberMessage {
+    const MESSAGE_ID: u16 = 5594;
 }
 

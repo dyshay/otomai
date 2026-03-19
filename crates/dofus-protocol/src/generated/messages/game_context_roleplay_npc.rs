@@ -6,9 +6,30 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 5615
+/// Protocol message — ID: 1685
 #[derive(Debug, Clone, Default)]
-pub struct TaxCollectorDialogQuestionExtendedMessage {
+pub struct NpcGenericActionFailureMessage {
+}
+
+impl DofusSerialize for NpcGenericActionFailureMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for NpcGenericActionFailureMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for NpcGenericActionFailureMessage {
+    const MESSAGE_ID: u16 = 1685;
+}
+
+/// Protocol message — ID: 1736
+#[derive(Debug, Clone, Default)]
+pub struct AllianceTaxCollectorDialogQuestionExtendedMessage {
     pub guild_info: BasicGuildInformations,
     pub max_pods: i16,
     pub prospecting: i16,
@@ -19,9 +40,10 @@ pub struct TaxCollectorDialogQuestionExtendedMessage {
     pub experience: i64,
     pub pods: i32,
     pub items_value: i64,
+    pub alliance: BasicNamedAllianceInformations,
 }
 
-impl DofusSerialize for TaxCollectorDialogQuestionExtendedMessage {
+impl DofusSerialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         self.guild_info.serialize(writer);
         writer.write_var_short(self.max_pods);
@@ -33,10 +55,11 @@ impl DofusSerialize for TaxCollectorDialogQuestionExtendedMessage {
         writer.write_var_long(self.experience);
         writer.write_var_int(self.pods);
         writer.write_var_long(self.items_value);
+        self.alliance.serialize(writer);
     }
 }
 
-impl DofusDeserialize for TaxCollectorDialogQuestionExtendedMessage {
+impl DofusDeserialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             guild_info: BasicGuildInformations::deserialize(reader)?,
@@ -49,15 +72,73 @@ impl DofusDeserialize for TaxCollectorDialogQuestionExtendedMessage {
             experience: reader.read_var_long()?,
             pods: reader.read_var_int()?,
             items_value: reader.read_var_long()?,
+            alliance: BasicNamedAllianceInformations::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for TaxCollectorDialogQuestionExtendedMessage {
-    const MESSAGE_ID: u16 = 5615;
+impl DofusMessage for AllianceTaxCollectorDialogQuestionExtendedMessage {
+    const MESSAGE_ID: u16 = 1736;
 }
 
-/// Protocol message — ID: 5616
+/// Protocol message — ID: 3416
+#[derive(Debug, Clone, Default)]
+pub struct NpcDialogCreationMessage {
+    pub map_id: f64,
+    pub npc_id: i32,
+}
+
+impl DofusSerialize for NpcDialogCreationMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.map_id);
+        writer.write_int(self.npc_id);
+    }
+}
+
+impl DofusDeserialize for NpcDialogCreationMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            map_id: reader.read_double()?,
+            npc_id: reader.read_int()?,
+        })
+    }
+}
+
+impl DofusMessage for NpcDialogCreationMessage {
+    const MESSAGE_ID: u16 = 3416;
+}
+
+/// Protocol message — ID: 6002
+#[derive(Debug, Clone, Default)]
+pub struct NpcGenericActionRequestMessage {
+    pub npc_id: i32,
+    pub npc_action_id: u8,
+    pub npc_map_id: f64,
+}
+
+impl DofusSerialize for NpcGenericActionRequestMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_int(self.npc_id);
+        writer.write_byte(self.npc_action_id);
+        writer.write_double(self.npc_map_id);
+    }
+}
+
+impl DofusDeserialize for NpcGenericActionRequestMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            npc_id: reader.read_int()?,
+            npc_action_id: reader.read_byte()?,
+            npc_map_id: reader.read_double()?,
+        })
+    }
+}
+
+impl DofusMessage for NpcGenericActionRequestMessage {
+    const MESSAGE_ID: u16 = 6002;
+}
+
+/// Protocol message — ID: 6305
 #[derive(Debug, Clone, Default)]
 pub struct NpcDialogReplyMessage {
     pub reply_id: i32,
@@ -78,10 +159,95 @@ impl DofusDeserialize for NpcDialogReplyMessage {
 }
 
 impl DofusMessage for NpcDialogReplyMessage {
-    const MESSAGE_ID: u16 = 5616;
+    const MESSAGE_ID: u16 = 6305;
 }
 
-/// Protocol message — ID: 5617
+/// Protocol message — ID: 6664
+#[derive(Debug, Clone, Default)]
+pub struct TaxCollectorDialogQuestionBasicMessage {
+    pub guild_info: BasicGuildInformations,
+}
+
+impl DofusSerialize for TaxCollectorDialogQuestionBasicMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        self.guild_info.serialize(writer);
+    }
+}
+
+impl DofusDeserialize for TaxCollectorDialogQuestionBasicMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            guild_info: BasicGuildInformations::deserialize(reader)?,
+        })
+    }
+}
+
+impl DofusMessage for TaxCollectorDialogQuestionBasicMessage {
+    const MESSAGE_ID: u16 = 6664;
+}
+
+/// Protocol message — ID: 6863
+#[derive(Debug, Clone, Default)]
+pub struct EntityTalkMessage {
+    pub entity_id: f64,
+    pub text_id: i16,
+    pub parameters: Vec<String>,
+}
+
+impl DofusSerialize for EntityTalkMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+        writer.write_double(self.entity_id);
+        writer.write_var_short(self.text_id);
+        writer.write_short(self.parameters.len() as _);
+        for item in &self.parameters {
+            writer.write_utf(item);
+        }
+    }
+}
+
+impl DofusDeserialize for EntityTalkMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+            entity_id: reader.read_double()?,
+            text_id: reader.read_var_short()?,
+            parameters: {
+                let count = reader.read_ushort()? as usize;
+                let mut v = Vec::with_capacity(count);
+                for _ in 0..count {
+                    v.push(reader.read_utf()?);
+                }
+                v
+            },
+        })
+    }
+}
+
+impl DofusMessage for EntityTalkMessage {
+    const MESSAGE_ID: u16 = 6863;
+}
+
+/// Protocol message — ID: 7636
+#[derive(Debug, Clone, Default)]
+pub struct AlliancePrismDialogQuestionMessage {
+}
+
+impl DofusSerialize for AlliancePrismDialogQuestionMessage {
+    fn serialize(&self, writer: &mut BigEndianWriter) {
+    }
+}
+
+impl DofusDeserialize for AlliancePrismDialogQuestionMessage {
+    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
+        Ok(Self {
+        })
+    }
+}
+
+impl DofusMessage for AlliancePrismDialogQuestionMessage {
+    const MESSAGE_ID: u16 = 7636;
+}
+
+/// Protocol message — ID: 7921
 #[derive(Debug, Clone, Default)]
 pub struct NpcDialogQuestionMessage {
     pub message_id: i32,
@@ -128,61 +294,10 @@ impl DofusDeserialize for NpcDialogQuestionMessage {
 }
 
 impl DofusMessage for NpcDialogQuestionMessage {
-    const MESSAGE_ID: u16 = 5617;
+    const MESSAGE_ID: u16 = 7921;
 }
 
-/// Protocol message — ID: 5618
-#[derive(Debug, Clone, Default)]
-pub struct NpcDialogCreationMessage {
-    pub map_id: f64,
-    pub npc_id: i32,
-}
-
-impl DofusSerialize for NpcDialogCreationMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.map_id);
-        writer.write_int(self.npc_id);
-    }
-}
-
-impl DofusDeserialize for NpcDialogCreationMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            map_id: reader.read_double()?,
-            npc_id: reader.read_int()?,
-        })
-    }
-}
-
-impl DofusMessage for NpcDialogCreationMessage {
-    const MESSAGE_ID: u16 = 5618;
-}
-
-/// Protocol message — ID: 5619
-#[derive(Debug, Clone, Default)]
-pub struct TaxCollectorDialogQuestionBasicMessage {
-    pub guild_info: BasicGuildInformations,
-}
-
-impl DofusSerialize for TaxCollectorDialogQuestionBasicMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        self.guild_info.serialize(writer);
-    }
-}
-
-impl DofusDeserialize for TaxCollectorDialogQuestionBasicMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            guild_info: BasicGuildInformations::deserialize(reader)?,
-        })
-    }
-}
-
-impl DofusMessage for TaxCollectorDialogQuestionBasicMessage {
-    const MESSAGE_ID: u16 = 5619;
-}
-
-/// Protocol message — ID: 5642
+/// Protocol message — ID: 8038
 #[derive(Debug, Clone, Default)]
 pub struct MapNpcsQuestStatusUpdateMessage {
     pub map_id: f64,
@@ -242,103 +357,12 @@ impl DofusDeserialize for MapNpcsQuestStatusUpdateMessage {
 }
 
 impl DofusMessage for MapNpcsQuestStatusUpdateMessage {
-    const MESSAGE_ID: u16 = 5642;
+    const MESSAGE_ID: u16 = 8038;
 }
 
-/// Protocol message — ID: 5898
+/// Protocol message — ID: 9199
 #[derive(Debug, Clone, Default)]
-pub struct NpcGenericActionRequestMessage {
-    pub npc_id: i32,
-    pub npc_action_id: u8,
-    pub npc_map_id: f64,
-}
-
-impl DofusSerialize for NpcGenericActionRequestMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_int(self.npc_id);
-        writer.write_byte(self.npc_action_id);
-        writer.write_double(self.npc_map_id);
-    }
-}
-
-impl DofusDeserialize for NpcGenericActionRequestMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            npc_id: reader.read_int()?,
-            npc_action_id: reader.read_byte()?,
-            npc_map_id: reader.read_double()?,
-        })
-    }
-}
-
-impl DofusMessage for NpcGenericActionRequestMessage {
-    const MESSAGE_ID: u16 = 5898;
-}
-
-/// Protocol message — ID: 5900
-#[derive(Debug, Clone, Default)]
-pub struct NpcGenericActionFailureMessage {
-}
-
-impl DofusSerialize for NpcGenericActionFailureMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for NpcGenericActionFailureMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for NpcGenericActionFailureMessage {
-    const MESSAGE_ID: u16 = 5900;
-}
-
-/// Protocol message — ID: 6110
-#[derive(Debug, Clone, Default)]
-pub struct EntityTalkMessage {
-    pub entity_id: f64,
-    pub text_id: i16,
-    pub parameters: Vec<String>,
-}
-
-impl DofusSerialize for EntityTalkMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-        writer.write_double(self.entity_id);
-        writer.write_var_short(self.text_id);
-        writer.write_short(self.parameters.len() as _);
-        for item in &self.parameters {
-            writer.write_utf(item);
-        }
-    }
-}
-
-impl DofusDeserialize for EntityTalkMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-            entity_id: reader.read_double()?,
-            text_id: reader.read_var_short()?,
-            parameters: {
-                let count = reader.read_ushort()? as usize;
-                let mut v = Vec::with_capacity(count);
-                for _ in 0..count {
-                    v.push(reader.read_utf()?);
-                }
-                v
-            },
-        })
-    }
-}
-
-impl DofusMessage for EntityTalkMessage {
-    const MESSAGE_ID: u16 = 6110;
-}
-
-/// Protocol message — ID: 6445
-#[derive(Debug, Clone, Default)]
-pub struct AllianceTaxCollectorDialogQuestionExtendedMessage {
+pub struct TaxCollectorDialogQuestionExtendedMessage {
     pub guild_info: BasicGuildInformations,
     pub max_pods: i16,
     pub prospecting: i16,
@@ -349,10 +373,9 @@ pub struct AllianceTaxCollectorDialogQuestionExtendedMessage {
     pub experience: i64,
     pub pods: i32,
     pub items_value: i64,
-    pub alliance: BasicNamedAllianceInformations,
 }
 
-impl DofusSerialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
+impl DofusSerialize for TaxCollectorDialogQuestionExtendedMessage {
     fn serialize(&self, writer: &mut BigEndianWriter) {
         self.guild_info.serialize(writer);
         writer.write_var_short(self.max_pods);
@@ -364,11 +387,10 @@ impl DofusSerialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
         writer.write_var_long(self.experience);
         writer.write_var_int(self.pods);
         writer.write_var_long(self.items_value);
-        self.alliance.serialize(writer);
     }
 }
 
-impl DofusDeserialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
+impl DofusDeserialize for TaxCollectorDialogQuestionExtendedMessage {
     fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
         Ok(Self {
             guild_info: BasicGuildInformations::deserialize(reader)?,
@@ -381,37 +403,15 @@ impl DofusDeserialize for AllianceTaxCollectorDialogQuestionExtendedMessage {
             experience: reader.read_var_long()?,
             pods: reader.read_var_int()?,
             items_value: reader.read_var_long()?,
-            alliance: BasicNamedAllianceInformations::deserialize(reader)?,
         })
     }
 }
 
-impl DofusMessage for AllianceTaxCollectorDialogQuestionExtendedMessage {
-    const MESSAGE_ID: u16 = 6445;
+impl DofusMessage for TaxCollectorDialogQuestionExtendedMessage {
+    const MESSAGE_ID: u16 = 9199;
 }
 
-/// Protocol message — ID: 6448
-#[derive(Debug, Clone, Default)]
-pub struct AlliancePrismDialogQuestionMessage {
-}
-
-impl DofusSerialize for AlliancePrismDialogQuestionMessage {
-    fn serialize(&self, writer: &mut BigEndianWriter) {
-    }
-}
-
-impl DofusDeserialize for AlliancePrismDialogQuestionMessage {
-    fn deserialize(reader: &mut BigEndianReader) -> Result<Self> {
-        Ok(Self {
-        })
-    }
-}
-
-impl DofusMessage for AlliancePrismDialogQuestionMessage {
-    const MESSAGE_ID: u16 = 6448;
-}
-
-/// Protocol message — ID: 6737
+/// Protocol message — ID: 9795
 #[derive(Debug, Clone, Default)]
 pub struct PortalDialogCreationMessage {
     pub map_id: f64,
@@ -438,6 +438,6 @@ impl DofusDeserialize for PortalDialogCreationMessage {
 }
 
 impl DofusMessage for PortalDialogCreationMessage {
-    const MESSAGE_ID: u16 = 6737;
+    const MESSAGE_ID: u16 = 9795;
 }
 

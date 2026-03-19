@@ -6,7 +6,7 @@ use dofus_io::boolean_byte_wrapper;
 use super::super::types::*;
 use anyhow::Result;
 
-/// Protocol message — ID: 10
+/// Protocol message — ID: 507
 #[derive(Debug, Clone, Default)]
 pub struct LoginQueueStatusMessage {
     pub position: i16,
@@ -30,10 +30,10 @@ impl DofusDeserialize for LoginQueueStatusMessage {
 }
 
 impl DofusMessage for LoginQueueStatusMessage {
-    const MESSAGE_ID: u16 = 10;
+    const MESSAGE_ID: u16 = 507;
 }
 
-/// Protocol message — ID: 6100
+/// Protocol message — ID: 5179
 #[derive(Debug, Clone, Default)]
 pub struct QueueStatusMessage {
     pub position: i16,
@@ -57,6 +57,6 @@ impl DofusDeserialize for QueueStatusMessage {
 }
 
 impl DofusMessage for QueueStatusMessage {
-    const MESSAGE_ID: u16 = 6100;
+    const MESSAGE_ID: u16 = 5179;
 }
 
