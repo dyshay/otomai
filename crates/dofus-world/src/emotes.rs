@@ -67,3 +67,49 @@ pub async fn handle_emote_play(
     state.world.broadcast_to_map(current_map_id, raw).await;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn default_emotes_not_empty() {
+        assert!(!DEFAULT_EMOTES.is_empty());
+        assert!(DEFAULT_EMOTES.len() >= 15);
+    }
+
+    #[test]
+    fn emote_list_serializes() {
+        use dofus_io::{BigEndianReader, BigEndianWriter, DofusDeserialize, DofusSerialize};
+
+        let msg = EmoteListMessage {
+            emote_ids: DEFAULT_EMOTES.to_vec(),
+        };
+        let mut w = BigEndianWriter::new();
+        msg.serialize(&mut w);
+
+        let mut r = BigEndianReader::new(w.into_data());
+        let decoded = EmoteListMessage::deserialize(&mut r).unwrap();
+        assert_eq!(decoded.emote_ids.len(), DEFAULT_EMOTES.len());
+        assert_eq!(decoded.emote_ids[0], 1);
+    }
+
+    #[test]
+    fn emote_play_serializes() {
+        use dofus_io::{BigEndianReader, BigEndianWriter, DofusDeserialize, DofusSerialize};
+
+        let msg = EmotePlayMessage {
+            emote_id: 5,
+            emote_start_time: 1000.0,
+            actor_id: 42.0,
+            account_id: 1,
+        };
+        let mut w = BigEndianWriter::new();
+        msg.serialize(&mut w);
+
+        let mut r = BigEndianReader::new(w.into_data());
+        let decoded = EmotePlayMessage::deserialize(&mut r).unwrap();
+        assert_eq!(decoded.emote_id, 5);
+        assert_eq!(decoded.actor_id, 42.0);
+    }
+}

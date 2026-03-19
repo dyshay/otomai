@@ -357,7 +357,83 @@ mod tests {
         let mut w = BigEndianWriter::new();
         write_actors(&mut w, &[]);
         let data = w.into_data();
-        // Should just be count=0 as i16
         assert_eq!(data, vec![0, 0]);
+    }
+
+    #[tokio::test]
+    async fn broadcast_global_reaches_all_maps() {
+        let world = World::new();
+        let (p1, mut rx1) = make_player(1, "Alice");
+        let (p2, mut rx2) = make_player(2, "Bob");
+
+        world.join_map(100, p1).await;
+        world.join_map(200, p2).await;
+
+        // Drain ShowActor messages
+        let _ = rx1.try_recv();
+        let _ = rx2.try_recv();
+
+        let raw = RawMessage {
+            message_id: 9999,
+            instance_id: 0,
+            payload: vec![1, 2, 3],
+        };
+        world.broadcast_global(raw).await;
+
+        // Both players on different maps should receive the broadcast
+        assert!(rx1.try_recv().is_ok(), "Alice should receive global broadcast");
+        assert!(rx2.try_recv().is_ok(), "Bob should receive global broadcast");
+    }
+
+    #[tokio::test]
+    async fn broadcast_to_map_only_targets_one_map() {
+        let world = World::new();
+        let (p1, mut rx1) = make_player(1, "Alice");
+        let (p2, mut rx2) = make_player(2, "Bob");
+
+        world.join_map(100, p1).await;
+        world.join_map(200, p2).await;
+
+        let _ = rx1.try_recv();
+        let _ = rx2.try_recv();
+
+        let raw = RawMessage {
+            message_id: 9999,
+            instance_id: 0,
+            payload: vec![4, 5, 6],
+        };
+        world.broadcast_to_map(100, raw).await;
+
+        assert!(rx1.try_recv().is_ok(), "Alice on map 100 should receive");
+        assert!(rx2.try_recv().is_err(), "Bob on map 200 should NOT receive");
+    }
+
+    #[tokio::test]
+    async fn find_player_by_name_case_insensitive() {
+        let world = World::new();
+        let (p1, _rx1) = make_player(1, "Alice");
+
+        world.join_map(100, p1).await;
+
+        assert!(world.find_player_by_name("Alice").await.is_some());
+        assert!(world.find_player_by_name("alice").await.is_some());
+        assert!(world.find_player_by_name("ALICE").await.is_some());
+        assert!(world.find_player_by_name("Bob").await.is_none());
+    }
+
+    #[tokio::test]
+    async fn find_player_by_id_across_maps() {
+        let world = World::new();
+        let (p1, _rx1) = make_player(1, "Alice");
+        let (p2, _rx2) = make_player(2, "Bob");
+
+        world.join_map(100, p1).await;
+        world.join_map(200, p2).await;
+
+        let found = world.find_player_by_id(2).await;
+        assert!(found.is_some());
+        assert_eq!(found.unwrap().name, "Bob");
+
+        assert!(world.find_player_by_id(999).await.is_none());
     }
 }

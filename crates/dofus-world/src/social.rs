@@ -118,3 +118,34 @@ pub async fn handle_ignored_delete(
     handle_ignored_get_list(session, state, account_id).await?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_friends_list_payload() {
+        let mut w = BigEndianWriter::new();
+        w.write_short(0);
+        let data = w.into_data();
+        // Should be just 2 bytes (count=0)
+        assert_eq!(data, vec![0, 0]);
+    }
+
+    #[test]
+    fn friend_delete_result_serializes() {
+        use dofus_io::{BigEndianReader, BigEndianWriter, DofusDeserialize, DofusSerialize};
+
+        let msg = FriendDeleteResultMessage {
+            success: true,
+            name: "TestFriend".to_string(),
+        };
+        let mut w = BigEndianWriter::new();
+        msg.serialize(&mut w);
+
+        let mut r = BigEndianReader::new(w.into_data());
+        let decoded = FriendDeleteResultMessage::deserialize(&mut r).unwrap();
+        assert!(decoded.success);
+        assert_eq!(decoded.name, "TestFriend");
+    }
+}
