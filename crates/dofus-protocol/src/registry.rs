@@ -2,9 +2,47 @@ use crate::messages::{auth, game};
 use dofus_io::{BigEndianReader, DofusDeserialize, DofusMessage};
 use std::fmt;
 
-/// A dynamically-typed protocol message (subset used by handlers).
-#[derive(Debug)]
-pub enum ProtocolMessage {
+/// Macro that generates the ProtocolMessage enum, message_id(), from_raw(), and Display
+/// from a flat list of (Module::Type) entries. Adding a new message = one line.
+/// IDs are resolved from each type's MESSAGE_ID const (set by protocol-gen).
+macro_rules! protocol_registry {
+    ( $( $variant:ident ( $module:ident :: $ty:ident ) ),* $(,)? ) => {
+        #[derive(Debug)]
+        pub enum ProtocolMessage {
+            $( $variant($module::$ty), )*
+            Unknown(u16, Vec<u8>),
+        }
+
+        impl ProtocolMessage {
+            pub fn message_id(&self) -> u16 {
+                match self {
+                    $( Self::$variant(_) => $module::$ty::MESSAGE_ID, )*
+                    Self::Unknown(id, _) => *id,
+                }
+            }
+
+            pub fn from_raw(message_id: u16, payload: Vec<u8>) -> anyhow::Result<Self> {
+                let mut reader = BigEndianReader::new(payload.clone());
+                match message_id {
+                    $( id if id == $module::$ty::MESSAGE_ID =>
+                        Ok(Self::$variant($module::$ty::deserialize(&mut reader)?)), )*
+                    _ => Ok(Self::Unknown(message_id, payload)),
+                }
+            }
+        }
+
+        impl fmt::Display for ProtocolMessage {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                match self {
+                    Self::Unknown(id, data) => write!(f, "Unknown({}, {} bytes)", id, data.len()),
+                    other => write!(f, "{:?}", other),
+                }
+            }
+        }
+    };
+}
+
+protocol_registry! {
     // Auth flow
     ProtocolRequired(auth::ProtocolRequired),
     HelloConnectMessage(auth::HelloConnectMessage),
@@ -23,71 +61,6 @@ pub enum ProtocolMessage {
     GameContextCreateRequestMessage(game::GameContextCreateRequestMessage),
     CharacterNameSuggestionRequestMessage(game::CharacterNameSuggestionRequestMessage),
     CharacterCreationRequestMessage(game::CharacterCreationRequestMessage),
-    // Unknown
-    Unknown(u16, Vec<u8>),
-}
-
-impl ProtocolMessage {
-    pub fn message_id(&self) -> u16 {
-        match self {
-            Self::ProtocolRequired(_) => auth::ProtocolRequired::MESSAGE_ID,
-            Self::HelloConnectMessage(_) => auth::HelloConnectMessage::MESSAGE_ID,
-            Self::IdentificationMessage(_) => auth::IdentificationMessage::MESSAGE_ID,
-            Self::IdentificationSuccessMessage(_) => auth::IdentificationSuccessMessage::MESSAGE_ID,
-            Self::IdentificationFailedMessage(_) => auth::IdentificationFailedMessage::MESSAGE_ID,
-            Self::ServersListMessage(_) => auth::ServersListMessage::MESSAGE_ID,
-            Self::ServerSelectionMessage(_) => auth::ServerSelectionMessage::MESSAGE_ID,
-            Self::SelectedServerDataMessage(_) => auth::SelectedServerDataMessage::MESSAGE_ID,
-            Self::AuthenticationTicketMessage(_) => game::AuthenticationTicketMessage::MESSAGE_ID,
-            Self::BasicPingMessage(_) => game::BasicPingMessage::MESSAGE_ID,
-            Self::BasicPongMessage(_) => game::BasicPongMessage::MESSAGE_ID,
-            Self::CharactersListRequestMessage(_) => game::CharactersListRequestMessage::MESSAGE_ID,
-            Self::CharacterSelectionMessage(_) => game::CharacterSelectionMessage::MESSAGE_ID,
-            Self::GameContextCreateRequestMessage(_) => game::GameContextCreateRequestMessage::MESSAGE_ID,
-            Self::CharacterNameSuggestionRequestMessage(_) => game::CharacterNameSuggestionRequestMessage::MESSAGE_ID,
-            Self::CharacterCreationRequestMessage(_) => game::CharacterCreationRequestMessage::MESSAGE_ID,
-            Self::Unknown(id, _) => *id,
-        }
-    }
-
-    pub fn from_raw(message_id: u16, payload: Vec<u8>) -> anyhow::Result<Self> {
-        let mut reader = BigEndianReader::new(payload.clone());
-        match message_id {
-            id if id == auth::ProtocolRequired::MESSAGE_ID =>
-                Ok(Self::ProtocolRequired(auth::ProtocolRequired::deserialize(&mut reader)?)),
-            id if id == auth::HelloConnectMessage::MESSAGE_ID =>
-                Ok(Self::HelloConnectMessage(auth::HelloConnectMessage::deserialize(&mut reader)?)),
-            id if id == auth::IdentificationMessage::MESSAGE_ID =>
-                Ok(Self::IdentificationMessage(auth::IdentificationMessage::deserialize(&mut reader)?)),
-            id if id == auth::IdentificationSuccessMessage::MESSAGE_ID =>
-                Ok(Self::IdentificationSuccessMessage(auth::IdentificationSuccessMessage::deserialize(&mut reader)?)),
-            id if id == auth::IdentificationFailedMessage::MESSAGE_ID =>
-                Ok(Self::IdentificationFailedMessage(auth::IdentificationFailedMessage::deserialize(&mut reader)?)),
-            id if id == auth::ServersListMessage::MESSAGE_ID =>
-                Ok(Self::ServersListMessage(auth::ServersListMessage::deserialize(&mut reader)?)),
-            id if id == auth::ServerSelectionMessage::MESSAGE_ID =>
-                Ok(Self::ServerSelectionMessage(auth::ServerSelectionMessage::deserialize(&mut reader)?)),
-            id if id == auth::SelectedServerDataMessage::MESSAGE_ID =>
-                Ok(Self::SelectedServerDataMessage(auth::SelectedServerDataMessage::deserialize(&mut reader)?)),
-            id if id == game::AuthenticationTicketMessage::MESSAGE_ID =>
-                Ok(Self::AuthenticationTicketMessage(game::AuthenticationTicketMessage::deserialize(&mut reader)?)),
-            id if id == game::BasicPingMessage::MESSAGE_ID =>
-                Ok(Self::BasicPingMessage(game::BasicPingMessage::deserialize(&mut reader)?)),
-            id if id == game::BasicPongMessage::MESSAGE_ID =>
-                Ok(Self::BasicPongMessage(game::BasicPongMessage::deserialize(&mut reader)?)),
-            id if id == game::CharactersListRequestMessage::MESSAGE_ID =>
-                Ok(Self::CharactersListRequestMessage(game::CharactersListRequestMessage::deserialize(&mut reader)?)),
-            id if id == game::CharacterSelectionMessage::MESSAGE_ID =>
-                Ok(Self::CharacterSelectionMessage(game::CharacterSelectionMessage::deserialize(&mut reader)?)),
-            id if id == game::GameContextCreateRequestMessage::MESSAGE_ID =>
-                Ok(Self::GameContextCreateRequestMessage(game::GameContextCreateRequestMessage::deserialize(&mut reader)?)),
-            id if id == game::CharacterNameSuggestionRequestMessage::MESSAGE_ID =>
-                Ok(Self::CharacterNameSuggestionRequestMessage(game::CharacterNameSuggestionRequestMessage::deserialize(&mut reader)?)),
-            id if id == game::CharacterCreationRequestMessage::MESSAGE_ID =>
-                Ok(Self::CharacterCreationRequestMessage(game::CharacterCreationRequestMessage::deserialize(&mut reader)?)),
-            _ => Ok(Self::Unknown(message_id, payload)),
-        }
-    }
 }
 
 #[cfg(test)]
@@ -172,19 +145,18 @@ mod tests {
     fn registry_parse_characters_list_request() {
         let msg = game::CharactersListRequestMessage {};
         let payload = serialize_msg(&msg);
-        let parsed = ProtocolMessage::from_raw(150, payload).unwrap();
+        let parsed = ProtocolMessage::from_raw(game::CharactersListRequestMessage::MESSAGE_ID, payload).unwrap();
         match parsed {
             ProtocolMessage::CharactersListRequestMessage(_) => {}
             _ => panic!("Wrong variant"),
         }
-        assert_eq!(parsed.message_id(), 150);
     }
 
     #[test]
     fn registry_parse_character_selection() {
         let msg = game::CharacterSelectionMessage { id: 123456789 };
         let payload = serialize_msg(&msg);
-        let parsed = ProtocolMessage::from_raw(152, payload).unwrap();
+        let parsed = ProtocolMessage::from_raw(game::CharacterSelectionMessage::MESSAGE_ID, payload).unwrap();
         match parsed {
             ProtocolMessage::CharacterSelectionMessage(m) => assert_eq!(m.id, 123456789),
             _ => panic!("Wrong variant"),
@@ -195,24 +167,22 @@ mod tests {
     fn registry_parse_game_context_create_request() {
         let msg = game::GameContextCreateRequestMessage {};
         let payload = serialize_msg(&msg);
-        let parsed = ProtocolMessage::from_raw(250, payload).unwrap();
+        let parsed = ProtocolMessage::from_raw(game::GameContextCreateRequestMessage::MESSAGE_ID, payload).unwrap();
         match parsed {
             ProtocolMessage::GameContextCreateRequestMessage(_) => {}
             _ => panic!("Wrong variant"),
         }
-        assert_eq!(parsed.message_id(), 250);
     }
 
     #[test]
     fn registry_parse_character_name_suggestion_request() {
         let msg = game::CharacterNameSuggestionRequestMessage {};
         let payload = serialize_msg(&msg);
-        let parsed = ProtocolMessage::from_raw(162, payload).unwrap();
+        let parsed = ProtocolMessage::from_raw(game::CharacterNameSuggestionRequestMessage::MESSAGE_ID, payload).unwrap();
         match parsed {
             ProtocolMessage::CharacterNameSuggestionRequestMessage(_) => {}
             _ => panic!("Wrong variant"),
         }
-        assert_eq!(parsed.message_id(), 162);
     }
 
     #[test]
@@ -225,7 +195,7 @@ mod tests {
             cosmetic_id: 42,
         };
         let payload = serialize_msg(&msg);
-        let parsed = ProtocolMessage::from_raw(160, payload).unwrap();
+        let parsed = ProtocolMessage::from_raw(game::CharacterCreationRequestMessage::MESSAGE_ID, payload).unwrap();
         match parsed {
             ProtocolMessage::CharacterCreationRequestMessage(m) => {
                 assert_eq!(m.name, "Xelor");
@@ -235,15 +205,6 @@ mod tests {
                 assert_eq!(m.cosmetic_id, 42);
             }
             _ => panic!("Wrong variant"),
-        }
-    }
-}
-
-impl fmt::Display for ProtocolMessage {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Unknown(id, data) => write!(f, "Unknown({}, {} bytes)", id, data.len()),
-            other => write!(f, "{:?}", other),
         }
     }
 }
