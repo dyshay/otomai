@@ -79,6 +79,21 @@ protocol_registry! {
     ChangeMapMessage(game::ChangeMapMessage),
     GameMapChangeOrientationRequestMessage(game::GameMapChangeOrientationRequestMessage),
     GameMapChangeOrientationMessage(game::GameMapChangeOrientationMessage),
+    // Phase 3 — Chat + Social
+    ChatClientMultiMessage(game::ChatClientMultiMessage),
+    ChatServerMessage(game::ChatServerMessage),
+    ChatClientPrivateMessage(game::ChatClientPrivateMessage),
+    ChatServerCopyMessage(game::ChatServerCopyMessage),
+    EmotePlayRequestMessage(game::EmotePlayRequestMessage),
+    EmotePlayMessage(game::EmotePlayMessage),
+    EmoteListMessage(game::EmoteListMessage),
+    FriendsGetListMessage(game::FriendsGetListMessage),
+    FriendAddRequestMessage(game::FriendAddRequestMessage),
+    FriendDeleteRequestMessage(game::FriendDeleteRequestMessage),
+    FriendDeleteResultMessage(game::FriendDeleteResultMessage),
+    IgnoredGetListMessage(game::IgnoredGetListMessage),
+    IgnoredAddRequestMessage(game::IgnoredAddRequestMessage),
+    IgnoredDeleteRequestMessage(game::IgnoredDeleteRequestMessage),
 }
 
 #[cfg(test)]

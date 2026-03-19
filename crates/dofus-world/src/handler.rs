@@ -1,4 +1,4 @@
-use crate::{character_selection, game_context, movement, ticket, WorldState};
+use crate::{character_selection, chat, emotes, game_context, movement, social, ticket, WorldState};
 use dofus_database::repository;
 use dofus_io::DofusMessage as _;
 use dofus_protocol::messages::auth::ProtocolRequired;
@@ -11,23 +11,18 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
     let peer = session.peer_addr()?;
     tracing::info!(%peer, "World client connected");
 
-    // Step 1: Send ProtocolRequired
+    // Step 1-2: Handshake
     session
         .send(&ProtocolRequired {
             version: state.config.protocol_version.clone(),
         })
         .await?;
-
-    // Step 2: Send HelloGameMessage
     session.send(&HelloGameMessage {}).await?;
 
-    // Step 3: Wait for AuthenticationTicketMessage
+    // Step 3: Ticket
     let raw = match session.recv().await? {
         Some(raw) => raw,
-        None => {
-            tracing::warn!(%peer, "Client disconnected before ticket");
-            return Ok(());
-        }
+        None => return Ok(()),
     };
 
     if raw.message_id != AuthenticationTicketMessage::MESSAGE_ID {
@@ -37,15 +32,10 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
 
     let ticket_msg = match ProtocolMessage::from_raw(raw.message_id, raw.payload) {
         Ok(ProtocolMessage::AuthenticationTicketMessage(m)) => m,
-        _ => {
-            tracing::warn!(%peer, "Failed to parse AuthenticationTicketMessage");
-            return Ok(());
-        }
+        _ => return Ok(()),
     };
 
-    tracing::debug!(%peer, lang = %ticket_msg.lang, "Received ticket");
-
-    // Step 4-5: Validate ticket, send acceptance + capabilities + time
+    // Step 4-5: Validate ticket
     let account_id = match ticket::handle_ticket(&mut session, &state, &ticket_msg).await? {
         Some(id) => id,
         None => return Ok(()),
@@ -53,10 +43,10 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
 
     // Player session state
     let mut current_character_id: Option<i64> = None;
+    let mut current_character_name: Option<String> = None;
     let mut current_map_id: Option<i64> = None;
     let mut current_movement: Option<movement::MovementState> = None;
 
-    // Broadcast channel
     let (broadcast_tx, mut broadcast_rx) = crate::world::new_broadcast_channel();
 
     // Step 6: Main game loop
@@ -81,6 +71,10 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                         if character_selection::handle_character_selection(
                             &mut session, &state, account_id, sel.id,
                         ).await? {
+                            // Store character info for chat/emotes
+                            if let Some(c) = repository::get_character(&state.pool, sel.id).await? {
+                                current_character_name = Some(c.name.clone());
+                            }
                             current_character_id = Some(sel.id);
                         }
                     }
@@ -100,11 +94,13 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                                 ).await?;
                                 let map_id = if character.map_id == 0 { 154010883 } else { character.map_id };
                                 current_map_id = Some(map_id);
+                                // Send emote list on entering world
+                                emotes::send_emote_list(&mut session).await?;
                             }
                         }
                     }
 
-                    // Phase 2 — Movement
+                    // Movement
                     Ok(ProtocolMessage::GameMapMovementRequestMessage(msg)) => {
                         if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
                             current_movement = movement::handle_movement_request(
@@ -141,8 +137,7 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                         }
                     }
                     Ok(ProtocolMessage::GameMapChangeOrientationRequestMessage(msg)) => {
-                        if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
-                            // Broadcast orientation change to all on map
+                        if let (Some(char_id), Some(_map_id)) = (current_character_id, current_map_id) {
                             let orient_msg = GameMapChangeOrientationMessage {
                                 orientation: dofus_protocol::generated::types::ActorOrientation {
                                     id: char_id as f64,
@@ -151,6 +146,55 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
                             };
                             session.send(&orient_msg).await?;
                         }
+                    }
+
+                    // Chat
+                    Ok(ProtocolMessage::ChatClientMultiMessage(msg)) => {
+                        if let (Some(char_id), Some(map_id), Some(ref name)) =
+                            (current_character_id, current_map_id, &current_character_name)
+                        {
+                            chat::handle_chat_multi(
+                                &mut session, &state, char_id, name, account_id, map_id, &msg,
+                            ).await?;
+                        }
+                    }
+                    Ok(ProtocolMessage::ChatClientPrivateMessage(msg)) => {
+                        if let (Some(char_id), Some(ref name)) =
+                            (current_character_id, &current_character_name)
+                        {
+                            chat::handle_chat_private(
+                                &mut session, &state, char_id, name, account_id, &msg,
+                            ).await?;
+                        }
+                    }
+
+                    // Emotes
+                    Ok(ProtocolMessage::EmotePlayRequestMessage(msg)) => {
+                        if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
+                            emotes::handle_emote_play(
+                                &state, char_id, account_id, map_id, &msg,
+                            ).await?;
+                        }
+                    }
+
+                    // Social
+                    Ok(ProtocolMessage::FriendsGetListMessage(_)) => {
+                        social::handle_friends_get_list(&mut session, &state, account_id).await?;
+                    }
+                    Ok(ProtocolMessage::FriendAddRequestMessage(msg)) => {
+                        social::handle_friend_add(&mut session, &state, account_id, &msg.name).await?;
+                    }
+                    Ok(ProtocolMessage::FriendDeleteRequestMessage(msg)) => {
+                        social::handle_friend_delete(&mut session, &state, account_id, msg.account_id).await?;
+                    }
+                    Ok(ProtocolMessage::IgnoredGetListMessage(_)) => {
+                        social::handle_ignored_get_list(&mut session, &state, account_id).await?;
+                    }
+                    Ok(ProtocolMessage::IgnoredAddRequestMessage(msg)) => {
+                        social::handle_ignored_add(&mut session, &state, account_id, &msg.name).await?;
+                    }
+                    Ok(ProtocolMessage::IgnoredDeleteRequestMessage(msg)) => {
+                        social::handle_ignored_delete(&mut session, &state, account_id, msg.account_id).await?;
                     }
 
                     Ok(msg) => {
@@ -168,9 +212,8 @@ pub async fn handle_client(mut session: Session, state: Arc<WorldState>) -> anyh
         }
     }
 
-    // Cleanup: remove player from map, save position on disconnect
+    // Cleanup
     if let (Some(char_id), Some(map_id)) = (current_character_id, current_map_id) {
-        // Save position before leaving
         let players = state.world.get_players_on_map(map_id).await;
         if let Some(player) = players.iter().find(|p| p.character_id == char_id) {
             let _ = repository::update_character_position(

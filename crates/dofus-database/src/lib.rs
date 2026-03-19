@@ -114,6 +114,32 @@ pub async fn run_migrations(pool: &PgPool) -> anyhow::Result<()> {
     .execute(pool)
     .await?;
 
+    // --- Social tables ---
+
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS friends (
+            account_id BIGINT NOT NULL REFERENCES accounts(id),
+            friend_account_id BIGINT NOT NULL REFERENCES accounts(id),
+            PRIMARY KEY (account_id, friend_account_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS ignored (
+            account_id BIGINT NOT NULL REFERENCES accounts(id),
+            ignored_account_id BIGINT NOT NULL REFERENCES accounts(id),
+            PRIMARY KEY (account_id, ignored_account_id)
+        )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
     // --- Game data tables ---
 
     // D2O objects (Items, Spells, Monsters, etc.)

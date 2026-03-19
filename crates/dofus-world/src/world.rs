@@ -93,6 +93,51 @@ impl World {
             .unwrap_or_default()
     }
 
+    /// Broadcast a raw message to ALL players in the world (global channels).
+    pub async fn broadcast_global(&self, raw: RawMessage) {
+        let maps = self.maps.read().await;
+        for world_map in maps.values() {
+            for player in world_map.players.values() {
+                let _ = player.tx.send(raw.clone());
+            }
+        }
+    }
+
+    /// Broadcast a raw message to all players on a specific map.
+    pub async fn broadcast_to_map(&self, map_id: i64, raw: RawMessage) {
+        let maps = self.maps.read().await;
+        if let Some(world_map) = maps.get(&map_id) {
+            for player in world_map.players.values() {
+                let _ = player.tx.send(raw.clone());
+            }
+        }
+    }
+
+    /// Find a player by character name across all maps.
+    /// Returns (character_id, account_id, map_id, tx).
+    pub async fn find_player_by_name(&self, name: &str) -> Option<MapPlayer> {
+        let maps = self.maps.read().await;
+        for world_map in maps.values() {
+            for player in world_map.players.values() {
+                if player.name.eq_ignore_ascii_case(name) {
+                    return Some(player.clone());
+                }
+            }
+        }
+        None
+    }
+
+    /// Find a player by character_id across all maps.
+    pub async fn find_player_by_id(&self, character_id: i64) -> Option<MapPlayer> {
+        let maps = self.maps.read().await;
+        for world_map in maps.values() {
+            if let Some(player) = world_map.players.get(&character_id) {
+                return Some(player.clone());
+            }
+        }
+        None
+    }
+
     /// Update a player's cell position on their current map.
     pub async fn update_player_cell(&self, map_id: i64, character_id: i64, cell_id: i16) {
         let mut maps = self.maps.write().await;

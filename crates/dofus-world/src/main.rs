@@ -1,9 +1,12 @@
 mod character_selection;
+mod chat;
+mod emotes;
 mod game_context;
 mod handler;
 mod inventory;
 pub mod map_cache;
 mod movement;
+mod social;
 mod spells;
 mod stats;
 mod ticket;

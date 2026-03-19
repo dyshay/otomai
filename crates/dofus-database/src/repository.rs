@@ -453,6 +453,85 @@ pub async fn insert_breed_spells(
     Ok(())
 }
 
+// --- Friends & Ignored ---
+
+pub async fn find_account_by_character_name(
+    pool: &PgPool,
+    name: &str,
+) -> anyhow::Result<Option<i64>> {
+    let row: Option<(i64,)> = sqlx::query_as(
+        "SELECT account_id FROM characters WHERE name = $1 LIMIT 1",
+    )
+    .bind(name)
+    .fetch_optional(pool)
+    .await?;
+    Ok(row.map(|r| r.0))
+}
+
+pub async fn add_friend(
+    pool: &PgPool,
+    account_id: i64,
+    friend_account_id: i64,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO friends (account_id, friend_account_id) VALUES ($1, $2)
+         ON CONFLICT DO NOTHING",
+    )
+    .bind(account_id)
+    .bind(friend_account_id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn remove_friend(
+    pool: &PgPool,
+    account_id: i64,
+    friend_account_id: i64,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "DELETE FROM friends WHERE account_id = $1 AND friend_account_id = $2",
+    )
+    .bind(account_id)
+    .bind(friend_account_id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn add_ignored(
+    pool: &PgPool,
+    account_id: i64,
+    ignored_account_id: i64,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "INSERT INTO ignored (account_id, ignored_account_id) VALUES ($1, $2)
+         ON CONFLICT DO NOTHING",
+    )
+    .bind(account_id)
+    .bind(ignored_account_id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn remove_ignored(
+    pool: &PgPool,
+    account_id: i64,
+    ignored_account_id: i64,
+) -> anyhow::Result<()> {
+    sqlx::query(
+        "DELETE FROM ignored WHERE account_id = $1 AND ignored_account_id = $2",
+    )
+    .bind(account_id)
+    .bind(ignored_account_id)
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+// --- Character Position ---
+
 pub async fn update_character_position(
     pool: &PgPool,
     character_id: i64,
