@@ -236,7 +236,7 @@ pub async fn handle_character_selection(
         })
         .await?;
 
-    // Messages required after selection (from GinyCore reference)
+    // Messages required after selection
     session
         .send(&NotificationListMessage {
             flags: vec![0x7FFFFFFF],

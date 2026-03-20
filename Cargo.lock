@@ -468,6 +468,7 @@ dependencies = [
  "dofus-common",
  "dofus-database",
  "dofus-io",
+ "dofus-ipc",
  "dofus-network",
  "dofus-protocol",
  "pkcs1",
@@ -518,6 +519,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "dofus-ipc"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "dofus-network"
 version = "0.1.0"
 dependencies = [
@@ -550,6 +562,7 @@ dependencies = [
  "dofus-common",
  "dofus-database",
  "dofus-io",
+ "dofus-ipc",
  "dofus-network",
  "dofus-protocol",
  "rand",

@@ -8,6 +8,7 @@ members = [
     "crates/dofus-network",
     "crates/dofus-auth",
     "crates/dofus-world",
+    "crates/dofus-ipc",
     "tools/generator-rsa",
     "tools/protocol-gen",
     "tools/data-reader",
@@ -44,3 +45,4 @@ dofus-protocol = { path = "crates/dofus-protocol" }
 dofus-common = { path = "crates/dofus-common" }
 dofus-database = { path = "crates/dofus-database" }
 dofus-network = { path = "crates/dofus-network" }
+dofus-ipc = { path = "crates/dofus-ipc" }

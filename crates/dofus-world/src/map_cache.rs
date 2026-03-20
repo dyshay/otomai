@@ -174,12 +174,11 @@ mod d2p {
             // Skip properties
             let _ = properties_offset;
 
-            // Read index
+            // Read index (index_count = number of entries)
             cursor.seek(SeekFrom::Start(index_offset as u64))?;
             let mut entries = HashMap::new();
-            let mut bytes_read = 0u32;
 
-            while bytes_read < index_count {
+            for _ in 0..index_count {
                 let name_len = cursor.read_u16::<BigEndian>()? as usize;
                 let mut name_buf = vec![0u8; name_len];
                 cursor.read_exact(&mut name_buf)?;
@@ -187,7 +186,6 @@ mod d2p {
                 let offset = cursor.read_u32::<BigEndian>()? + data_offset;
                 let length = cursor.read_u32::<BigEndian>()?;
 
-                bytes_read += 2 + name_len as u32 + 8;
                 entries.insert(name, D2PEntry { offset, length });
             }
 

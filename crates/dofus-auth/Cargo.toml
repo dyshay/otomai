@@ -9,6 +9,7 @@ dofus-protocol = { workspace = true }
 dofus-common = { workspace = true }
 dofus-database = { workspace = true }
 dofus-network = { workspace = true }
+dofus-ipc = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

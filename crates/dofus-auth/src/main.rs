@@ -260,6 +260,33 @@ async fn main() -> anyhow::Result<()> {
         "Auth server ready"
     );
 
+    // Start IPC server for world server communication
+    let ipc_addr = format!("0.0.0.0:{}", config.ipc_port);
+    let (_ipc_rx, _ipc_handle) = dofus_ipc::server::start(&ipc_addr).await?;
+    tracing::info!("IPC server ready on port {}", config.ipc_port);
+
+    // Spawn IPC message handler
+    tokio::spawn(async move {
+        let mut ipc_rx = _ipc_rx;
+        while let Some((envelope, reply_tx)) = ipc_rx.recv().await {
+            match envelope.msg_type.as_str() {
+                "handshake" => {
+                    if let Ok(hs) = serde_json::from_value::<dofus_ipc::messages::Handshake>(envelope.payload) {
+                        tracing::info!("World server registered: {} (id={})", hs.server_name, hs.server_id);
+                    }
+                }
+                "server_status" => {
+                    if let Ok(status) = serde_json::from_value::<dofus_ipc::messages::ServerStatusUpdate>(envelope.payload) {
+                        tracing::info!("World {} status: {} players, status={}", status.server_id, status.player_count, status.status);
+                    }
+                }
+                _ => {
+                    tracing::debug!("Unknown IPC message: {}", envelope.msg_type);
+                }
+            }
+        }
+    });
+
     let addr = format!("{}:{}", config.host, config.port);
     server::run_server(&addr, move |session| {
         let state = Arc::clone(&state);

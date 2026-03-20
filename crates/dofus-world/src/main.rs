@@ -72,6 +72,25 @@ async fn main() -> anyhow::Result<()> {
         maps,
     });
 
+    // Connect to Auth IPC server
+    match dofus_ipc::client::IpcClient::connect(&config.ipc_addr).await {
+        Ok(ipc) => {
+            ipc.send("handshake", &dofus_ipc::messages::Handshake {
+                server_id: config.server_id as i16,
+                server_name: config.server_name.clone(),
+            });
+            ipc.send("server_status", &dofus_ipc::messages::ServerStatusUpdate {
+                server_id: config.server_id as i16,
+                player_count: 0,
+                status: 3, // online
+            });
+            tracing::info!("IPC connected to auth at {}", config.ipc_addr);
+        }
+        Err(e) => {
+            tracing::warn!("IPC connection to auth failed: {} (continuing without IPC)", e);
+        }
+    }
+
     let addr = format!("{}:{}", config.host, config.port);
     server::run_server(&addr, move |session| {
         let state = Arc::clone(&state);
