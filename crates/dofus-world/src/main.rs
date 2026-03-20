@@ -3,7 +3,7 @@ mod chat;
 mod emotes;
 mod fight;
 mod game_context;
-mod handler;
+mod handlers;
 mod inventory;
 pub mod map_cache;
 mod movement;
@@ -74,7 +74,7 @@ async fn main() -> anyhow::Result<()> {
     let addr = format!("{}:{}", config.host, config.port);
     server::run_server(&addr, move |session| {
         let state = Arc::clone(&state);
-        async move { handler::handle_client(session, state).await }
+        async move { handlers::handle_client(session, state).await }
     })
     .await
 }
