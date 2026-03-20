@@ -286,7 +286,7 @@ pub async fn handle_change_map(
     session
         .send(&CurrentMapMessage {
             map_id: target_map_id as f64,
-            map_key: "649ae451ca33ec53bbcbcc33becf15f4".to_string(),
+            map_key: crate::constants::MAP_ENCRYPTION_KEY.to_string(),
         })
         .await?;
 

@@ -1,5 +1,6 @@
 mod character_selection;
 mod chat;
+mod constants;
 mod emotes;
 mod fight;
 mod game_context;

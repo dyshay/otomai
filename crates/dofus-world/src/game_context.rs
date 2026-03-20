@@ -11,34 +11,7 @@ use dofus_protocol::messages::game::*;
 use std::sync::Arc;
 use tokio::sync::mpsc;
 
-/// MapComplementaryInformationsDataMessage ID (polymorphic, not in generated structs).
-const MAP_COMPLEMENTARY_MSG_ID: u16 = 5176;
-
-/// Default spawn map: Incarnam statue.
-const DEFAULT_MAP_ID: i64 = 154010883;
-const DEFAULT_SUB_AREA_ID: i16 = 449;
-
-/// Breed skin IDs — maps (breed_id, sex) to the base skin.
-const BREED_SKINS: [(i16, i16); 18] = [
-    (10, 20),   // 1  Feca
-    (30, 40),   // 2  Osamodas
-    (50, 60),   // 3  Enutrof
-    (70, 80),   // 4  Sram
-    (90, 100),  // 5  Xelor
-    (110, 120), // 6  Ecaflip
-    (130, 140), // 7  Eniripsa
-    (150, 160), // 8  Iop
-    (170, 180), // 9  Cra
-    (190, 200), // 10 Sadida
-    (210, 220), // 11 Sacrieur
-    (230, 240), // 12 Pandawa
-    (250, 260), // 13 Roublard
-    (270, 280), // 14 Zobal
-    (290, 300), // 15 Steamer
-    (310, 320), // 16 Eliotrope
-    (330, 340), // 17 Huppermage
-    (350, 360), // 18 Ouginak
-];
+use crate::constants::{BREED_SKINS, DEFAULT_MAP_ID, DEFAULT_SUB_AREA_ID, MAP_COMPLEMENTARY_MSG_ID, MAP_ENCRYPTION_KEY};
 
 /// Build an EntityLook from a DB Character.
 pub fn build_entity_look(c: &Character) -> EntityLook {
@@ -157,7 +130,7 @@ pub async fn handle_game_context_create(
     session
         .send(&CurrentMapMessage {
             map_id: map_id_f64,
-            map_key: "649ae451ca33ec53bbcbcc33becf15f4".to_string(),
+            map_key: MAP_ENCRYPTION_KEY.to_string(),
         })
         .await?;
 
