@@ -19,6 +19,16 @@ pub async fn dispatch(
             character_selection::handle_characters_list_request(session, state, ps.account_id).await?;
         }
         ProtocolMessage::CharacterSelectionMessage(sel) => {
+            tracing::info!(character_id = sel.id, "CharacterSelectionMessage received");
+            if character_selection::handle_character_selection(session, state, ps.account_id, sel.id).await? {
+                if let Some(c) = repository::get_character(&state.pool, sel.id).await? {
+                    ps.character_name = Some(c.name.clone());
+                }
+                ps.character_id = Some(sel.id);
+            }
+        }
+        ProtocolMessage::CharacterFirstSelectionMessage(sel) => {
+            tracing::info!(character_id = sel.id, "CharacterFirstSelectionMessage received");
             if character_selection::handle_character_selection(session, state, ps.account_id, sel.id).await? {
                 if let Some(c) = repository::get_character(&state.pool, sel.id).await? {
                     ps.character_name = Some(c.name.clone());

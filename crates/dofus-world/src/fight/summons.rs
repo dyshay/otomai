@@ -112,7 +112,7 @@ pub async fn summon_creature(
     fighter.look.serialize(&mut w);
     w.write_byte(0); // wave
     w.write_ushort(8253); // GameFightMinimalStats
-    super::write_minimal_stats(&mut w, fighter);
+    super::serialization::write_minimal_stats(&mut w, fighter);
     w.write_short(0); // previousPositions
     w.write_var_short(fighter.monster_id as i16);
     w.write_byte(fighter.monster_grade);

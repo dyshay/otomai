@@ -1,145 +1,14 @@
 use crate::WorldState;
-use dofus_database::models::NpcSpawn;
 use dofus_database::repository;
-use dofus_io::{BigEndianWriter, DofusSerialize, DofusType};
-use dofus_network::codec::RawMessage;
 use dofus_network::session::Session;
-use dofus_protocol::generated::types::{
-    EntityDispositionInformations, EntityDispositionInformationsVariant, EntityLook,
-    GameRolePlayNpcQuestFlag, GameRolePlayNpcWithQuestInformations,
-};
 use dofus_protocol::messages::game::*;
 use std::sync::Arc;
+use super::actors::npc_contextual_id;
 
-/// Negative contextual IDs for NPCs (convention: negative to distinguish from players).
-/// Each NPC spawn gets a unique negative ID based on its spawn row ID.
-fn npc_contextual_id(spawn_id: i32) -> f64 {
-    -(spawn_id as f64) - 1000.0
-}
-
-/// Parse an EntityLook from the string format stored in Npcs.d2o / npc_spawns.
-/// Format: "{bonesId|skin1,skin2|color1,color2|scale1}"
-/// For simplicity, if empty or unparseable, return a default NPC look.
-fn parse_npc_look(look_str: &str) -> EntityLook {
-    if look_str.is_empty() {
-        return EntityLook {
-            bones_id: 1,
-            skins: vec![],
-            indexed_colors: vec![],
-            scales: vec![100],
-            subentities: vec![],
-        };
-    }
-
-    // Strip outer braces
-    let inner = look_str.trim_matches(|c| c == '{' || c == '}');
-    let parts: Vec<&str> = inner.split('|').collect();
-
-    let bones_id = parts.first().and_then(|s| s.parse::<i16>().ok()).unwrap_or(1);
-
-    let skins = parts
-        .get(1)
-        .map(|s| {
-            s.split(',')
-                .filter_map(|v| v.parse::<i16>().ok())
-                .collect()
-        })
-        .unwrap_or_default();
-
-    let indexed_colors = parts
-        .get(2)
-        .map(|s| {
-            s.split(',')
-                .filter_map(|v| v.parse::<i32>().ok())
-                .collect()
-        })
-        .unwrap_or_default();
-
-    let scales = parts
-        .get(3)
-        .map(|s| {
-            s.split(',')
-                .filter_map(|v| v.parse::<i16>().ok())
-                .collect()
-        })
-        .unwrap_or_else(|| vec![100]);
-
-    EntityLook {
-        bones_id,
-        skins,
-        indexed_colors,
-        scales,
-        subentities: vec![],
-    }
-}
-
-/// Build NPC actor data for MapComplementary, including quest flags for a specific player.
-pub fn build_npc_actor(
-    spawn: &NpcSpawn,
-    npc_look: &EntityLook,
-    quests_to_start: Vec<i16>,
-    quests_to_valid: Vec<i16>,
-) -> GameRolePlayNpcWithQuestInformations {
-    GameRolePlayNpcWithQuestInformations {
-        contextual_id: npc_contextual_id(spawn.id),
-        disposition: Box::new(EntityDispositionInformationsVariant::EntityDispositionInformations(
-            EntityDispositionInformations {
-                cell_id: spawn.cell_id as i16,
-                direction: spawn.direction as u8,
-            },
-        )),
-        look: npc_look.clone(),
-        npc_id: spawn.npc_id as i16,
-        sex: false,
-        special_artwork_id: 0,
-        quest_flag: GameRolePlayNpcQuestFlag {
-            quests_to_valid_id: quests_to_valid,
-            quests_to_start_id: quests_to_start,
-        },
-    }
-}
-
-/// Write NPC actors into the MapComplementary actor list.
-/// Must be called during actor serialization (after player actors).
-pub fn write_npc_actors(
-    w: &mut BigEndianWriter,
-    npcs: &[GameRolePlayNpcWithQuestInformations],
-) {
-    for npc in npcs {
-        w.write_ushort(GameRolePlayNpcWithQuestInformations::TYPE_ID);
-        npc.serialize(w);
-    }
-}
-
-/// Get NPC look from D2O data (Npcs.d2o stored in game_data table).
-/// Falls back to spawn's look field or default.
-pub async fn get_npc_look(
-    state: &Arc<WorldState>,
-    npc_id: i32,
-    spawn_look: &str,
-) -> EntityLook {
-    // Try spawn's own look first
-    if !spawn_look.is_empty() {
-        return parse_npc_look(spawn_look);
-    }
-
-    // Try D2O data
-    if let Ok(Some(game_data)) =
-        repository::get_game_data(&state.pool, "Npcs", npc_id).await
-    {
-        if let Some(look_str) = game_data.data.get("look").and_then(|v| v.as_str()) {
-            return parse_npc_look(look_str);
-        }
-    }
-
-    // Default
-    EntityLook {
-        bones_id: 1,
-        skins: vec![],
-        indexed_colors: vec![],
-        scales: vec![100],
-        subentities: vec![],
-    }
+/// State for an active NPC dialogue.
+pub struct NpcDialogState {
+    pub npc_id: i32,
+    pub current_message_index: usize,
 }
 
 /// Handle NpcGenericActionRequestMessage — player interacts with NPC.
@@ -193,12 +62,6 @@ pub async fn handle_npc_action(
     }
 
     Ok(None)
-}
-
-/// State for an active NPC dialogue.
-pub struct NpcDialogState {
-    pub npc_id: i32,
-    pub current_message_index: usize,
 }
 
 /// Handle NpcDialogReplyMessage — player chose a dialogue option.
@@ -299,31 +162,4 @@ async fn get_npc_dialog(
         }
     }
     (0, vec![])
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parse_npc_look_basic() {
-        let look = parse_npc_look("{1|100,200|16777215|120}");
-        assert_eq!(look.bones_id, 1);
-        assert_eq!(look.skins, vec![100, 200]);
-        assert_eq!(look.scales, vec![120]);
-    }
-
-    #[test]
-    fn parse_npc_look_empty() {
-        let look = parse_npc_look("");
-        assert_eq!(look.bones_id, 1);
-        assert!(look.skins.is_empty());
-    }
-
-    #[test]
-    fn npc_contextual_id_is_negative() {
-        assert!(npc_contextual_id(1) < 0.0);
-        assert!(npc_contextual_id(100) < 0.0);
-        assert_ne!(npc_contextual_id(1), npc_contextual_id(2));
-    }
 }
