@@ -105,8 +105,28 @@ pub async fn handle_characters_list_request(
 
     tracing::debug!(account_id, count = base_infos.len(), "Sending characters list");
 
-    let payload = build_characters_list_payload(&base_infos, false);
+    // Build CharactersListMessage manually with minimal EntityLook for testing
+    let mut writer = BigEndianWriter::new();
+    writer.write_short(base_infos.len() as i16);
+    for char_info in &base_infos {
+        writer.write_ushort(CharacterBaseInformations::TYPE_ID);
+        // AbstractCharacterInformation: id
+        writer.write_var_long(char_info.id);
+        // CharacterBasicMinimalInformations: name
+        writer.write_utf(&char_info.name);
+        // CharacterMinimalInformations: level
+        writer.write_var_short(char_info.level);
+        // CharacterMinimalPlusLookInformations: entityLook + breed
+        char_info.entity_look.serialize(&mut writer);
+        writer.write_byte(char_info.breed);
+        // CharacterBaseInformations: sex
+        writer.write_boolean(char_info.sex);
+    }
+    writer.write_boolean(false); // hasStartupActions
+    let payload = writer.into_data();
+
     tracing::debug!(
+        account_id,
         payload_len = payload.len(),
         first_bytes = ?&payload[..payload.len().min(40)],
         "CharactersListMessage payload"
@@ -236,6 +256,23 @@ pub async fn handle_character_selection(
             infos: base_info,
             is_collecting_stats: false,
         })
+        .await?;
+
+    // Messages required after selection (from GinyCore reference)
+    session
+        .send(&NotificationListMessage {
+            flags: vec![0x7FFFFFFF],
+        })
+        .await?;
+
+    session
+        .send(&CharacterCapabilitiesMessage {
+            guild_emblem_symbol_categories: 4095,
+        })
+        .await?;
+
+    session
+        .send(&SequenceNumberRequestMessage {})
         .await?;
 
     Ok(true)

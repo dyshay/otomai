@@ -1,6 +1,10 @@
-use crate::WorldState;
+use crate::{character_selection, WorldState};
 use dofus_database::repository;
+use dofus_io::DofusMessage;
 use dofus_network::session::Session;
+use dofus_protocol::generated::messages::game_approach::*;
+use dofus_protocol::generated::messages::secure::*;
+use dofus_protocol::generated::messages::subscription::*;
 use dofus_protocol::messages::game::*;
 use std::sync::Arc;
 
@@ -29,6 +33,15 @@ pub async fn handle_ticket(
 
     // Send acceptance
     session.send(&AuthenticationTicketAcceptedMessage {}).await?;
+
+    // AccountInformationsUpdateMessage (subscription end date — 3 years from now)
+    let sub_end = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs_f64() + (3.0 * 365.25 * 24.0 * 3600.0);
+    session.send(&AccountInformationsUpdateMessage {
+        subscription_end_date: sub_end,
+    }).await?;
 
     // Send account capabilities (all breeds visible/available)
     session.send(&AccountCapabilitiesMessage {
@@ -59,6 +72,28 @@ pub async fn handle_ticket(
         arena_leave_ban_time: 0,
         item_max_level: 200,
     }).await?;
+
+    // ServerOptionalFeaturesMessage (empty features)
+    session.send(&ServerOptionalFeaturesMessage {
+        features: vec![],
+    }).await?;
+
+    // ServerSessionConstantsMessage (empty — polymorphic, send raw)
+    session.send_raw(dofus_network::codec::RawMessage {
+        message_id: ServerSessionConstantsMessage::MESSAGE_ID,
+        instance_id: 0,
+        payload: vec![0, 0], // count=0
+    }).await?;
+
+    // TrustStatusMessage
+    session.send(&TrustStatusMessage {
+        trusted: true,
+        certified: true,
+    }).await?;
+
+    // Proactively send character list so the client shows selection screen
+    // instead of defaulting to creation (AccountCapabilitiesMessage triggers CharacterCreationStart)
+    character_selection::handle_characters_list_request(session, state, ticket.account_id).await?;
 
     Ok(Some(ticket.account_id))
 }

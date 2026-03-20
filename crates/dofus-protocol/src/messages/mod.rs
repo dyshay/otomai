@@ -12,6 +12,7 @@ pub mod game {
     pub use crate::generated::messages::game_character_stats::*;
     pub use crate::generated::messages::game_chat::*;
     pub use crate::generated::messages::game_context::*;
+    pub use crate::generated::messages::game_context_notification::*;
     pub use crate::generated::messages::game_context_roleplay::*;
     pub use crate::generated::messages::game_context_roleplay_emote::*;
     pub use crate::generated::messages::game_context_roleplay_npc::*;
